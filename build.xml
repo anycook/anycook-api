@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'utf-8'?> <!DOCTYPE project>
 
-<project name="anycook-backend" default="dist" basedir=".">
+<project name="anycook-graph" default="dist" basedir=".">
 	<!-- properties -->
 	<property name="project.src" location="src/de" />
 	<property name="project.build" location="build" />
