@@ -1,0 +1,63 @@
+<?xml version = '1.0' encoding = 'utf-8'?> <!DOCTYPE project>
+
+<project name="anycook-backend" default="dist" basedir=".">
+	<!-- properties -->
+	<property name="project.src" location="src/de" />
+	<property name="project.build" location="build" />
+	<property name="project.lib" location="WebContent/WEB-INF/lib" />
+	<property name="project.dist" location="dist" />
+	<property name="project.webxml" location="WebContent/WEB-INF/web.xml" />
+	<property name="tomcat.lib" location="../Servers/tomcat7/lib" />
+	<property name="anycook" location="../anycook" />
+	<property name="anycook.build" location="${anycook}/build.xml" />
+	<property name="anycook.dist" location="${anycook}/dist" />
+	<property name="build.sysclasspath" value="last" />
+	<!--<ant antfile="${anycook.build}" dir="${anycook}"/>-->
+
+	<!-- distribution -->
+	<target name="dist" depends="compile">
+		<mkdir dir="${project.dist}" />
+		<war destfile="${project.dist}/anycook-graph.war" webxml="${project.webxml}">
+			<classes dir="${project.build}">
+				<include name="**/*" />
+			</classes>
+            <lib dir="${anycook.dist}">
+                    <include name="anycook.jar" />
+            </lib>
+        
+		</war>
+		<delete dir="${project.build}" />
+	</target>
+
+	<!-- compile -->
+	<target name="compile" depends="init">
+		<javac srcdir="${project.src}" destdir="${project.build}" target="1.7" encoding="utf8">
+			<classpath>
+				<pathelement path="${classpath}" />
+				<fileset dir="${anycook.dist}">
+				    <include name="anycook.jar"/>
+				</fileset>
+				<fileset dir="${project.lib}">
+					<include name="**/*" />
+				</fileset>
+				<fileset dir="${tomcat.lib}">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<!-- init -->
+	<target name="init" depends="clean">
+		<tstamp />
+		<mkdir dir="${project.build}" />
+	</target>
+
+	<!-- cleanup -->
+	<target name="clean">
+		<delete dir="${project.build}" />
+		<delete dir="${project.dist}" />
+	</target>
+	
+	<!-- at least copy chatnoir.war to webis15:/usr/share/tomcat6/webapps/ -->
+</project>
