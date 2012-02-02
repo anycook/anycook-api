@@ -36,7 +36,7 @@ public class UserGraph {
 	public Response getUser(@PathParam("userid") int userid,
 			@QueryParam("callback") String callback){
 		User user = User.init(userid);
-		return Response.ok(JsonpBuilder.build(callback, user)).build();
+		return Response.ok(JsonpBuilder.build(callback, user.getProfileInfoJSONWithRecipes())).build();
 	}
 	
 	@GET

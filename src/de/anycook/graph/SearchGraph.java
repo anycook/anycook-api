@@ -1,8 +1,7 @@
 package de.anycook.graph;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -44,19 +43,19 @@ public class SearchGraph {
 	@SuppressWarnings("unchecked")
 	@GET
 	public Response search(@QueryParam("callback") String callback, 
-			@QueryParam("tags") Set<String>	tags,
-			@QueryParam("ingredients") Set<String> ingredients,
-			@QueryParam("terms") Set<String> terms,
+			@QueryParam("tags") StringSet tags,
+			@QueryParam("ingredients") StringSet ingredients,
+			@QueryParam("terms") StringSet terms,
 			@QueryParam("category") String category,
 			@QueryParam("calorie") int calorie,
 			@QueryParam("skill") int skill,
 			@QueryParam("time") String time){
 		Search search = new Search();
-		if(!tags.isEmpty())
+		if(tags!= null && !tags.isEmpty())
 			search.addTags(tags);
-		if(!ingredients.isEmpty())
+		if(ingredients != null && !ingredients.isEmpty())
 			search.addZutaten(ingredients);
-		if(!terms.isEmpty())
+		if(terms != null && !terms.isEmpty())
 			search.addTerms(terms);
 		search.setKategorie(category);
 		search.setCalorie(calorie);
@@ -74,5 +73,20 @@ public class SearchGraph {
 		json.put("recipes", recipes);
 		
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
+	}
+	
+	public static class StringSet extends HashSet<String>{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public StringSet(String in) {
+			super();
+			if(in != null){
+				for(String split : in.split(","))
+					add(split);
+			}
+		}
 	}
 }
