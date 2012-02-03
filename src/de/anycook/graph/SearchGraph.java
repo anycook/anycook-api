@@ -2,11 +2,14 @@ package de.anycook.graph;
 
 import java.util.HashSet;
 import java.util.List;
+
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -49,7 +52,9 @@ public class SearchGraph {
 			@QueryParam("category") String category,
 			@QueryParam("calorie") int calorie,
 			@QueryParam("skill") int skill,
-			@QueryParam("time") String time){
+			@QueryParam("time") String time,
+			@DefaultValue("0") @QueryParam("start") int start,
+			@DefaultValue("10") @QueryParam("num") int num){
 		Search search = new Search();
 		if(tags!= null && !tags.isEmpty())
 			search.addTags(tags);
@@ -62,14 +67,15 @@ public class SearchGraph {
 		search.setSkill(skill);
 		search.setTime(time);
 		
-		List<String> results = search.search();
+		Pair<Integer, List<String>> resultPair = search.search(start, num);
 		JSONObject json = new JSONObject();
 		JSONArray recipes = new JSONArray();
+		List<String> results = resultPair.getRight();
 		for(String result : results){
 			recipes.add(Recipe.getJSONforSearch(result));
 		}
 		
-		json.put("size", results.size());
+		json.put("size", resultPair.getLeft());
 		json.put("recipes", recipes);
 		
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
