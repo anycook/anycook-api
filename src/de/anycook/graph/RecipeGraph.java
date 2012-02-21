@@ -19,6 +19,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -74,40 +75,61 @@ public class RecipeGraph {
 	public Response saveRecipe(@Context HttpHeaders hh,
 			@PathParam("recipename") String recipeName,
 			@Context HttpServletRequest request,
-			@FormParam("recipe") String recipeData){
+			@FormParam("recipe") String recipeData,
+			@FormParam("tags") String tags,
+			@FormParam("userid") @DefaultValue("-1") Integer userid){
 		logger.info("want to save recipe");
+		if(recipeData == null && tags == null){
+			throw new WebApplicationException(400);
+		}
 		
-		if(recipeData == null)
-			throw new WebApplicationException(Response.status(400).entity("\"recipe\" is not defined").build());
 		logger.debug("recipe:"+recipeData);
 		Session session = Session.init(request.getSession());
 		Map<String, Cookie> cookies = hh.getCookies();
 		JSONParser parser = new JSONParser();
-		JSONObject json;
-		try {
-			json = (JSONObject) parser.parse(recipeData);
-		}catch (ParseException e) {
-			throw new WebApplicationException(Response.status(400).entity(e.getMessage()).build());
-		}
+		JSONObject json = null;
 		
-		if(json.containsKey("userid")){
+		if(userid != -1){
 			if(session.checkLogin(cookies)){
 				 User user = session.getUser();
-				 int recipeUserid = Integer.parseInt(json.get("userid").toString());
-				 if(user.id != recipeUserid)
+				 if(user.id != userid)
 					 throw new WebApplicationException(401);
 			}
 		}
-		NewRecipe newRecipe;
-		try {
-			newRecipe = NewRecipe.initWithJSON(recipeName,json);
-		} catch (ParseException | NewRecipeException e) {
-			throw new WebApplicationException(Response.status(400).entity(e.getMessage()).build());
+		
+		if(recipeData != null){			
+			try {
+				json = (JSONObject) parser.parse(recipeData);
+			}catch (ParseException e) {
+	//			throw new WebApplicationException(Response.status(400).entity(e.getMessage()).build());
+			}
+			
+			if(json != null){
+				NewRecipe newRecipe;
+				try {
+					newRecipe = NewRecipe.initWithJSON(recipeName,json);
+				} catch (ParseException | NewRecipeException e) {
+					throw new WebApplicationException(Response.status(400).entity(e.getMessage()).build());
+				}
+				newRecipe.saveNewVersion();
+				if(json.containsKey("mongoid"))
+					CouchDB.delete(json.get("mongoid").toString(), 
+							Integer.parseInt(json.get("userid").toString()));
+			}
 		}
-		newRecipe.saveNewVersion();
-		if(json.containsKey("mongoid"))
-			CouchDB.delete(json.get("mongoid").toString(), 
-					Integer.parseInt(json.get("userid").toString()));
+		
+		if(tags != null){
+			try {
+				JSONArray tagsJSON = (JSONArray)parser.parse(tags);
+				
+				for(int i = 0; i<tagsJSON.size(); i++){
+					Recipe.suggestTag(recipeName, tagsJSON.get(i).toString(), userid);
+				}
+			} catch (ParseException e) {
+				throw new WebApplicationException(Response.status(400).entity(e.getMessage()).build());
+			}
+			
+		}
 		return Response.ok().build();			
 		
 		
