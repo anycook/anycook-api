@@ -18,6 +18,8 @@ public class Graph extends Application {
 		classes.add(IngredientGraph.class);
 		classes.add(SearchGraph.class);
 		classes.add(TagGraph.class);
+		classes.add(MessageGraph.class);
+		classes.add(SessionGraph.class);
 		
 		return classes;
 	}
