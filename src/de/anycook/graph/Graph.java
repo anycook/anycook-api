@@ -7,8 +7,6 @@ import javax.ws.rs.core.Application;
 
 import com.mysql.jdbc.Messages;
 
-import anycook.messages.Messagesession;
-
 import de.anycook.graph.listener.StartListener;
 import de.anycook.graph.servlets.GetMessageNumber;
 import de.anycook.graph.servlets.GetMessagesession;

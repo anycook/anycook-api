@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import anycook.messages.Messagesession;
 import anycook.messages.checker.NewMessageChecker;
 import anycook.session.Session;
 import anycook.user.User;
@@ -29,7 +30,6 @@ public class Messages extends HttpServlet{
 		req.setCharacterEncoding("UTF-8");
 		resp.setCharacterEncoding("UTF-8");
 		
-//		String message = req.getParameter("message");
 		String path = req.getRequestURI();
 		String callback = req.getParameter("callback");
 		
@@ -44,6 +44,20 @@ public class Messages extends HttpServlet{
 		AsyncContext async = req.startAsync();
 		async.setTimeout(20000);
 		NewMessageChecker.addContext(lastid, user.id, sessionid, async, callback);
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse resp)
+			throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
+		
+		String path = request.getRequestURI();
+		Integer sessionid = Integer.parseInt(path.split("/")[3]);
+		
+		String message = request.getParameter("message");
+		Session session = Session.init(request.getSession());
+		User user = session.getUser();
+		Messagesession.getSession(sessionid, user.id).newMessage(user.id, message);
 	}
 
 }
