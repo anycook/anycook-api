@@ -5,7 +5,13 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import com.mysql.jdbc.Messages;
+
+import anycook.messages.Messagesession;
+
 import de.anycook.graph.listener.StartListener;
+import de.anycook.graph.servlets.GetMessageNumber;
+import de.anycook.graph.servlets.GetMessagesession;
 
 public class Graph extends Application {
 	@Override
@@ -20,6 +26,9 @@ public class Graph extends Application {
 		classes.add(TagGraph.class);
 		classes.add(MessageGraph.class);
 		classes.add(SessionGraph.class);
+		classes.add(GetMessagesession.class);
+		classes.add(GetMessageNumber.class);
+		classes.add(Messages.class);
 		
 		return classes;
 	}

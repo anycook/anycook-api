@@ -14,9 +14,9 @@
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
   <session-config>
-  	<cookie-config>
-  		<domain>.anycook.de</domain>
-  		<path>/</path>
-  	</cookie-config>
+    <cookie-config>
+      <domain>.anycook.de</domain>
+      <path>/</path>
+    </cookie-config>
   </session-config>
 </web-app>
