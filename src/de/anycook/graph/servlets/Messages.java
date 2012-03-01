@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import anycook.messages.Message;
 import anycook.messages.Messagesession;
 import anycook.messages.checker.NewMessageChecker;
 import anycook.session.Session;
@@ -51,13 +52,26 @@ public class Messages extends HttpServlet{
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		
-		String path = request.getRequestURI();
-		Integer sessionid = Integer.parseInt(path.split("/")[3]);
+		String[] path = request.getRequestURI().split("/");
 		
-		String message = request.getParameter("message");
-		Session session = Session.init(request.getSession());
-		User user = session.getUser();
-		Messagesession.getSession(sessionid, user.id).newMessage(user.id, message);
+		if(path.length == 4){
+			Integer sessionid = Integer.parseInt(path[3]);
+			String message = request.getParameter("message");
+			Session session = Session.init(request.getSession());
+			User user = session.getUser();
+			Messagesession.getSession(sessionid, user.id).newMessage(user.id, message);
+		}else if(path.length ==5){
+			Integer sessionid = Integer.parseInt(path[3]);
+			Integer messageid = Integer.parseInt(path[4]);
+			Session session = Session.init(request.getSession());
+			User user = session.getUser();
+			Message.read(sessionid, messageid, user.id);
+		}
+		
+		
+		
+		
+		
 	}
 
 }

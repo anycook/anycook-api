@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -24,7 +25,11 @@ public class SessionGraph {
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession(true));
-		session.checkLogin(hh.getCookies());
+		try{
+			session.checkLogin(hh.getCookies());
+		}catch(WebApplicationException e){
+			return JsonpBuilder.buildResponse(callback, "false");
+		}
 		User user = session.getUser();
 		return JsonpBuilder.buildResponse(callback, user);
 	}

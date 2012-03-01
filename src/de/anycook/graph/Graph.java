@@ -28,6 +28,7 @@ public class Graph extends Application {
 		classes.add(GetMessageNumber.class);
 		classes.add(Messages.class);
 		
+		
 		return classes;
 	}
 }

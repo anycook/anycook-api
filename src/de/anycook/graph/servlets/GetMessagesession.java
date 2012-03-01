@@ -1,7 +1,10 @@
 package de.anycook.graph.servlets;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -10,6 +13,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import anycook.messages.Messagesession;
 import anycook.messages.checker.MessagesessionChecker;
 import anycook.misc.DateParser;
 import anycook.session.Session;
@@ -17,6 +26,12 @@ import anycook.user.User;
 
 @WebServlet(urlPatterns = "/message", asyncSupported=true)
 public class GetMessagesession extends HttpServlet{
+	private final Logger logger;
+	
+	public GetMessagesession() {
+		logger = Logger.getLogger(getClass());
+	}
+	
 	
 	/**
 	 * 
@@ -38,5 +53,41 @@ public class GetMessagesession extends HttpServlet{
 		AsyncContext async = req.startAsync();
 		async.setTimeout(20000);
 		MessagesessionChecker.addContext(lastChange, user.id, async, callback);
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
+		String message = request.getParameter("message");
+		String recipientsString = request.getParameter("recipients");
+		
+		if(message == null){
+			logger.info("message was null");
+			return;
+		}
+		
+		if(recipientsString == null){
+			logger.info("recipients was null");
+			return;
+		}
+		
+		message = URLDecoder.decode(message, "UTF-8");
+		
+		try {
+			JSONParser parser = new JSONParser();
+			JSONArray recipientsJSON = (JSONArray)parser.parse(recipientsString);
+			Session session = Session.init(request.getSession());
+			session.checkLogin();
+			List<Integer> recipients = new LinkedList<>();
+			for(Object recipientString : recipientsJSON)
+				recipients.add(Integer.parseInt(recipientString.toString()));
+			int userid = session.getUser().id;
+			recipients.add(userid);
+			Messagesession.getSession(recipients).newMessage(userid, message);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
