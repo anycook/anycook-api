@@ -43,15 +43,19 @@ public class SessionGraph {
 			@QueryParam("password") String password,
 			@QueryParam("stayloggedin") boolean stayloggedin){
 		Session session = Session.init(request.getSession(true));
-		session.login(username, password);
-		User user = session.getUser();
-		ResponseBuilder response = Response.ok(JsonpBuilder.build(callback, user));
-		if(stayloggedin){
-			NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.id), "/", "anycook.de", "", 14 * 24 * 60 *60, true);
-			response.cookie(cookie);
-			
+		try{
+			session.login(username, password);
+			User user = session.getUser();
+			ResponseBuilder response = Response.ok(JsonpBuilder.build(callback, user));
+			if(stayloggedin){
+				NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.id), "/", "anycook.de", "", 14 * 24 * 60 *60, true);
+				response.cookie(cookie);
+				
+			}
+			return response.build();
+		}catch(WebApplicationException e){
+			return JsonpBuilder.buildResponse(callback, "false");
 		}
-		return response.build();
 	}
 	
 	@GET
