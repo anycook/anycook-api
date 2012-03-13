@@ -35,6 +35,15 @@ public class UserGraph {
 		
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
 	}
+
+	@GET
+	@Path("recommendations")
+	public Response getRecommendations(@Context HttpServletRequest request, 
+			@QueryParam("callback") String callback){
+		Session session = Session.init(request.getSession());
+		session.checkLogin();
+		return JsonpBuilder.buildResponse(callback, session.getUser().getRecommendations());
+	}
 	
 	@GET
 	@Path("{userid}")

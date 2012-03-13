@@ -1,4 +1,4 @@
-package de.anycook.graph.servlets;
+package de.anycook.graph.servlets.message;
 
 import java.io.IOException;
 

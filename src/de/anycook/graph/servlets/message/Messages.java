@@ -1,4 +1,4 @@
-package de.anycook.graph.servlets;
+package de.anycook.graph.servlets.message;
 
 import java.io.IOException;
 
@@ -8,8 +8,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
 
 import anycook.messages.Message;
 import anycook.messages.Messagesession;
@@ -36,8 +34,7 @@ public class Messages extends HttpServlet{
 		
 		String lastidString = req.getParameter("lastid");
 		int lastid = lastidString == null ? -1 : Integer.parseInt(lastidString);
-		
-		Logger.getLogger(getClass()).info(path);
+
 		Integer sessionid = Integer.parseInt(path.split("/")[3]);
 		
 		Session session = Session.init(req.getSession());

@@ -17,7 +17,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -62,12 +61,59 @@ public class RecipeGraph {
 	}
 	
 	@GET
+	@Path("{recipename}/{versionid}")
+	public Response getVersion(@PathParam("recipename") String recipeName,
+			@PathParam("versionid") int versionid,
+			@QueryParam("callback") String callback){
+		Recipe recipe = Recipe.init(recipeName, versionid);
+		return JsonpBuilder.buildResponse(callback, recipe);
+	}
+	
+	@GET
 	@Path("{recipename}/image")
 	@Produces("image/png")
 	public Response getImage(@PathParam("recipename") String recipeName,
 			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
 		return Response.ok(Recipe.getRecipeImage(recipeName, type)).build();
+	}
+	
+	@GET
+	@Path("{recipename}/schmeckt")
+	public Response checkSchmeckt(@PathParam("recipename") String recipeName,
+			@Context HttpServletRequest request,
+			@QueryParam("callback") String callback){
+		Session session = Session.init(request.getSession());
+		session.checkLogin();
+		boolean schmeckt = session.checkSchmeckt(recipeName);
+		return JsonpBuilder.buildResponse(callback, schmeckt);
+		
+	}
+	
+	@POST
+	@Path("{recipename}/schmeckt")
+	public void schmeckt(@PathParam("recipename") String recipeName,
+			@Context HttpHeaders hh,
+			@Context HttpServletRequest request){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		boolean schmeckt = session.checkSchmeckt(recipeName);
+		if(!schmeckt)
+			session.makeSchmeckt(recipeName);
+		
+	}
+	
+	@POST
+	@Path("{recipename}/schmecktnicht")
+	public void schmecktNicht(@PathParam("recipename") String recipeName,
+			@Context HttpHeaders hh,
+			@Context HttpServletRequest request){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		boolean schmeckt = session.checkSchmeckt(recipeName);
+		if(schmeckt)
+			session.removeSchmeckt(recipeName);
+		
 	}
 	
 	@POST
