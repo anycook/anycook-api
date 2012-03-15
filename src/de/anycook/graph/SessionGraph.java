@@ -48,10 +48,11 @@ public class SessionGraph {
 			User user = session.getUser();
 			ResponseBuilder response = Response.ok(JsonpBuilder.build(callback, user));
 			if(stayloggedin){
-				NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.id), "/", "anycook.de", "", 14 * 24 * 60 *60, true);
+				NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.id), "/", ".anycook.de", "", 7 * 24 * 60 *60, true);
 				response.cookie(cookie);
 				
 			}
+			
 			return response.build();
 		}catch(WebApplicationException e){
 			return JsonpBuilder.buildResponse(callback, "false");
@@ -76,5 +77,19 @@ public class SessionGraph {
 		}
 		session.logout();
 		return response.entity(JsonpBuilder.build(callback, "true")).build();
+	}
+	
+	@GET
+	@Path("couchdb")
+	public Response getCouchDBCookie(@Context HttpServletRequest request,
+			@QueryParam("callback") String callback){
+		Session session = Session.init(request.getSession());
+		session.checkLogin();
+		User user = session.getUser();
+		String couchdbAuthToken = user.getCouchDBAuthToken();
+		Cookie cookie = new Cookie("AuthSession", couchdbAuthToken, "/", ".anycook.de");
+		return Response.ok(JsonpBuilder.build(callback, true)).cookie(new NewCookie(cookie))
+				.build();
+		
 	}
 }
