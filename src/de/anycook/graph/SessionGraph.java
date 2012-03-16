@@ -1,9 +1,13 @@
 package de.anycook.graph;
 
+import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -16,6 +20,10 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import anycook.misc.JsonpBuilder;
 import anycook.session.Session;
 import anycook.user.User;
+import anycook.user.User.Userfields;
+import anycook.user.settings.MailSettings;
+import anycook.user.settings.MailSettings.Field;
+import anycook.user.settings.Settings;
 
 @Path("session")
 public class SessionGraph {
@@ -91,5 +99,53 @@ public class SessionGraph {
 		return Response.ok(JsonpBuilder.build(callback, true)).cookie(new NewCookie(cookie))
 				.build();
 		
+	}
+	
+	
+	//settings
+	
+	@GET
+	@Path("settings")
+	public Response getSettings(@Context HttpServletRequest request,
+			@QueryParam("callback") String callback){
+		Session session = Session.init(request.getSession());
+		User user = session.getUser();
+		MailSettings mailsettings = MailSettings.init(user.id);
+		Map<String, Settings> settings = new HashMap<>();
+		settings.put("mail", mailsettings);
+		return JsonpBuilder.buildResponse(callback, settings);
+	}
+	
+	@POST
+	@Path("settings/account/")
+	public void changeAccountSettings(@Context HttpServletRequest request,
+			@Context HttpHeaders hh,
+			@FormParam("username") String username,
+			@FormParam("text") String text,
+			@FormParam("place") String place){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		
+		User user = session.getUser();
+		user.changeSetting(Userfields.NAME, username);
+		user.changeSetting(Userfields.TEXT, text);
+		user.changeSetting(Userfields.PLACE, place);
+		
+	}
+	
+	@POST
+	@Path("settings/mail/{type}")
+	public void changeMailSettings(@Context HttpServletRequest request,
+			@Context HttpHeaders hh, 
+			@PathParam("type") String type,
+			@FormParam("value") boolean value){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		MailSettings settings = MailSettings.init(session.getUser().id);
+		if(type.equals("all")){
+			settings.changeAll(value);
+		}else{
+			settings.change(Field.valueOf(type), value);
+		}		
 	}
 }

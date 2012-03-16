@@ -1,6 +1,7 @@
 <?xml version = '1.0' encoding = 'utf-8'?> <!DOCTYPE project>
 
 <project name="anycook-graph" default="dist" basedir=".">
+	
 	<!-- properties -->
 	<property name="project.src" location="src/de" />
 	<property name="project.build" location="build" />
@@ -9,11 +10,17 @@
 	<property name="project.webxml" location="WebContent/WEB-INF/web.xml" />
 	<property name="tomcat.lib" location="../Servers/tomcat7/lib" />
 	<property name="anycook" location="../anycook" />
-	<property name="anycook.build" location="${anycook}/build.xml" />
+	<property name="anycook.buildfile" location="${anycook}/build.xml" />
+	<property name="anycook.build" location="${anycook}/build" />
 	<property name="anycook.dist" location="${anycook}/dist" />
 	<property name="build.sysclasspath" value="last" />
 	<!--<ant antfile="${anycook.build}" dir="${anycook}"/>-->
 
+	<!-- upload war file to anycook.de -->
+	<target name="upload" depends="dist">
+		  <scp file="${project.dist}/anycook-graph.war" todir="jan@anycook.de://usr/share/apache-tomcat-7.0.22/webapps/" password="king.kong.14.12"/>
+	</target>
+	
 	<!-- distribution -->
 	<target name="dist" depends="compile">
 		<mkdir dir="${project.dist}" />
@@ -26,7 +33,7 @@
             </lib>
         
 		</war>
-		<delete dir="${project.build}" />
+		<!-- <delete dir="${project.build}" /> -->
 	</target>
 
 	<!-- compile -->
@@ -54,10 +61,14 @@
 	</target>
 
 	<!-- cleanup -->
-	<target name="clean">
+	<target name="clean" depends="buildAllSubProjects">
 		<delete dir="${project.build}" />
 		<delete dir="${project.dist}" />
 	</target>
+	
+	<target name="buildAllSubProjects">
+        <subant target="dist" genericantfile="${anycook.buildfile}" buildpath="${anycook}"/>
+    </target>
 	
 	<!-- at least copy chatnoir.war to webis15:/usr/share/tomcat6/webapps/ -->
 </project>
