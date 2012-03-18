@@ -5,6 +5,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -116,20 +117,39 @@ public class SessionGraph {
 		return JsonpBuilder.buildResponse(callback, settings);
 	}
 	
+	@OPTIONS
+	@Path("settings/account")
+	public Response setAllowOrigins(){
+		ResponseBuilder response = Response.ok();
+		response.header("Access-Control-Allow-Origin", "*");
+		response.header("Access-Control-Allow-Methods", "POST, OPTIONS");
+		response.header("Access-Control-Allow-Headers", "X-Requested-With, X-File-Name, Content-Type");
+		response.header("Access-Control-Max-Age", "180");
+		return response.build();
+	}
+	
 	@POST
-	@Path("settings/account/")
-	public void changeAccountSettings(@Context HttpServletRequest request,
+	@Path("settings/account")
+	public Response changeAccountSettings(@Context HttpServletRequest request,
 			@Context HttpHeaders hh,
 			@FormParam("username") String username,
 			@FormParam("text") String text,
 			@FormParam("place") String place){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
+		ResponseBuilder response = null;
+		try{
+			session.checkLogin(hh.getCookies());
+			
+			User user = session.getUser();
+			user.changeSetting(Userfields.NAME, username);
+			user.changeSetting(Userfields.TEXT, text);
+			user.changeSetting(Userfields.PLACE, place);
+			response = Response.ok();
+		}catch(WebApplicationException e){
+			response = Response.status(401);
+		}
 		
-		User user = session.getUser();
-		user.changeSetting(Userfields.NAME, username);
-		user.changeSetting(Userfields.TEXT, text);
-		user.changeSetting(Userfields.PLACE, place);
+		return response.header("Access-Control-Allow-Origin", "*").build();
 		
 	}
 	
