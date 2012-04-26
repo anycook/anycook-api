@@ -31,8 +31,6 @@ public class Graph extends Application {
 		classes.add(DiscoverGraph.class);
 		classes.add(GetDiscussion.class);
 		classes.add(UploadGraph.class);
-		
-		
 		return classes;
 	}
 }
