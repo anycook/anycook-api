@@ -6,9 +6,9 @@ import javax.servlet.annotation.WebListener;
 
 import org.apache.log4j.Logger;
 
+import de.anycook.db.couchdb.CouchDB;
 import de.anycook.graph.MessageGraph;
 
-import anycook.db.couchdb.CouchDB;
 
 /**
  * Application Lifecycle Listener implementation class StartListener

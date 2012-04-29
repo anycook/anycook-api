@@ -13,10 +13,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import anycook.misc.JsonpBuilder;
-import anycook.recipe.Recipe;
-import anycook.search.DiscoverHandler;
-import anycook.session.Session;
+import de.anycook.misc.JsonpBuilder;
+import de.anycook.recipe.Recipe;
+import de.anycook.search.DiscoverHandler;
+import de.anycook.session.Session;
+
 
 @Path("/discover")
 public class DiscoverGraph {

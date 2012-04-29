@@ -10,8 +10,9 @@ import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
 
-import anycook.misc.JsonpBuilder;
-import anycook.tag.Tag;
+import de.anycook.misc.JsonpBuilder;
+import de.anycook.tag.Tag;
+
 
 @Path("tag")
 public class TagGraph {

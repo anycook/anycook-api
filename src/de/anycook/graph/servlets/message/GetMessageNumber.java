@@ -9,9 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import anycook.messages.checker.MessageChecker;
-import anycook.session.Session;
-import anycook.user.User;
+import de.anycook.messages.checker.MessageChecker;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+
 
 /**
  * Servlet implementation class GetMessageNumber

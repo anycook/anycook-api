@@ -10,8 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
 
-import anycook.discussion.Discussion;
-import anycook.session.Session;
+import de.anycook.discussion.Discussion;
+import de.anycook.session.Session;
+
 
 /**
  * Servlet implementation class GetNewDiscussions

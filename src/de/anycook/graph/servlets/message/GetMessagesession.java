@@ -18,11 +18,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import anycook.messages.Messagesession;
-import anycook.messages.checker.MessagesessionChecker;
-import anycook.misc.DateParser;
-import anycook.session.Session;
-import anycook.user.User;
+import de.anycook.messages.Messagesession;
+import de.anycook.messages.checker.MessagesessionChecker;
+import de.anycook.misc.DateParser;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+
 
 @WebServlet(urlPatterns = "/message", asyncSupported=true)
 public class GetMessagesession extends HttpServlet{

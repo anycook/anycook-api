@@ -13,9 +13,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import anycook.misc.JsonpBuilder;
-import anycook.recipe.Recipe;
-import anycook.search.Search;
+import de.anycook.misc.JsonpBuilder;
+import de.anycook.recipe.Recipe;
+import de.anycook.search.Search;
+
 
 @Path("search")
 public class SearchGraph {

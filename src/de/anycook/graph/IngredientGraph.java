@@ -10,8 +10,9 @@ import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
 
-import anycook.ingredient.Ingredient;
-import anycook.misc.JsonpBuilder;
+import de.anycook.ingredient.Ingredient;
+import de.anycook.misc.JsonpBuilder;
+
 
 @Path("/ingredient")
 public class IngredientGraph {

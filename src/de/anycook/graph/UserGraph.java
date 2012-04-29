@@ -16,10 +16,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 
-import anycook.misc.JsonpBuilder;
-import anycook.misc.enumerations.ImageType;
-import anycook.session.Session;
-import anycook.user.User;
+import de.anycook.misc.JsonpBuilder;
+import de.anycook.misc.enumerations.ImageType;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+
 
 @Path("/user")
 public class UserGraph {
@@ -81,7 +82,7 @@ public class UserGraph {
 	public Response getImage(@PathParam("userid") int userid,
 			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
-		String imagePath = "/var/www/sites/anycook.de/htdocs"+User.getUserImage(userid, type);
+		String imagePath = "/var/www/sites/de.anycook.de/htdocs"+User.getUserImage(userid, type);
 		return Response.ok(new File(imagePath)).build();
 	}
 }

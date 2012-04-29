@@ -13,10 +13,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
-import anycook.session.Session;
-import anycook.upload.RecipeUploader;
-import anycook.upload.UploadHandler;
-import anycook.upload.UserUploader;
+import de.anycook.session.Session;
+import de.anycook.upload.RecipeUploader;
+import de.anycook.upload.UploadHandler;
+import de.anycook.upload.UserUploader;
+
 
 @Path("upload")
 public class UploadGraph {

@@ -18,14 +18,14 @@
 
 	<!-- upload war file to anycook.de -->
 	<target name="upload" depends="dist">
-		  <scp file="${project.dist}/anycook-graph.war" todir="jan@anycook.de://usr/share/apache-tomcat-7.0.22/webapps/" password="king.kong.14.12"/>
+		  <scp file="${project.dist}/anycook-graph.war" todir="jan@anycook.de:/usr/share/apache-tomcat-7.0.22/webapps/" keyfile="../../.ssh/id_rsa" />
 	</target>
 	
 	<!-- distribution -->
 	<target name="dist" depends="compile">
 		<mkdir dir="${project.dist}" />
 		<war destfile="${project.dist}/anycook-graph.war" webxml="${project.webxml}">
-			<classes dir="${project.build}">
+			<classes dir="${project.build}/classes">
 				<include name="**/*" />
 			</classes>
             <lib dir="${anycook.dist}">
@@ -38,7 +38,7 @@
 
 	<!-- compile -->
 	<target name="compile" depends="init">
-		<javac srcdir="${project.src}" destdir="${project.build}" target="1.7" encoding="utf8">
+		<javac srcdir="${project.src}" destdir="${project.build}/classes" target="1.7" encoding="utf8">
 			<classpath>
 				<pathelement path="${classpath}" />
 				<fileset dir="${anycook.dist}">
@@ -57,12 +57,12 @@
 	<!-- init -->
 	<target name="init" depends="clean">
 		<tstamp />
-		<mkdir dir="${project.build}" />
+		<mkdir dir="${project.build}/classes" />
 	</target>
 
 	<!-- cleanup -->
 	<target name="clean" depends="buildAllSubProjects">
-		<delete dir="${project.build}" />
+		<delete dir="${project.build}/classes" />
 		<delete dir="${project.dist}" />
 	</target>
 	

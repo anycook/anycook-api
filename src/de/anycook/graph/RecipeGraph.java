@@ -23,14 +23,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import anycook.db.couchdb.CouchDB;
-import anycook.misc.JsonpBuilder;
-import anycook.misc.enumerations.ImageType;
-import anycook.newrecipe.NewRecipe;
-import anycook.newrecipe.NewRecipe.NewRecipeException;
-import anycook.recipe.Recipe;
-import anycook.session.Session;
-import anycook.user.User;
+import de.anycook.db.couchdb.CouchDB;
+import de.anycook.misc.JsonpBuilder;
+import de.anycook.misc.enumerations.ImageType;
+import de.anycook.newrecipe.NewRecipe;
+import de.anycook.newrecipe.NewRecipe.NewRecipeException;
+import de.anycook.recipe.Recipe;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+
 
 @Path("/recipe")
 public class RecipeGraph {

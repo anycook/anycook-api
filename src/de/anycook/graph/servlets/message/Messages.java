@@ -9,11 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import anycook.messages.Message;
-import anycook.messages.Messagesession;
-import anycook.messages.checker.NewMessageChecker;
-import anycook.session.Session;
-import anycook.user.User;
+import de.anycook.messages.Message;
+import de.anycook.messages.Messagesession;
+import de.anycook.messages.checker.NewMessageChecker;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+
 
 @WebServlet(urlPatterns = "/message/*", asyncSupported=true)
 public class Messages extends HttpServlet{

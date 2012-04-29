@@ -4,10 +4,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.ws.rs.Path;
-import anycook.messages.checker.MessageChecker;
-import anycook.messages.checker.MessagesessionChecker;
-import anycook.messages.checker.NewMessageChecker;
-import anycook.misc.DaemonThreadFactory;
+
+import de.anycook.messages.checker.MessageChecker;
+import de.anycook.messages.checker.MessagesessionChecker;
+import de.anycook.messages.checker.NewMessageChecker;
+import de.anycook.misc.DaemonThreadFactory;
 
 @Path("/message")
 public class MessageGraph  {

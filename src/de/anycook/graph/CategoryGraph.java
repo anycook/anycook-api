@@ -6,12 +6,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
 
-import anycook.category.Category;
-import anycook.misc.JsonpBuilder;
+import de.anycook.category.Category;
+import de.anycook.misc.JsonpBuilder;
+
 
 @Path("/category")
 public class CategoryGraph {
@@ -32,6 +34,8 @@ public class CategoryGraph {
 	public Response getCategory(@QueryParam("callback") String callback,
 			@PathParam("categoryname") String categoryname){
 		Category category = Category.init(categoryname);
+		if(category == null)
+			throw new WebApplicationException(400);
 		return Response.ok(JsonpBuilder.build(callback, category)).build();
 	}
 }

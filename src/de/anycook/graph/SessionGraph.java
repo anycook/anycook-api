@@ -18,13 +18,14 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
-import anycook.misc.JsonpBuilder;
-import anycook.session.Session;
-import anycook.user.User;
-import anycook.user.User.Userfields;
-import anycook.user.settings.MailSettings;
-import anycook.user.settings.MailSettings.Field;
-import anycook.user.settings.Settings;
+import de.anycook.misc.JsonpBuilder;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+import de.anycook.user.User.Userfields;
+import de.anycook.user.settings.MailSettings;
+import de.anycook.user.settings.Settings;
+import de.anycook.user.settings.MailSettings.Field;
+
 
 @Path("session")
 public class SessionGraph {
@@ -57,7 +58,7 @@ public class SessionGraph {
 			User user = session.getUser();
 			ResponseBuilder response = Response.ok(JsonpBuilder.build(callback, user));
 			if(stayloggedin){
-				NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.id), "/", ".anycook.de", "", 7 * 24 * 60 *60, true);
+				NewCookie cookie = new NewCookie("de.anycook", session.makePermanentCookieId(user.id), "/", ".de.anycook.de", "", 7 * 24 * 60 *60, true);
 				response.cookie(cookie);
 				
 			}
@@ -78,8 +79,8 @@ public class SessionGraph {
 		session.checkLogin(hh.getCookies());
 		
 		ResponseBuilder response = Response.ok();
-		if(cookies.containsKey("anycook")){
-			Cookie cookie = cookies.get("anycook");
+		if(cookies.containsKey("de.anycook")){
+			Cookie cookie = cookies.get("de.anycook");
 			session.deleteCookieID(cookie.getValue());
 			NewCookie newCookie = new NewCookie(cookie, "", -1, false);
 			response.cookie(newCookie);
@@ -96,7 +97,7 @@ public class SessionGraph {
 		session.checkLogin();
 		User user = session.getUser();
 		String couchdbAuthToken = user.getCouchDBAuthToken();
-		Cookie cookie = new Cookie("AuthSession", couchdbAuthToken, "/", ".anycook.de");
+		Cookie cookie = new Cookie("AuthSession", couchdbAuthToken, "/", ".de.anycook.de");
 		return Response.ok(JsonpBuilder.build(callback, true)).cookie(new NewCookie(cookie))
 				.build();
 		
