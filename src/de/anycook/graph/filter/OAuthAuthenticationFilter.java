@@ -14,7 +14,6 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 
 import de.anycook.db.mysql.DBApps;
-import de.anycook.misc.A;
 
 
 public class OAuthAuthenticationFilter implements ContainerRequestFilter{
