@@ -80,5 +80,10 @@ public class GetDiscussion extends HttpServlet {
 			}
 		}
 	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		exec.shutdownNow();
+	}
 
 }

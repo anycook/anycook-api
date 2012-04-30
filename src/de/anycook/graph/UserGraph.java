@@ -82,7 +82,7 @@ public class UserGraph {
 	public Response getImage(@PathParam("userid") int userid,
 			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
-		String imagePath = "/var/www/sites/de.anycook.de/htdocs"+User.getUserImage(userid, type);
+		String imagePath = "/var/www/sites/anycook.de/htdocs"+User.getUserImage(userid, type);
 		return Response.ok(new File(imagePath)).build();
 	}
 }
