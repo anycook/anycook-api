@@ -4,9 +4,10 @@
 	
 	<!-- properties -->
 	<property name="project.src" location="src/de" />
-	<property name="project.build" location="build" />
+	<property name="project.build" location="build/classes" />
 	<property name="project.lib" location="WebContent/WEB-INF/lib" />
 	<property name="project.dist" location="dist" />
+	<property name="project.log4j" location="log4j-conf" />
 	<property name="project.webxml" location="WebContent/WEB-INF/web.xml" />
 	<property name="tomcat.lib" location="../Servers/tomcat7/lib" />
 	<property name="anycook" location="../anycook" />
@@ -23,22 +24,20 @@
 	
 	<!-- distribution -->
 	<target name="dist" depends="compile">
-		<mkdir dir="${project.dist}" />
 		<war destfile="${project.dist}/anycook-graph.war" webxml="${project.webxml}">
-			<classes dir="${project.build}/classes">
+			<classes dir="${project.build}">
 				<include name="**/*" />
 			</classes>
             <lib dir="${anycook.dist}">
                     <include name="anycook.jar" />
             </lib>
-        
 		</war>
 		<!-- <delete dir="${project.build}" /> -->
 	</target>
 
 	<!-- compile -->
 	<target name="compile" depends="init">
-		<javac srcdir="${project.src}" destdir="${project.build}/classes" target="1.7" encoding="utf8">
+		<javac srcdir="${project.src}" destdir="${project.build}" target="1.7" encoding="utf8">
 			<classpath>
 				<pathelement path="${classpath}" />
 				<fileset dir="${anycook.dist}">
@@ -52,17 +51,21 @@
 				</fileset>
 			</classpath>
 		</javac>
+		<copy todir="${project.build}">
+			<fileset dir="${project.log4j}"/>
+		</copy>
 	</target>
 
 	<!-- init -->
 	<target name="init" depends="clean">
 		<tstamp />
-		<mkdir dir="${project.build}/classes" />
+		<mkdir dir="${project.build}" />
+		<mkdir dir="${project.dist}" />
 	</target>
 
 	<!-- cleanup -->
 	<target name="clean" depends="buildAllSubProjects">
-		<delete dir="${project.build}/classes" />
+		<delete dir="${project.build}" />
 		<delete dir="${project.dist}" />
 	</target>
 	

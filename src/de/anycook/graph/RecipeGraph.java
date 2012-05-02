@@ -1,5 +1,6 @@
 package de.anycook.graph;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
@@ -78,7 +79,12 @@ public class RecipeGraph {
 			@DefaultValue("small") @QueryParam("type") String typeString, 
 			@QueryParam("callback") String callback){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
-		return Response.ok(Recipe.getRecipeImage(recipeName, type)).build();
+		try {
+			return Response.temporaryRedirect(Recipe.getRecipeImage(recipeName, type)).build();
+		} catch (URISyntaxException e) {
+			logger.error(e);
+			throw new WebApplicationException(400);
+		}
 	}
 	
 	@GET

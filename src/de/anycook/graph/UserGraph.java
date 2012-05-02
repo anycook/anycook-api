@@ -1,6 +1,7 @@
 package de.anycook.graph;
 
-import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -11,9 +12,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import de.anycook.misc.JsonpBuilder;
@@ -24,6 +28,8 @@ import de.anycook.user.User;
 
 @Path("/user")
 public class UserGraph {
+	private final Logger logger = Logger.getLogger(getClass());
+	
 	
 	@SuppressWarnings("unchecked")
 	@GET
@@ -82,7 +88,13 @@ public class UserGraph {
 	public Response getImage(@PathParam("userid") int userid,
 			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
-		String imagePath = "/var/www/sites/anycook.de/htdocs"+User.getUserImage(userid, type);
-		return Response.ok(new File(imagePath)).build();
+		
+		try {
+			URI uri = new URI("http://images.anycook.de"+User.getUserImage(userid, type));
+			return Response.temporaryRedirect(uri).build();
+		} catch (URISyntaxException e) {
+			logger.warn(e);
+			throw new WebApplicationException(400);
+		}
 	}
 }

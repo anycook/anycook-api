@@ -30,7 +30,6 @@ public class OAuthAuthenticationFilter implements ContainerRequestFilter{
 		URI referer;
 		try {
 			String refererStr = containerRequest.getHeaderValue("referer");
-			logger.info(refererStr);
 			referer = new URI(refererStr);
 		} catch (URISyntaxException | NullPointerException e) {
 			throw new WebApplicationException(401);
@@ -43,11 +42,21 @@ public class OAuthAuthenticationFilter implements ContainerRequestFilter{
 		
 		DBApps db = new DBApps();
 		String appSecret = db.getAppSecretByDomain(refererDomain);
-		String appID = db.getAppIDbyDomain(refererDomain);
+		Integer appID = db.getAppIDbyDomain(refererDomain);
+		db.close();
 		if(appSecret == null || appID == null){
-			db.close();
 			throw new WebApplicationException(401);
 		}
+		
+		String clientAppIDStr = containerRequest.getQueryParameters().getFirst("appid");
+		
+		if(clientAppIDStr == null){
+			throw new WebApplicationException(401);
+		}
+		
+		Integer clientAppID = Integer.parseInt(clientAppIDStr);
+		if(clientAppID != appID)
+			throw new WebApplicationException(401);
 		
 		
 		// Read the OAuth parameters from the request
@@ -58,7 +67,7 @@ public class OAuthAuthenticationFilter implements ContainerRequestFilter{
         // Set the secret(s), against which we will verify the request
         OAuthSecrets secrets = new OAuthSecrets();
         secrets.setTokenSecret(appSecret);
-        secrets.setConsumerSecret(appID);
+        secrets.setConsumerSecret(appID.toString());
         
         // TODO... secret setting code ...
         
