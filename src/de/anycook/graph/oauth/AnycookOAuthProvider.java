@@ -11,10 +11,7 @@ import java.util.UUID;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.oauth.server.api.providers.DefaultOAuthProvider;
 import com.sun.jersey.oauth.server.spi.OAuthConsumer;
 import com.sun.jersey.oauth.server.spi.OAuthProvider;
 import com.sun.jersey.oauth.server.spi.OAuthToken;
