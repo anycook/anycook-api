@@ -19,12 +19,12 @@
 
 	<!-- upload war file to anycook.de -->
 	<target name="upload" depends="dist">
-		  <scp file="${project.dist}/anycook-graph.war" todir="${user}@anycook.de:/usr/share/apache-tomcat-7.0.22/webapps/" password="${password}" />
+		  <scp file="${project.dist}/ROOT.war" todir="${user}@anycook.de:/usr/share/apache-tomcat-7.0.22/webapps/" password="${password}" />
 	</target>
 	
 	<!-- distribution -->
 	<target name="dist" depends="compile">
-		<war destfile="${project.dist}/anycook-graph.war" webxml="${project.webxml}">
+		<war destfile="${project.dist}/ROOT.war" webxml="${project.webxml}">
 			<classes dir="${project.build}">
 				<include name="**/*" />
 			</classes>

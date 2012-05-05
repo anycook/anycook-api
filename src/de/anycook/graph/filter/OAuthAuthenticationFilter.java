@@ -1,19 +1,10 @@
 package de.anycook.graph.filter;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-
-import javax.ws.rs.WebApplicationException;
-
 import org.apache.log4j.Logger;
 
-import com.sun.jersey.oauth.server.OAuthServerRequest;
-import com.sun.jersey.oauth.signature.OAuthParameters;
-import com.sun.jersey.oauth.signature.OAuthSecrets;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
-
-import de.anycook.db.mysql.DBApps;
 
 
 public class OAuthAuthenticationFilter implements ContainerRequestFilter{
