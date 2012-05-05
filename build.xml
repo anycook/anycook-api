@@ -19,7 +19,7 @@
 
 	<!-- upload war file to anycook.de -->
 	<target name="upload" depends="dist">
-		  <scp file="${project.dist}/anycook-graph.war" todir="jan@anycook.de:/usr/share/apache-tomcat-7.0.22/webapps/" keyfile="../../.ssh/id_rsa" />
+		  <scp file="${project.dist}/anycook-graph.war" todir="${user}@anycook.de:/usr/share/apache-tomcat-7.0.22/webapps/" password="${password}" />
 	</target>
 	
 	<!-- distribution -->
