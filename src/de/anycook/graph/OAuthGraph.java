@@ -1,7 +1,8 @@
 package de.anycook.graph;
 
 import java.io.UnsupportedEncodingException;
-import javax.ws.rs.GET;
+
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -31,7 +32,7 @@ public class OAuthGraph {
 		provider = new AnycookOAuthProvider();
 	}
 	
-	@GET
+	@POST
 	@Path("request_token")
 	public String getRequestToken(@Context HttpContext hc) throws UnsupportedEncodingException{
 		OAuthServerRequest req = new OAuthServerRequest(hc.getRequest());		
