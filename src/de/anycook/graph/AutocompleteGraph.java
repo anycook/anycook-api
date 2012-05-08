@@ -17,7 +17,7 @@ public class AutocompleteGraph {
 	
 	@GET
 	public Response autocomplete(@QueryParam("q") String query,
-			@QueryParam("maxlength") @DefaultValue("10") int maxresults,
+			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);

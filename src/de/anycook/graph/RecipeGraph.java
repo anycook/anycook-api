@@ -58,7 +58,8 @@ public class RecipeGraph {
 			recipe = Recipe.getRandomRecipe();
 		else
 			recipe = Recipe.init(recipeName);
-		
+		if(recipe == null)
+			throw new WebApplicationException(400);
 		return Response.ok(JsonpBuilder.build(callback, recipe)).build();
 	}
 	
