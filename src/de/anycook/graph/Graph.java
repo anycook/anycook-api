@@ -39,6 +39,7 @@ public class Graph extends Application {
 		classes.add(GetDiscussion.class);
 		classes.add(UploadGraph.class);		
 		classes.add(OAuthGraph.class);
+		classes.add(AutocompleteGraph.class);
 		return classes;
 	}
 	
