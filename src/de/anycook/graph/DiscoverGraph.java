@@ -25,7 +25,7 @@ public class DiscoverGraph {
 	@GET
 	public Response getDiscover(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipeNum") int recipenum,
+			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
 		Map<String, List<Recipe>> recipes;
