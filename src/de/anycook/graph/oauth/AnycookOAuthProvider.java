@@ -3,6 +3,7 @@ package de.anycook.graph.oauth;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,12 +19,18 @@ import com.sun.jersey.oauth.server.spi.OAuthToken;
 
 @Provider
 public class AnycookOAuthProvider implements OAuthProvider{
+	private static final Map<String, OAuthToken> requestTokens;
+	private static final Map<String ,OAuthToken> accessTokens;
+	
+	static{
+		requestTokens = new HashMap<>();
+		accessTokens = new HashMap<>();
+	}
 	
 
 	@Override
 	public OAuthToken getAccessToken(String token) {
-		// TODO Auto-generated method stub
-		return null;
+		return accessTokens.get(token);
 	}
 
 	@Override
@@ -33,8 +40,7 @@ public class AnycookOAuthProvider implements OAuthProvider{
 
 	@Override
 	public OAuthToken getRequestToken(String token) {
-		// TODO Auto-generated method stub
-		return null;
+		return requestTokens.get(token);
 	}
 
 	@Override
@@ -50,6 +56,7 @@ public class AnycookOAuthProvider implements OAuthProvider{
 		String secret = newUUIDString();
 		OAuthToken request_token = 
 				new AnycookOAuthToken(token, secret, consumerKey, attributes);
+		requestTokens.put(token, request_token);
 		return request_token;
 	}
 	
