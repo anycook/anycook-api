@@ -52,6 +52,7 @@ public class SessionGraph {
 			@QueryParam("username") String username,
 			@QueryParam("password") String password,
 			@QueryParam("stayloggedin") boolean stayloggedin){
+		
 		Session session = Session.init(request.getSession(true));
 		try{
 			session.login(username, password);

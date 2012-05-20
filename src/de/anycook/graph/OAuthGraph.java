@@ -1,6 +1,9 @@
 package de.anycook.graph;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -80,29 +83,36 @@ public class OAuthGraph {
 	@GET
 	@Path("authorize")
 	public Response appLogin(@QueryParam("oauth_token") String oauthToken, 
-			@Context HttpServletRequest request){
+			@Context HttpServletRequest request) throws URISyntaxException, UnsupportedEncodingException{
 		if(oauthToken == null )
 			throw new WebApplicationException(401);
-		
+		Session session = Session.init(request.getSession());
+		try{
+			session.checkLogin();
+		}catch(WebApplicationException e){
+			StringBuilder redirectURL = new StringBuilder("http://test.anycook.de/login.html?redirect=");
+			redirectURL.append(URLEncoder.encode("http://graph.anycook.de/oauth/authorize", "UTF-8"));
+			redirectURL.append("&oauth_token=").append(oauthToken);			
+			
+			return Response.temporaryRedirect(new URI(redirectURL.toString())).build();
+		}
 		OAuthToken requestToken = provider.getRequestToken(oauthToken);
 		OAuthConsumer consumer = requestToken.getConsumer();
 		String appID = consumer.getKey();
-		Session session = Session.init(request.getSession());
+		
 		StringBuilder responseString = new StringBuilder();
 		DBApps dbApps = new DBApps();
 		String appName = dbApps.getAppName(appID);
 		dbApps.close();
 		
-		responseString.append("Do want to authorize \"").append(appName)
+		User user = session.getUser();
+		responseString.append("Hello ").append(user.name).append("!<br>");
+		
+		responseString.append("Do you want to authorize \"").append(appName)
 			.append("\"? <br>");
 		
 		
-		try{
-			User user = session.getUser();
-			responseString.append("Your logged in as: ").append(user.name);
-		}catch(WebApplicationException e){
-			responseString.append("Your not logged in.");
-		}
+		
 		responseString.append("<br>App:").append(consumer.getKey());
 		return Response.ok(responseString.toString()).build();
 	}
