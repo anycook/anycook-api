@@ -17,16 +17,20 @@ import com.sun.jersey.oauth.server.spi.OAuthConsumer;
 import com.sun.jersey.oauth.server.spi.OAuthProvider;
 import com.sun.jersey.oauth.server.spi.OAuthToken;
 
+import de.anycook.db.mysql.DBApps;
+
 @Provider
 public class AnycookOAuthProvider implements OAuthProvider{
 	private static final Map<String, OAuthToken> requestTokens;
 	private static final Map<String ,OAuthToken> accessTokens;
 	private static final Map<String , OAuthConsumer> verifierTokens;
+	private static final Map<String, Integer> verifierUser;
 	
 	static{
 		requestTokens = new HashMap<>();
 		accessTokens = new HashMap<>();
 		verifierTokens = new HashMap<>();
+		verifierUser = new HashMap<>();
 	}
 	
 
@@ -42,27 +46,42 @@ public class AnycookOAuthProvider implements OAuthProvider{
 
 	@Override
 	public OAuthToken getRequestToken(String token) {
+		if(token == null)
+			return null;
 		return requestTokens.get(token);
 	}
 
 	@Override
 	public OAuthToken newAccessToken(OAuthToken requestToken, String verifier) {
-		// TODO Auto-generated method stub
+		OAuthConsumer consumer = verifierTokens.get(verifier);
+		if(consumer !=null && requestToken.getConsumer().equals(consumer)){
+			verifierTokens.remove(verifier);
+			int userid = verifierUser.get(verifier);
+			verifierUser.remove(verifier);
+			String token = newUUIDString();
+			String secret = newUUIDString();
+			DBApps dbapps = new DBApps();
+			dbapps.setUserOAuthToken(userid, consumer.getKey(), token, secret);
+			dbapps.close();
+			return new AnycookOAuthToken(token, secret, consumer.getKey(), null, null);
+		}
+		
 		return null;
 	}
 	
-	public boolean verify(String verifier, String appID){
-		OAuthConsumer consumer = verifierTokens.get(verifier);
-		if(consumer == null)
-			return false;
-		
-		verifierTokens.remove(verifier);
-		return appID.equals(consumer.getKey());
-	}
+//	public boolean verify(String verifier, String appID){
+//		OAuthConsumer consumer = verifierTokens.get(verifier);
+//		if(consumer == null)
+//			return false;
+//		
+//		verifierTokens.remove(verifier);
+//		return appID.equals(consumer.getKey());
+//	}
 	
-	public String getVerifier(OAuthConsumer consumer){
+	public String getVerifier(OAuthConsumer consumer, int userid){
 		String verifier = newUUIDString();
 		verifierTokens.put(verifier, consumer);
+		verifierUser.put(verifier, userid);
 		return verifier;
 	}
 	

@@ -109,12 +109,12 @@ public class OAuthGraph {
 			throw new WebApplicationException(401);
 		
 		OAuthConsumer consumer = requestToken.getConsumer();
-		logger.debug(consumer!=null);
 		
 		String appID = consumer.getKey();
 		
 		
 		DBApps db = new DBApps();
+		User user = session.getUser();
 		//if app seems to be accepted check referer
 		if(accept != null && accept){
 			String referer = request.getHeader("Referer");
@@ -125,11 +125,11 @@ public class OAuthGraph {
 			if(!refererURI.getHost().equals("graph.anycook.de"))
 				throw new WebApplicationException(400);
 			
-			db.authorizeApp(session.getUser(), consumer.getKey());		
+			db.authorizeApp(user, consumer.getKey());		
 		}		
 		
-		if(db.checkUserForApp(session.getUser(), consumer.getKey())){
-			String verifier = provider.getVerifier(consumer);
+		if(db.checkUserForApp(user, consumer.getKey())){
+			String verifier = provider.getVerifier(consumer, user.id);
 			String callbackURL = requestToken.getPrincipal().getName();
 			
 			if(callbackURL == null)
@@ -143,7 +143,6 @@ public class OAuthGraph {
 		String appName = db.getAppName(appID);
 		db.close();
 		
-		User user = session.getUser();
 		responseString.append("Hello ").append(user.name).append("!<br>");
 		
 		responseString.append("Do you want to authorize \"").append(appName)
@@ -158,8 +157,35 @@ public class OAuthGraph {
 	
 	@GET
 	@Path("access_token")
-	public Response getAccessToken(@Context HttpContext hc){
-		return null;
+	public String getAccessToken(@Context HttpContext hc){
+		OAuthServerRequest req = new OAuthServerRequest(hc.getRequest());		
+		OAuthParameters params = new OAuthParameters();
+		params.readRequest(req);
+		
+		String appID = params.getConsumerKey();
+		String verifier = params.getVerifier();
+		OAuthToken requestToken = provider.getRequestToken(params.getToken());
+		if(requestToken == null){
+			throw new WebApplicationException(401);
+		}
+		String secret = requestToken.getSecret();
+		OAuthSecrets secrets = new OAuthSecrets();
+		secrets.setTokenSecret(secret);
+		
+		try {
+	        if(!OAuthSignature.verify(req, params, secrets)){
+	        	logger.warn("verification failed for "+appID);
+	        	throw new WebApplicationException(401);
+	        }
+	        	
+	    }
+	    catch (OAuthSignatureException ose) {
+	    	
+	    	throw new WebApplicationException(401);
+	    }
+		
+		OAuthToken accessToken = provider.newAccessToken(requestToken, verifier);		
+		return accessToken.toString();
 	}
 	
 }
