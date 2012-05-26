@@ -21,10 +21,12 @@ import com.sun.jersey.oauth.server.spi.OAuthToken;
 public class AnycookOAuthProvider implements OAuthProvider{
 	private static final Map<String, OAuthToken> requestTokens;
 	private static final Map<String ,OAuthToken> accessTokens;
+	private static final Map<String , OAuthConsumer> verifierTokens;
 	
 	static{
 		requestTokens = new HashMap<>();
 		accessTokens = new HashMap<>();
+		verifierTokens = new HashMap<>();
 	}
 	
 
@@ -48,6 +50,23 @@ public class AnycookOAuthProvider implements OAuthProvider{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public boolean verify(String verifier, String appID){
+		OAuthConsumer consumer = verifierTokens.get(verifier);
+		if(consumer == null)
+			return false;
+		
+		verifierTokens.remove(verifier);
+		return appID.equals(consumer.getKey());
+	}
+	
+	public String getVerifier(OAuthConsumer consumer){
+		String verifier = newUUIDString();
+		verifierTokens.put(verifier, consumer);
+		return verifier;
+	}
+	
+	
 
 	@Override
 	public OAuthToken newRequestToken(String consumerKey, String callbackUrl,
@@ -55,7 +74,7 @@ public class AnycookOAuthProvider implements OAuthProvider{
 		String token = newUUIDString();
 		String secret = newUUIDString();
 		OAuthToken request_token = 
-				new AnycookOAuthToken(token, secret, consumerKey, attributes);
+				new AnycookOAuthToken(token, secret, consumerKey, callbackUrl, attributes);
 		requestTokens.put(token, request_token);
 		return request_token;
 	}

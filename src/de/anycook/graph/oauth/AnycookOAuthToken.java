@@ -20,20 +20,25 @@ public class AnycookOAuthToken implements OAuthToken {
 	private final Set<String> roles;
 	
 	
-	protected AnycookOAuthToken(String token, String secret, String consumerKey, 
-			Principal principal, Map<String, List<String>> attributes, 
-			Set<String> roles) {
+//	protected AnycookOAuthToken(String token, String secret, String consumerKey, 
+//			Principal principal, Map<String, List<String>> attributes, 
+//			Set<String> roles) {
+//		this.token = token;
+//		this.secret = secret;
+//		this.consumerKey = consumerKey;
+//		this.principal = principal;
+//		this.attributes = AnycookOAuthProvider.newImmutableMultiMap(attributes);
+//		this.roles = roles;
+//	}
+	
+	public AnycookOAuthToken(String token, String secret, String consumerKey, 
+			String callbackURL, Map<String, List<String>> attributes){
 		this.token = token;
 		this.secret = secret;
 		this.consumerKey = consumerKey;
-		this.principal = principal;
+		this.principal = new CallbackPrincipal(callbackURL);
 		this.attributes = AnycookOAuthProvider.newImmutableMultiMap(attributes);
-		this.roles = roles;
-	}
-	
-	public AnycookOAuthToken(String token, String secret, String consumerKey,
-			Map<String, List<String>> attributes){
-		this(token, secret, consumerKey, null, attributes, new HashSet<String>());
+		this.roles = new HashSet<>();
 	}
 
 	@Override
@@ -85,6 +90,20 @@ public class AnycookOAuthToken implements OAuthToken {
 		responseBuilder.append("&oauth_token_secret=").append(getSecret());
 		responseBuilder.append("&oauth_callback_confirmed=true");
 		return responseBuilder.toString();
+		
+	}
+	
+	public static class CallbackPrincipal implements Principal{
+		private final String callbackURL;
+		
+		public CallbackPrincipal(String callbackURL) {
+			this.callbackURL = callbackURL;
+		}
+		
+		@Override
+		public String getName() {
+			return callbackURL;
+		}
 		
 	}
 

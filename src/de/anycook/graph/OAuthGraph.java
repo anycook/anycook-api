@@ -18,7 +18,6 @@ import org.apache.log4j.Logger;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.oauth.server.OAuthServerRequest;
 import com.sun.jersey.oauth.server.spi.OAuthConsumer;
-import com.sun.jersey.oauth.server.spi.OAuthProvider;
 import com.sun.jersey.oauth.server.spi.OAuthToken;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
@@ -35,12 +34,16 @@ import de.anycook.user.User;
 public class OAuthGraph {
 	
 	private final Logger logger;
-	private final OAuthProvider provider;
+	private final static AnycookOAuthProvider provider;
+	
+	static{
+		provider = new AnycookOAuthProvider();
+	}
 	
 	
 	public OAuthGraph(){
 		logger = Logger.getLogger(getClass());
-		provider = new AnycookOAuthProvider();
+		
 	}
 	
 	@POST
@@ -71,7 +74,7 @@ public class OAuthGraph {
 	    	throw new WebApplicationException(401);
 	    }
 		
-		OAuthToken requestToken = provider.newRequestToken(appID, null, hc.getRequest().getQueryParameters());
+		OAuthToken requestToken = provider.newRequestToken(appID, params.getCallback(), hc.getRequest().getQueryParameters());
 		
 
 		
@@ -80,41 +83,83 @@ public class OAuthGraph {
 		
 	}
 	
+	
+	
 	@GET
 	@Path("authorize")
 	public Response appLogin(@QueryParam("oauth_token") String oauthToken, 
-			@Context HttpServletRequest request) throws URISyntaxException, UnsupportedEncodingException{
+			@QueryParam("accept") Boolean accept, @Context HttpServletRequest request) 
+			throws URISyntaxException, UnsupportedEncodingException{
+		
+		//throw exception if theres no request token
 		if(oauthToken == null )
-			throw new WebApplicationException(401);
+			throw new WebApplicationException(400);
+		
 		Session session = Session.init(request.getSession());
 		try{
 			session.checkLogin();
 		}catch(WebApplicationException e){
 			StringBuilder redirectURL = new StringBuilder("http://test.anycook.de/login.html?redirect=");
-			redirectURL.append(URLEncoder.encode("http://graph.anycook.de/oauth/authorize", "UTF-8"));
-			redirectURL.append("&oauth_token=").append(oauthToken);			
-			
+			redirectURL.append(URLEncoder.encode("http://graph.anycook.de/oauth/authorize?oauth_token="+oauthToken, "UTF-8"));			
 			return Response.temporaryRedirect(new URI(redirectURL.toString())).build();
 		}
+		
 		OAuthToken requestToken = provider.getRequestToken(oauthToken);
+		if(requestToken == null)
+			throw new WebApplicationException(401);
+		
 		OAuthConsumer consumer = requestToken.getConsumer();
+		logger.debug(consumer!=null);
+		
 		String appID = consumer.getKey();
 		
+		
+		DBApps db = new DBApps();
+		//if app seems to be accepted check referer
+		if(accept != null && accept){
+			String referer = request.getHeader("Referer");
+			if(referer == null)
+				throw new WebApplicationException(400);
+			URI refererURI = new URI(referer);
+			logger.info(refererURI.getHost());
+			if(!refererURI.getHost().equals("graph.anycook.de"))
+				throw new WebApplicationException(400);
+			
+			db.authorizeApp(session.getUser(), consumer.getKey());		
+		}		
+		
+		if(db.checkUserForApp(session.getUser(), consumer.getKey())){
+			String verifier = provider.getVerifier(consumer);
+			String callbackURL = requestToken.getPrincipal().getName();
+			
+			if(callbackURL == null)
+				return Response.ok("oauth_verifier="+verifier).build();
+			callbackURL+="?oauth_token="+oauthToken+"&oauth_verifier="+verifier;
+			return Response.temporaryRedirect(new URI(callbackURL)).build();
+		}
+		
+		
 		StringBuilder responseString = new StringBuilder();
-		DBApps dbApps = new DBApps();
-		String appName = dbApps.getAppName(appID);
-		dbApps.close();
+		String appName = db.getAppName(appID);
+		db.close();
 		
 		User user = session.getUser();
 		responseString.append("Hello ").append(user.name).append("!<br>");
 		
 		responseString.append("Do you want to authorize \"").append(appName)
 			.append("\"? <br>");
-		
-		
-		
+		responseString.append("<p><a href=\"/oauth/authorize?oauth_token=");
+		responseString.append(oauthToken).append("&accept=true\">yes</a> ");		
+		responseString.append("<a>no</a></p>");		
 		responseString.append("<br>App:").append(consumer.getKey());
+		
 		return Response.ok(responseString.toString()).build();
+	}
+	
+	@GET
+	@Path("access_token")
+	public Response getAccessToken(@Context HttpContext hc){
+		return null;
 	}
 	
 }
