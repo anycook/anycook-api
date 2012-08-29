@@ -5,12 +5,11 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
-import com.mysql.jdbc.Messages;
-
 import de.anycook.graph.filter.OAuthAuthenticationFilter;
 import de.anycook.graph.servlets.discussion.GetDiscussion;
 import de.anycook.graph.servlets.message.GetMessageNumber;
 import de.anycook.graph.servlets.message.GetMessagesession;
+import de.anycook.graph.servlets.message.Messages;
 
 public class Graph extends Application {
 	@Override
