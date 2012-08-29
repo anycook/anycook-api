@@ -9,9 +9,9 @@
       <param-value>de.anycook.graph;de.anycook.graph.filter</param-value>
     </init-param>
     <init-param>
-	  <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-	  <param-value>de.anycook.graph.filter.OAuthAuthenticationFilter</param-value>
-	</init-param>
+      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+      <param-value>de.anycook.graph.filter.OAuthAuthenticationFilter</param-value>
+    </init-param>
   </filter>
   <filter-mapping>
     <filter-name>JerseyBackend</filter-name>

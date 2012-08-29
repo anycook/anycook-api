@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="de.anycook-graph">
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="anycook-graph">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <property name="context-root" value="de.anycook-graph"/>
-        <property name="java-output-path" value="/de.anycook-graph/build/classes"/>
+        <property name="java-output-path" value="/anycook-graph/build/classes"/>
+        <property name="context-root" value="anycook-graph"/>
     </wb-module>
 </project-modules>
