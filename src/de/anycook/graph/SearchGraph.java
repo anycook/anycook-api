@@ -6,7 +6,9 @@ import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -46,6 +48,7 @@ public class SearchGraph {
 	
 	@SuppressWarnings("unchecked")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response search(@QueryParam("callback") String callback, 
 			@QueryParam("tags") StringSet tags,
 			@QueryParam("ingredients") StringSet ingredients,

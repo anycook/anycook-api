@@ -21,6 +21,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
@@ -45,6 +46,7 @@ public class RecipeGraph {
 
 	@SuppressWarnings("unchecked")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll(@QueryParam("callback") String callback){
 		JSONObject json = new JSONObject();
 		List<String> recipes = Recipe.getAll();
@@ -60,6 +62,7 @@ public class RecipeGraph {
 	 */
 	@GET
 	@Path("number")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getNum(@QueryParam("callback") String callback){
 		return JsonpBuilder.buildResponse(callback, Recipe.getTotal());
 	}
@@ -71,6 +74,7 @@ public class RecipeGraph {
 	 */
 	@GET
 	@Path("oftheday")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRecipeOfTheDay(@QueryParam("callback") String callback){
 		Recipe recipeOfTheDay = Recipe.getTagesRezept();
 		return JsonpBuilder.buildResponse(callback, recipeOfTheDay);
@@ -78,6 +82,7 @@ public class RecipeGraph {
 	
 	@GET
 	@Path("{recipename}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRecipe(@PathParam("recipename") String recipeName, 
 			@QueryParam("callback") String callback){
 		
@@ -94,6 +99,7 @@ public class RecipeGraph {
 	
 	@GET
 	@Path("{recipename}/{versionid}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getVersion(@PathParam("recipename") String recipeName,
 			@PathParam("versionid") int versionid,
 			@QueryParam("callback") String callback){
@@ -118,6 +124,7 @@ public class RecipeGraph {
 	
 	@GET
 	@Path("{recipename}/schmeckt")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response checkSchmeckt(@PathParam("recipename") String recipeName,
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){

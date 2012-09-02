@@ -15,6 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
@@ -33,6 +34,7 @@ public class UserGraph {
 	
 	@SuppressWarnings("unchecked")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUsers(@QueryParam("appid") int appid,
 			@QueryParam("callback") String callback){
 		JSONObject json = new JSONObject();
@@ -50,12 +52,14 @@ public class UserGraph {
 	 */
 	@GET
 	@Path("number")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getNum(@QueryParam("callback") String callback){
 		return JsonpBuilder.buildResponse(callback, User.getTotal());
 	}
 
 	@GET
 	@Path("recommendations")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRecommendations(@Context HttpServletRequest request, 
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
@@ -65,6 +69,7 @@ public class UserGraph {
 	
 	@GET
 	@Path("{userid}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUser(@PathParam("userid") int userid,
 			@QueryParam("callback") String callback){
 		User user = User.init(userid);
@@ -73,6 +78,7 @@ public class UserGraph {
 	
 	@POST
 	@Path("{userid}/follow")
+	@Produces(MediaType.APPLICATION_JSON)
 	public void follow(@PathParam("userid") int userid,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
@@ -84,6 +90,7 @@ public class UserGraph {
 	
 	@POST
 	@Path("{userid}/unfollow")
+	@Produces(MediaType.APPLICATION_JSON)
 	public void unfollow(@PathParam("userid") int userid,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){

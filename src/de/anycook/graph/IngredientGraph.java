@@ -5,7 +5,9 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
@@ -19,6 +21,7 @@ public class IngredientGraph {
 	
 	@SuppressWarnings("unchecked")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll(@QueryParam("callback") String callback, @QueryParam("parent") String parent){
 		List<Ingredient> ingredients;
 		if(parent==null)
@@ -39,12 +42,14 @@ public class IngredientGraph {
 	 */
 	@GET
 	@Path("number")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getNum(@QueryParam("callback") String callback){
 		return JsonpBuilder.buildResponse(callback, Ingredient.getTotal());
 	}
 	
 	@GET
 	@Path("{ingredientname}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getIngredient(@PathParam("ingredientname") String ingredientName,
 			@QueryParam("callback") String callback,
 			@QueryParam("children") String children){
