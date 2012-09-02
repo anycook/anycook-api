@@ -9,11 +9,13 @@ import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -31,6 +33,7 @@ import de.anycook.user.settings.MailSettings.Field;
 public class SessionGraph {
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSession(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
@@ -46,6 +49,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("login")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback,
@@ -72,6 +76,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("logout")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response logout(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
@@ -92,6 +97,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("couchdb")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCouchDBCookie(@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
@@ -109,6 +115,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("settings")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getSettings(@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
