@@ -5,7 +5,9 @@ import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
@@ -19,6 +21,7 @@ public class TagGraph {
 	
 	@SuppressWarnings("unchecked")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll(@QueryParam("callback") String callback){
 		List<Tag> tags = Tag.getAll();
 		JSONObject json = new JSONObject();
@@ -34,12 +37,14 @@ public class TagGraph {
 	 */
 	@GET
 	@Path("number")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getNum(@QueryParam("callback") String callback){
 		return JsonpBuilder.buildResponse(callback, Tag.getTotal());
 	}
 	
 	@GET
 	@Path("{tagname}")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getTag(@QueryParam("callback") String callback,
 			@PathParam("tagname") String tagname){
 		Tag tag = Tag.init(tagname);
