@@ -6,8 +6,10 @@ import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
@@ -21,6 +23,7 @@ public class CategoryGraph {
 
 	@SuppressWarnings("unchecked")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAll(@QueryParam("callback") String callback){
 		List<String> categories = Category.getAll();
 		JSONObject json = new JSONObject();
@@ -37,6 +40,7 @@ public class CategoryGraph {
 	 */
 	@Path("sorted")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getAllSorted(@QueryParam("callback") String callback){
 		Map<String, Integer> categories = Category.getAllSorted();
 		return JsonpBuilder.buildResponse(callback, categories);
@@ -44,6 +48,7 @@ public class CategoryGraph {
 	
 	@Path("{categoryname}")
 	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getCategory(@QueryParam("callback") String callback,
 			@PathParam("categoryname") String categoryname){
 		Category category = Category.init(categoryname);
