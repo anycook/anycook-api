@@ -32,6 +32,17 @@ public class IngredientGraph {
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
 	}
 	
+	/**
+	 * Number of ingredients
+	 * @param callback
+	 * @return
+	 */
+	@GET
+	@Path("number")
+	public Response getNum(@QueryParam("callback") String callback){
+		return JsonpBuilder.buildResponse(callback, Ingredient.getTotal());
+	}
+	
 	@GET
 	@Path("{ingredientname}")
 	public Response getIngredient(@PathParam("ingredientname") String ingredientName,
