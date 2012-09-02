@@ -53,6 +53,29 @@ public class RecipeGraph {
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
 	}
 	
+	/**
+	 * Number of recipes
+	 * @param callback
+	 * @return
+	 */
+	@GET
+	@Path("number")
+	public Response getNum(@QueryParam("callback") String callback){
+		return JsonpBuilder.buildResponse(callback, Recipe.getTotal());
+	}
+	
+	/**
+	 * returns the recipe of the day
+	 * @param callback
+	 * @return
+	 */
+	@GET
+	@Path("oftheday")
+	public Response getRecipeOfTheDay(@QueryParam("callback") String callback){
+		Recipe recipeOfTheDay = Recipe.getTagesRezept();
+		return JsonpBuilder.buildResponse(callback, recipeOfTheDay);
+	}
+	
 	@GET
 	@Path("{recipename}")
 	public Response getRecipe(@PathParam("recipename") String recipeName, 

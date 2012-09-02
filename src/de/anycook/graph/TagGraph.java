@@ -27,6 +27,17 @@ public class TagGraph {
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
 	}
 	
+	/**
+	 * Number of tags
+	 * @param callback
+	 * @return
+	 */
+	@GET
+	@Path("number")
+	public Response getNum(@QueryParam("callback") String callback){
+		return JsonpBuilder.buildResponse(callback, Tag.getTotal());
+	}
+	
 	@GET
 	@Path("{tagname}")
 	public Response getTag(@QueryParam("callback") String callback,

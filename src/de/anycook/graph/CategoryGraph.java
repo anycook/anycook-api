@@ -1,6 +1,7 @@
 package de.anycook.graph;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -26,7 +27,19 @@ public class CategoryGraph {
 		json.put("total", categories.size());
 		json.put("categories", categories);
 		
-		return Response.ok(JsonpBuilder.build(callback, json)).build();
+		return JsonpBuilder.buildResponse(callback, json.toJSONString());
+	}
+	
+	/**
+	 * All categories ordered by order attribute in DB
+	 * @param callback
+	 * @return
+	 */
+	@Path("sorted")
+	@GET
+	public Response getAllSorted(@QueryParam("callback") String callback){
+		Map<String, Integer> categories = Category.getAllSorted();
+		return JsonpBuilder.buildResponse(callback, categories);
 	}
 	
 	@Path("{categoryname}")

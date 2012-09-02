@@ -42,6 +42,17 @@ public class UserGraph {
 		
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
 	}
+	
+	/**
+	 * returns the number of users
+	 * @param callback
+	 * @return
+	 */
+	@GET
+	@Path("number")
+	public Response getNum(@QueryParam("callback") String callback){
+		return JsonpBuilder.buildResponse(callback, User.getTotal());
+	}
 
 	@GET
 	@Path("recommendations")
