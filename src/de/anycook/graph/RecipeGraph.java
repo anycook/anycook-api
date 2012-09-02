@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -18,6 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -100,7 +105,18 @@ public class RecipeGraph {
 		
 	}
 	
-	@POST
+	@OPTIONS 
+    @Path("{recipename}/schmeckt") 
+    public Response testt(@Context HttpServletResponse servlerResponse) { 
+        servlerResponse.addHeader("Allow-Control-Allow-Methods", "PUT,DELETE,GET,OPTIONS"); 
+        servlerResponse.addHeader("Access-Control-Allow-Credentials", "true"); 
+        servlerResponse.addHeader("Access-Control-Allow-Origin", "anycook.de"); 
+        servlerResponse.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With"); 
+        servlerResponse.addHeader("Access-Control-Max-Age", "60"); 
+        return Response.ok().build(); 
+    }
+	
+	@PUT
 	@Path("{recipename}/schmeckt")
 	public void schmeckt(@PathParam("recipename") String recipeName,
 			@Context HttpHeaders hh,
@@ -113,8 +129,8 @@ public class RecipeGraph {
 		
 	}
 	
-	@POST
-	@Path("{recipename}/schmecktnicht")
+	@DELETE
+	@Path("{recipename}/unmakeschmeckt")
 	public void schmecktNicht(@PathParam("recipename") String recipeName,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){

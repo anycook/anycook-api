@@ -6,7 +6,6 @@ import javax.servlet.annotation.WebListener;
 
 import org.apache.log4j.Logger;
 
-import de.anycook.db.couchdb.CouchDB;
 import de.anycook.graph.MessageGraph;
 
 
@@ -30,7 +29,7 @@ public class StartListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent arg0) {
     	 logger.info("Server started");
     	 MessageGraph.init();
-         CouchDB.start();
+//         CouchDB.start();
     }
 
 	/**

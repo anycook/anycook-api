@@ -15,9 +15,22 @@ import de.anycook.autocomplete.Autocomplete;
 import de.anycook.misc.JsonpBuilder;
 import de.anycook.user.User;
 
+
+/**
+ * Handles all autocomplete calls
+ * @author Jan Graßegger <jan@anycook.de>
+ *
+ */
 @Path("autocomplete")
 public class AutocompleteGraph {
 	
+	/**
+	 * autocompletes for all categories
+	 * @param query 
+	 * @param maxresults
+	 * @param callback
+	 * @return
+	 */
 	@GET
 	public Response autocomplete(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
