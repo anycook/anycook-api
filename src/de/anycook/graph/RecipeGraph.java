@@ -140,7 +140,7 @@ public class RecipeGraph {
     public Response testt(@Context HttpServletResponse servlerResponse) { 
         servlerResponse.addHeader("Allow-Control-Allow-Methods", "PUT,DELETE,GET,OPTIONS"); 
         servlerResponse.addHeader("Access-Control-Allow-Credentials", "true"); 
-        servlerResponse.addHeader("Access-Control-Allow-Origin", "anycook.de"); 
+        servlerResponse.addHeader("Access-Control-Allow-Origin", "*.anycook.de"); 
         servlerResponse.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With"); 
         servlerResponse.addHeader("Access-Control-Max-Age", "60"); 
         return Response.ok().build(); 
@@ -160,7 +160,7 @@ public class RecipeGraph {
 	}
 	
 	@DELETE
-	@Path("{recipename}/unmakeschmeckt")
+	@Path("{recipename}/schmeckt")
 	public void schmecktNicht(@PathParam("recipename") String recipeName,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
