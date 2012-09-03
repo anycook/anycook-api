@@ -3,6 +3,7 @@ package de.anycook.graph;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,7 +11,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -135,23 +135,30 @@ public class RecipeGraph {
 		
 	}
 	
-	@OPTIONS 
-    @Path("{recipename}/schmeckt") 
-    public Response testt(@Context HttpServletResponse servlerResponse) { 
-        servlerResponse.addHeader("Allow-Control-Allow-Methods", "PUT,DELETE,GET,OPTIONS"); 
-        servlerResponse.addHeader("Access-Control-Allow-Credentials", "true"); 
-        servlerResponse.addHeader("Access-Control-Allow-Origin", "*.anycook.de"); 
-        servlerResponse.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With"); 
-        servlerResponse.addHeader("Access-Control-Max-Age", "60"); 
-        return Response.ok().build(); 
-    }
+//	@OPTIONS 
+//    @Path("{recipename}/schmeckt") 
+//    public Response testt(@Context HttpServletResponse servletResponse) { 
+//        servletResponse.addHeader("Access-Control-Allow-Methods", "PUT,DELETE,GET,OPTIONS"); 
+//        servletResponse.addHeader("Access-Control-Allow-Credentials", "true"); 
+//        servletResponse.addHeader("Access-Control-Allow-Origin", "test.anycook.de"); 
+//        servletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With"); 
+//        servletResponse.addHeader("Access-Control-Max-Age", "60"); 
+//        return Response.ok().build(); 
+//    }
 	
 	@PUT
 	@Path("{recipename}/schmeckt")
 	public void schmeckt(@PathParam("recipename") String recipeName,
 			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+			@Context HttpServletRequest request,
+			@Context HttpServletResponse servletResponse){
+		
 		Session session = Session.init(request.getSession());
+		Map<String, Cookie> cookies = hh.getCookies();
+		logger.debug("cookies:");
+		for(Entry<String, Cookie> cookie : cookies.entrySet()){
+			logger.debug(cookie.getKey()+":"+cookie.getValue());
+		}
 		session.checkLogin(hh.getCookies());
 		boolean schmeckt = session.checkSchmeckt(recipeName);
 		if(!schmeckt)

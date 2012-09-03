@@ -2,7 +2,7 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-  version="3.0"> 
+  version="3.0" metadata-complete="true"> 
   <display-name>anycook-graph</display-name>
   <filter>
     <filter-name>JerseyBackend</filter-name>
@@ -15,6 +15,10 @@
       <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
       <param-value>de.anycook.graph.filter.OAuthAuthenticationFilter</param-value>
     </init-param>
+     <init-param>
+      <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+      <param-value>de.anycook.graph.filter.AccessOriginFilter</param-value>
+  </init-param>
   </filter>
   <filter-mapping>
     <filter-name>JerseyBackend</filter-name>
@@ -24,6 +28,8 @@
     <cookie-config>
       <domain>.anycook.de</domain>
       <path>/</path>
+      <http-only>false</http-only>
+      <secure>false</secure>      
     </cookie-config>
   </session-config>
 </web-app>

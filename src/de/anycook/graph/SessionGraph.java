@@ -63,9 +63,8 @@ public class SessionGraph {
 			User user = session.getUser();
 			ResponseBuilder response = Response.ok(JsonpBuilder.build(callback, user));
 			if(stayloggedin){
-				NewCookie cookie = new NewCookie("de.anycook", session.makePermanentCookieId(user.id), "/", ".de.anycook.de", "", 7 * 24 * 60 *60, true);
-				response.cookie(cookie);
-				
+				NewCookie cookie = new NewCookie("de.anycook", session.makePermanentCookieId(user.id), "/", ".anycook.de", "", 7 * 24 * 60 *60, true);
+				response.cookie(cookie);				
 			}
 			
 			return response.build();
