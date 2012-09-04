@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.log4j.Logger;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -19,17 +18,8 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
  *
  */
 public class AccessOriginFilter implements ContainerResponseFilter {
-	private final Logger logger;
 	private final static Pattern hostPattern = Pattern.compile("(http://(.*)anycook\\.de).*");
 	
-	/**
-	 * Default constructor
-	 */
-	public AccessOriginFilter() {
-		logger = Logger.getLogger(getClass());
-		logger.debug("filter constructor");
-	}
-
 	/* (non-Javadoc)
 	 * @see com.sun.jersey.spi.container.ContainerResponseFilter#filter(com.sun.jersey.spi.container.ContainerRequest, com.sun.jersey.spi.container.ContainerResponse)
 	 */

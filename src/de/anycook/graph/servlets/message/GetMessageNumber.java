@@ -25,6 +25,7 @@ public class GetMessageNumber extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		request.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", true);
 		Integer lastnum = Integer.parseInt(request.getParameter("lastnum"));
 		String callback = request.getParameter("callback");
 		

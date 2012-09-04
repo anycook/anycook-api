@@ -31,6 +31,7 @@ public class GetMessagesession extends HttpServlet{
 	
 	public GetMessagesession() {
 		logger = Logger.getLogger(getClass());
+		logger.debug("init "+getClass());
 	}
 	
 	
@@ -42,6 +43,7 @@ public class GetMessagesession extends HttpServlet{
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		req.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", true);
 		req.setCharacterEncoding("UTF-8");
 		resp.setCharacterEncoding("UTF-8");
 		String lastchange = req.getParameter("lastchange");
