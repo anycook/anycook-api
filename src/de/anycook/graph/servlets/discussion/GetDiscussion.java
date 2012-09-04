@@ -45,7 +45,7 @@ public class GetDiscussion extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		
 		String path = request.getRequestURI();
-		String recipe = path.split("/")[3];
+		String recipe = path.split("/")[2];
 		recipe = URLDecoder.decode(recipe, "UTF-8");
 		
 		String maxidString = request.getParameter("lastid");
