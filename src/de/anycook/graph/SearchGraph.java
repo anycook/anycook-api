@@ -8,12 +8,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import com.google.common.collect.Multimap;
 
 import de.anycook.misc.JsonpBuilder;
 import de.anycook.recipe.Recipe;
@@ -83,6 +86,20 @@ public class SearchGraph {
 		json.put("recipes", recipes);
 		
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
+	}
+	
+	@GET
+	@Path("validate")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response validateSearch(@QueryParam("q") String query,
+			@QueryParam("callback") String callback){
+		if(query==null)
+			throw new WebApplicationException(400);
+			
+		query=query.toLowerCase();
+		Multimap<String, String> result = Search.validateSearch(query);			
+		return JsonpBuilder.buildResponse(callback,
+				JSONObject.toJSONString(result.asMap()));
 	}
 	
 	public static class StringSet extends HashSet<String>{
