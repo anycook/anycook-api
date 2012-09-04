@@ -2,11 +2,11 @@
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-  version="3.0" metadata-complete="true"> 
+  version="3.0"> 
   <display-name>anycook-graph</display-name>
-  <filter>
-    <filter-name>JerseyBackend</filter-name>
-    <filter-class>com.sun.jersey.spi.container.servlet.ServletContainer</filter-class>
+  <servlet>
+    <servlet-name>JerseyBackend</servlet-name>
+    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
     <init-param>
       <param-name>com.sun.jersey.config.property.packages</param-name>
       <param-value>de.anycook.graph;de.anycook.graph.filter</param-value>
@@ -19,16 +19,15 @@
       <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
       <param-value>de.anycook.graph.filter.AccessOriginFilter</param-value>
   </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>JerseyBackend</filter-name>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JerseyBackend</servlet-name>
     <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  </servlet-mapping>  
   <session-config>
     <cookie-config>
       <domain>.anycook.de</domain>
       <path>/</path>
-      <http-only>false</http-only>
       <secure>false</secure>      
     </cookie-config>
   </session-config>
