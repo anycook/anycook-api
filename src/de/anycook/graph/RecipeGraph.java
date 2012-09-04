@@ -3,8 +3,6 @@ package de.anycook.graph;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -154,11 +152,6 @@ public class RecipeGraph {
 			@Context HttpServletResponse servletResponse){
 		
 		Session session = Session.init(request.getSession());
-		Map<String, Cookie> cookies = hh.getCookies();
-		logger.debug("cookies:");
-		for(Entry<String, Cookie> cookie : cookies.entrySet()){
-			logger.debug(cookie.getKey()+":"+cookie.getValue());
-		}
 		session.checkLogin(hh.getCookies());
 		boolean schmeckt = session.checkSchmeckt(recipeName);
 		if(!schmeckt)
