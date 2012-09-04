@@ -36,7 +36,9 @@ public class AccessOriginFilter implements ContainerResponseFilter {
 	@Override
 	public ContainerResponse filter(ContainerRequest request,
 			ContainerResponse resp) {
-		Matcher hostMatcher = hostPattern.matcher(request.getHeaderValue("Referer"));
+		String referer = request.getHeaderValue("Referer");
+		if(referer == null) return resp;
+		Matcher hostMatcher = hostPattern.matcher(referer);
 		if(hostMatcher.matches()){
 			
 //			String refHost = referer.getHost();
