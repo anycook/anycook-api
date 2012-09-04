@@ -88,6 +88,13 @@ public class SearchGraph {
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
 	}
 	
+	
+	/**
+	 * Get possible types for a query. Exact query is matched. 
+	 * @param query 
+	 * @param callback
+	 * @return
+	 */
 	@GET
 	@Path("validate")
 	@Produces(MediaType.APPLICATION_JSON)
