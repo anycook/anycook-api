@@ -1,8 +1,7 @@
-package de.anycook.graph.servlets.message;
+package de.anycook.graph.message;
 
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,14 +17,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.anycook.graph.message.checker.MessagesessionChecker;
 import de.anycook.messages.Messagesession;
-import de.anycook.messages.checker.MessagesessionChecker;
-import de.anycook.misc.DateParser;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 
 
-@WebServlet(urlPatterns = "/message", asyncSupported=true)
+@WebServlet(urlPatterns = "/getmessage", asyncSupported=true, name="MessageSession")
 public class GetMessagesession extends HttpServlet{
 	private final Logger logger;
 	
@@ -40,26 +38,36 @@ public class GetMessagesession extends HttpServlet{
 	 */
 	private static final long serialVersionUID = 1L;
 	
+	
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServlet#doOptions(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
+	@Override
+	protected void doOptions(HttpServletRequest arg0, HttpServletResponse arg1)
+			throws ServletException, IOException {
+		logger.debug("OPTIONS message");
+	}
+	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		req.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", true);
 		req.setCharacterEncoding("UTF-8");
 		resp.setCharacterEncoding("UTF-8");
-		String lastchange = req.getParameter("lastchange");
+		String change = req.getParameter("lastchange");
+		Long lastchange = null;
+		if(change != null)
+			lastchange = Long.parseLong(change);
 		String callback = req.getParameter("callback");
-		Date lastChange = null;
-		if(lastchange != null)
-			lastChange = DateParser.parseDateTime(lastchange);		
 		Session session = Session.init(req.getSession());
 		User user = session.getUser();		
 		AsyncContext async = req.startAsync();
 		async.setTimeout(20000);
-		MessagesessionChecker.addContext(lastChange, user.id, async, callback);
+		MessagesessionChecker.addContext(lastchange, user.id, async, callback);
 	}
 	
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	protected void doPut(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		request.setCharacterEncoding("UTF-8");
 		String message = request.getParameter("message");
@@ -75,6 +83,7 @@ public class GetMessagesession extends HttpServlet{
 			return;
 		}
 		
+		logger.debug("new message");
 		message = URLDecoder.decode(message, "UTF-8");
 		
 		try {
@@ -89,8 +98,7 @@ public class GetMessagesession extends HttpServlet{
 			recipients.add(userid);
 			Messagesession.getSession(recipients).newMessage(userid, message);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 }

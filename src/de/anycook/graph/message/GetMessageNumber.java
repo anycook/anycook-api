@@ -1,4 +1,4 @@
-package de.anycook.graph.servlets.message;
+package de.anycook.graph.message;
 
 import java.io.IOException;
 
@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.anycook.messages.checker.MessageChecker;
+import de.anycook.graph.message.checker.MessageChecker;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 
@@ -17,7 +17,7 @@ import de.anycook.user.User;
 /**
  * Servlet implementation class GetMessageNumber
  */
-@WebServlet(urlPatterns = "/message/number", asyncSupported=true)
+@WebServlet(urlPatterns = "/getmessage/number", asyncSupported=true, name="MessageNumber")
 public class GetMessageNumber extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
