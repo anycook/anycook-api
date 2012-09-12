@@ -5,7 +5,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -125,17 +124,6 @@ public class SessionGraph {
 		return JsonpBuilder.buildResponse(callback, settings);
 	}
 	
-	@OPTIONS
-	@Path("settings/account")
-	public Response setAllowOrigins(){
-		ResponseBuilder response = Response.ok();
-		response.header("Access-Control-Allow-Origin", "*");
-		response.header("Access-Control-Allow-Methods", "POST, OPTIONS");
-		response.header("Access-Control-Allow-Headers", "X-Requested-With, X-File-Name, Content-Type");
-		response.header("Access-Control-Max-Age", "180");
-		return response.build();
-	}
-	
 	@POST
 	@Path("settings/account")
 	public Response changeAccountSettings(@Context HttpServletRequest request,
@@ -157,7 +145,7 @@ public class SessionGraph {
 			response = Response.status(401);
 		}
 		
-		return response.header("Access-Control-Allow-Origin", "*").build();
+		return response.build();
 		
 	}
 	

@@ -45,7 +45,7 @@ public class AutocompleteGraph {
 	}
 	
 	@GET
-	@Path("ingredients")
+	@Path("ingredient")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response autocompleteIngredient(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
@@ -57,7 +57,7 @@ public class AutocompleteGraph {
 	}
 	
 	@GET
-	@Path("users")
+	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response autocompleteUser(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
@@ -69,7 +69,7 @@ public class AutocompleteGraph {
 	}
 	
 	@GET
-	@Path("tags")
+	@Path("tag")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response autocompleteTags(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,

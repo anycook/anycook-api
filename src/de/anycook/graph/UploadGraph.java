@@ -3,7 +3,6 @@ package de.anycook.graph;
 import java.io.File;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -21,17 +20,6 @@ import de.anycook.upload.UserUploader;
 
 @Path("upload")
 public class UploadGraph {
-	
-	@OPTIONS
-	@Path("image/{type}")
-	public Response setAllowOrigins(){
-		ResponseBuilder response = Response.ok();
-		response.header("Access-Control-Allow-Origin", "*");
-		response.header("Access-Control-Allow-Methods", "POST, OPTIONS");
-		response.header("Access-Control-Allow-Headers", "X-Requested-With, X-File-Name, Content-Type");
-		response.header("Access-Control-Max-Age", "180");
-		return response.build();
-	}
 	
 	@POST
 	@Path("image/{type}")
@@ -53,8 +41,7 @@ public class UploadGraph {
 				upload = new UserUploader(session.getUser());
 				break;
 			default:
-				return Response.status(400).entity("unknown type")
-						.header("Access-Control-Allow-Origin", "*").build();
+				return Response.status(400).entity("unknown type").build();
 			}
 			File tempfile = upload.uploadFile(request);		
 			if(tempfile!=null){
@@ -66,7 +53,7 @@ public class UploadGraph {
 		}catch(WebApplicationException e){
 			response = Response.status(401);
 		}
-		return response.header("Access-Control-Allow-Origin", "*").build();
+		return response.build();
 		
 	}
 	

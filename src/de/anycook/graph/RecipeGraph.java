@@ -148,8 +148,7 @@ public class RecipeGraph {
 	@Path("{recipename}/schmeckt")
 	public void schmeckt(@PathParam("recipename") String recipeName,
 			@Context HttpHeaders hh,
-			@Context HttpServletRequest request,
-			@Context HttpServletResponse servletResponse){
+			@Context HttpServletRequest request){
 		
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());

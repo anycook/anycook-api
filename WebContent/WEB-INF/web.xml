@@ -17,7 +17,7 @@
     </init-param>
      <init-param>
       <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-      <param-value>de.anycook.graph.filter.AccessOriginFilter</param-value>
+      <param-value>de.anycook.graph.filter.CorsFilter</param-value>
   </init-param>
   </servlet>
   <servlet-mapping>

@@ -41,7 +41,17 @@
   <param name="Append" value="true" />
   <param name="DatePattern"  value="'.'yyyy-MM" />
     <layout class="org.apache.log4j.PatternLayout">
-      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t]: %m%n" />
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c: %m%n" />
+    </layout>
+  </appender>
+  
+   <!-- GraphApi Logging -->
+  <appender name="snapshot-DaRoPi" class="org.apache.log4j.DailyRollingFileAppender">
+  <param name="File"  value="/var/www/sites/anycook.de/log/snapshot.log" />
+  <param name="Append" value="true" />
+  <param name="DatePattern"  value="'.'yyyy-MM" />
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d{ISO8601} %-5p [%t] %c: %m%n" />
     </layout>
   </appender>
   
@@ -50,6 +60,11 @@
   	<level value="DEBUG" />
   	<appender-ref ref="GRAPH-DaRoPi" />
     <appender-ref ref="mail" />
+   </logger>
+   
+   <logger name="de.anycook.snapshot">
+  	<level value="DEBUG" />
+  	<appender-ref ref="snapshot-DaRoPi" />
    </logger>
    
   <root> 
