@@ -17,13 +17,13 @@
     </init-param>
      <init-param>
       <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-      <param-value>de.anycook.graph.filter.CorsFilter</param-value>
+      <param-value>de.anycook.graph.filter.cors.CorsFilter</param-value>
   </init-param>
   </servlet>
   <servlet-mapping>
     <servlet-name>JerseyBackend</servlet-name>
     <url-pattern>/*</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
   <session-config>
     <cookie-config>
       <domain>.anycook.de</domain>

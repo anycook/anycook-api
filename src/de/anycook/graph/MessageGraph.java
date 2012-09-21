@@ -19,13 +19,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.anycook.graph.filter.CorsFilter;
+import de.anycook.graph.filter.cors.CorsFilter;
 import de.anycook.graph.message.checker.MessageChecker;
 import de.anycook.graph.message.checker.MessagesessionChecker;
 import de.anycook.graph.message.checker.NewMessageChecker;
@@ -63,26 +62,26 @@ public class MessageGraph  {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void newMessage(
 			@HeaderParam("Origin") String origin, 
-			@FormParam("message") String message,
-			@FormParam("recipients") String recipientsString,
+//			@FormParam("message") String message,
+//			@FormParam("recipients") String recipientsString,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request
 			){
 		
-		if(!CorsFilter.checkOrigin(origin)){
-			logger.warn("origin check failed");
+		if(!CorsFilter.checkOrigin(origin))
 			throw new WebApplicationException(401);
-		}
 		
-		if(message == null){
-			logger.info("message was null");
-			throw new WebApplicationException(400);
-		}
-		
-		if(recipientsString == null){
-			logger.info("recipients was null");
-			throw new WebApplicationException(400);
-		}		
+		String message = "test";
+		String recipientsString = "[1]";
+//		if(message == null){
+//			logger.info("message was null");
+//			throw new WebApplicationException(400);
+//		}
+//		
+//		if(recipientsString == null){
+//			logger.info("recipients was null");
+//			throw new WebApplicationException(400);
+//		}
 		
 		try {
 			message = URLDecoder.decode(message, "UTF-8");
@@ -100,6 +99,7 @@ public class MessageGraph  {
 			logger.error(e);
 			throw new WebApplicationException(400);
 		}
+//		return CorsFilter.buildResponse(origin);
 	}
 	
 	@PUT

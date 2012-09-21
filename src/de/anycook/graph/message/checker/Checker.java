@@ -29,7 +29,6 @@ public abstract class Checker implements Runnable {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		logger.debug("stopping "+Thread.currentThread().getId()+" from "+getClass());
 		stop();
 	}
 	
