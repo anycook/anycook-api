@@ -13,7 +13,6 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -61,8 +60,8 @@ public class MessageGraph  {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void newMessage(
 			@HeaderParam("Origin") String origin, 
-//			@FormParam("message") String message,
-//			@FormParam("recipients") String recipientsString,
+			@FormParam("message") String message,
+			@FormParam("recipients") String recipientsString,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request
 			){
@@ -70,17 +69,15 @@ public class MessageGraph  {
 		if(!CorsFilter.checkOrigin(origin))
 			throw new WebApplicationException(401);
 		
-		String message = "test";
-		String recipientsString = "[1]";
-//		if(message == null){
-//			logger.info("message was null");
-//			throw new WebApplicationException(400);
-//		}
-//		
-//		if(recipientsString == null){
-//			logger.info("recipients was null");
-//			throw new WebApplicationException(400);
-//		}
+		if(message == null){
+			logger.info("message was null");
+			throw new WebApplicationException(400);
+		}
+		
+		if(recipientsString == null){
+			logger.info("recipients was null");
+			throw new WebApplicationException(400);
+		}
 		
 		try {
 			message = URLDecoder.decode(message, "UTF-8");
@@ -105,9 +102,18 @@ public class MessageGraph  {
 	@Path("{sessionid}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void answerSession(@PathParam("sessionid") int sessionid,
-			@QueryParam("message") String message,
+			@HeaderParam("Origin") String origin,
+			@FormParam("message") String message,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest req){
+		if(!CorsFilter.checkOrigin(origin))
+			throw new WebApplicationException(401);
+		
+		if(message == null){
+			logger.info("message was null");
+			throw new WebApplicationException(400);
+		}
+		
 		Session session = Session.init(req.getSession());
 		session.checkLogin(hh.getCookies());
 		User user = session.getUser();
