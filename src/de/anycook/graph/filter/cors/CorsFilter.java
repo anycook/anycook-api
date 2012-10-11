@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
@@ -67,12 +66,10 @@ public class CorsFilter implements ContainerResponseFilter {
 			throw new WebApplicationException(401);
 		
 //		String method = request.getMethod();
-		
-		
-		MultivaluedMap<String, Object> headers =resp.getHttpHeaders();
-		headers.putSingle("Access-Control-Allow-Origin", origin);
-		headers.putSingle("Access-Control-Allow-Credentials", "true");
-		
+		ResponseBuilder respBuilder = Response.fromResponse(resp.getResponse());
+		respBuilder.header("Access-Control-Allow-Origin", origin);
+		respBuilder.header("Access-Control-Allow-Credentials", "true");		
+		resp.setResponse(respBuilder.build());
 		
 		return resp;
 	}
@@ -95,13 +92,13 @@ public class CorsFilter implements ContainerResponseFilter {
 		String requestHeaders = 
 				request.getHeaderValue("Access-Control-Request-Headers");
 		
-		MultivaluedMap<String, Object> headers =resp.getHttpHeaders();
-		headers.putSingle("Access-Control-Allow-Origin", origin);
-		headers.putSingle("Access-Control-Allow-Credentials", "true");
-		headers.putSingle("Access-Control-Allow-Methods", methodHeader);
-		if(requestHeaders.length() > 0)
-			headers.putSingle("Access-Control-Allow-Headers", requestHeaders);
-		
+		ResponseBuilder respBuilder = Response.fromResponse(resp.getResponse());
+		respBuilder.header("Access-Control-Allow-Origin", origin);
+		respBuilder.header("Access-Control-Allow-Credentials", "true");
+		respBuilder.header("Access-Control-Allow-Methods", methodHeader);
+		if(requestHeaders != null && requestHeaders.length() > 0)
+			respBuilder.header("Access-Control-Allow-Headers", requestHeaders);
+		resp.setResponse(respBuilder.build());
 		
 		return resp;
 	}
@@ -118,15 +115,15 @@ public class CorsFilter implements ContainerResponseFilter {
 	 * @param hh
 	 * @return
 	 */
-	public static Response buildResponse(String origin) {
-//		if(!checkOrigin(origin))
-//			throw new WebApplicationException(401);
-		
-		ResponseBuilder resp = Response.ok();
-		resp.header("Access-Control-Allow-Origin", origin);
-		resp.header("Access-Control-Allow-Credentials", "true");
-		return resp.build();
-	}
+//	public static Response buildResponse(String origin) {
+////		if(!checkOrigin(origin))
+////			throw new WebApplicationException(401);
+//		
+//		ResponseBuilder resp = Response.ok();
+//		resp.header("Access-Control-Allow-Origin", origin);
+//		resp.header("Access-Control-Allow-Credentials", "true");
+//		return resp.build();
+//	}
 
 	
 	
