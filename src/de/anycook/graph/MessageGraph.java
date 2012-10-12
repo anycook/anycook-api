@@ -14,7 +14,6 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -104,9 +103,18 @@ public class MessageGraph  {
 	@Path("{sessionid}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void answerSession(@PathParam("sessionid") int sessionid,
-			@QueryParam("message") String message,
+			@HeaderParam("Origin") String origin,
+			@FormParam("message") String message,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest req){
+		if(!CorsFilter.checkOrigin(origin))
+			throw new WebApplicationException(401);
+		
+		if(message == null){
+			logger.info("message was null");
+			throw new WebApplicationException(400);
+		}
+		
 		Session session = Session.init(req.getSession());
 		session.checkLogin(hh.getCookies());
 		User user = session.getUser();
