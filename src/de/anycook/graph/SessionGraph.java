@@ -102,7 +102,7 @@ public class SessionGraph {
 		session.checkLogin();
 		User user = session.getUser();
 		String couchdbAuthToken = user.getCouchDBAuthToken();
-		Cookie cookie = new Cookie("AuthSession", couchdbAuthToken, "/", ".de.anycook.de");
+		Cookie cookie = new Cookie("AuthSession", couchdbAuthToken, "/", ".anycook.de");
 		return Response.ok(JsonpBuilder.build(callback, true)).cookie(new NewCookie(cookie))
 				.build();
 		
