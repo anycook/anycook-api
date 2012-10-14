@@ -18,6 +18,7 @@
 	<property name="thirdparty.commons.lang3" location="${thirdparty}/thirdparty-apache-commons-lang3-3.1"/>
 	<property name="thirdparty.commons.math3" location="${thirdparty}/thirdparty-apache-commons-math3-3.0"/>
 	<property name="thirdparty.commons.dbcp" location="${thirdparty}/thirdparty-apache-commons-dbcp-1.4"/>
+	<property name="thirdparty.commons.logging" location="${thirdparty}/thirdparty-apache-commons-logging-1.1.1"/>
 	<property name="thirdparty.commons.pool" location="${thirdparty}/thirdparty-apache-commons-pool-1.6"/>
 	<property name="thirdparty.mysql.jdbc" location="${thirdparty}//thirdparty-mysql-connector-java-5.1.21"/>
 	<property name="aitools3" location="../../aitools3"/>
@@ -77,6 +78,9 @@
 			</lib>
 			<lib dir="${thirdparty.mysql.jdbc}">
 				<include name="mysql-connector-java-5.1.21-bin.jar" />
+			</lib>
+			<lib dir="${thirdparty.commons.logging}">
+				<include name="commons-logging-1.1.1.jar" />
 			</lib>
 		</war>
 		<!-- <delete dir="${project.build}" /> -->
