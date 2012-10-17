@@ -24,7 +24,7 @@ import de.anycook.misc.JsonpBuilder;
 @Path("/life")
 public class LifeGraph {	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getLifes(@QueryParam("newestid") Integer newestid,
 			@QueryParam("oldestid") Integer oldestid,
 			@QueryParam("callback") String callback){

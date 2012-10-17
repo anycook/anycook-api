@@ -48,7 +48,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("login")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response login(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback,
@@ -74,7 +74,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("logout")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response logout(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
@@ -95,7 +95,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("couchdb")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getCouchDBCookie(@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
@@ -113,7 +113,7 @@ public class SessionGraph {
 	
 	@GET
 	@Path("settings")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getSettings(@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());

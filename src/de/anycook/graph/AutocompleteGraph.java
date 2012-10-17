@@ -34,7 +34,7 @@ public class AutocompleteGraph {
 	 * @return
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocomplete(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
@@ -46,7 +46,7 @@ public class AutocompleteGraph {
 	
 	@GET
 	@Path("ingredient")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocompleteIngredient(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
@@ -58,7 +58,7 @@ public class AutocompleteGraph {
 	
 	@GET
 	@Path("user")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocompleteUser(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
@@ -70,7 +70,7 @@ public class AutocompleteGraph {
 	
 	@GET
 	@Path("tag")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocompleteTags(@QueryParam("q") String query,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){

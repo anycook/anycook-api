@@ -23,7 +23,7 @@ public class CategoryGraph {
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getAll(@QueryParam("callback") String callback){
 		List<String> categories = Category.getAll();
 		JSONObject json = new JSONObject();
@@ -40,7 +40,7 @@ public class CategoryGraph {
 	 */
 	@Path("sorted")
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getAllSorted(@QueryParam("callback") String callback){
 		Map<String, Integer> categories = Category.getAllSorted();
 		return JsonpBuilder.buildResponse(callback, categories);
@@ -48,7 +48,7 @@ public class CategoryGraph {
 	
 	@Path("{categoryname}")
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getCategory(@QueryParam("callback") String callback,
 			@PathParam("categoryname") String categoryname){
 		Category category = Category.init(categoryname);

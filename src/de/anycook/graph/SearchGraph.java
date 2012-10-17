@@ -51,7 +51,7 @@ public class SearchGraph {
 	
 	@SuppressWarnings("unchecked")
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response search(@QueryParam("callback") String callback, 
 			@QueryParam("tags") StringSet tags,
 			@QueryParam("ingredients") StringSet ingredients,
@@ -97,7 +97,7 @@ public class SearchGraph {
 	 */
 	@GET
 	@Path("validate")
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response validateSearch(@QueryParam("q") String query,
 			@QueryParam("callback") String callback){
 		if(query==null)

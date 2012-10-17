@@ -7,10 +7,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.anycook.misc.JsonpBuilder;
@@ -23,6 +25,7 @@ import de.anycook.session.Session;
 public class DiscoverGraph {
 	
 	@GET
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getDiscover(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
