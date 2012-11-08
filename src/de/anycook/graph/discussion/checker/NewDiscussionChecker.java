@@ -11,8 +11,8 @@ import javax.ws.rs.core.MediaType;
 
 import de.anycook.db.mysql.DBDiscussion;
 import de.anycook.discussion.Discussion;
-import de.anycook.graph.message.checker.Checker;
-import de.anycook.misc.JsonpBuilder;
+import de.anycook.messages.checker.Checker;
+import de.anycook.utils.JsonpBuilder;
 
 
 public class NewDiscussionChecker extends Checker {

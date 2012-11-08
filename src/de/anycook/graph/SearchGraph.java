@@ -18,7 +18,7 @@ import org.json.simple.JSONObject;
 
 import com.google.common.collect.Multimap;
 
-import de.anycook.misc.JsonpBuilder;
+import de.anycook.utils.JsonpBuilder;
 import de.anycook.recipe.Recipe;
 import de.anycook.search.Search;
 

@@ -21,8 +21,9 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
-import de.anycook.misc.JsonpBuilder;
-import de.anycook.misc.enumerations.ImageType;
+import de.anycook.utils.JsonpBuilder;
+import de.anycook.utils.enumerations.ImageType;
+import de.anycook.recommendation.Recommendation;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 
@@ -64,7 +65,8 @@ public class UserGraph {
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
-		return JsonpBuilder.buildResponse(callback, session.getUser().getRecommendations());
+		Recommendation rec = new Recommendation(session.getUser().id);
+		return JsonpBuilder.buildResponse(callback, rec.recommend());
 	}
 	
 	@GET
@@ -73,7 +75,8 @@ public class UserGraph {
 	public Response getUser(@PathParam("userid") int userid,
 			@QueryParam("callback") String callback){
 		User user = User.init(userid);
-		return Response.ok(JsonpBuilder.build(callback, user.getProfileInfoJSONWithRecipes())).build();
+		String jsonString = user.getProfileInfoJSON().toJSONString();
+		return JsonpBuilder.buildResponse(callback, jsonString);
 	}
 	
 	@POST

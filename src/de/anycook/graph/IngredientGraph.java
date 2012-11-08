@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 
 import de.anycook.ingredient.Ingredient;
-import de.anycook.misc.JsonpBuilder;
+import de.anycook.utils.JsonpBuilder;
 
 
 @Path("/ingredient")

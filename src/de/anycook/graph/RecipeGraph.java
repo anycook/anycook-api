@@ -27,9 +27,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.anycook.db.couchdb.CouchDB;
-import de.anycook.misc.JsonpBuilder;
-import de.anycook.misc.enumerations.ImageType;
+import de.anycook.utils.JsonpBuilder;
+import de.anycook.utils.enumerations.ImageType;
+import de.anycook.couchdb.CouchDB;
 import de.anycook.newrecipe.NewRecipe;
 import de.anycook.newrecipe.NewRecipe.NewRecipeException;
 import de.anycook.recipe.Recipe;

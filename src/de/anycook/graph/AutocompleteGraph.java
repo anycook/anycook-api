@@ -14,7 +14,7 @@ import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 
 import de.anycook.autocomplete.Autocomplete;
-import de.anycook.misc.JsonpBuilder;
+import de.anycook.utils.JsonpBuilder;
 import de.anycook.user.User;
 
 

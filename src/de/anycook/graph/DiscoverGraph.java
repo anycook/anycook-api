@@ -15,7 +15,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import de.anycook.misc.JsonpBuilder;
+import de.anycook.user.User;
+import de.anycook.utils.JsonpBuilder;
 import de.anycook.recipe.Recipe;
 import de.anycook.search.DiscoverHandler;
 import de.anycook.session.Session;
@@ -34,7 +35,8 @@ public class DiscoverGraph {
 		Map<String, List<Recipe>> recipes;
 		try {
 			session.checkLogin(hh.getCookies());
-			recipes = DiscoverHandler.getDiscoverRecipes(recipenum, session.getUser());
+			User user = session.getUser();
+			recipes = DiscoverHandler.getDiscoverRecipes(recipenum, user.id);
 		} catch (WebApplicationException e) {
 			recipes = DiscoverHandler.getDiscoverRecipes(recipenum);
 		}

@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import de.anycook.graph.message.checker.NewMessageChecker;
+import de.anycook.messages.checker.NewMessageChecker;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 

@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.anycook.graph.message.checker.MessageChecker;
+import de.anycook.messages.checker.MessageChecker;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 

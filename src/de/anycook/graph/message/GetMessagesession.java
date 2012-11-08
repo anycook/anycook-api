@@ -17,8 +17,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.anycook.graph.message.checker.MessagesessionChecker;
 import de.anycook.messages.Messagesession;
+import de.anycook.messages.checker.MessagesessionChecker;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 

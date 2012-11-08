@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
 
-import de.anycook.misc.JsonpBuilder;
+import de.anycook.utils.JsonpBuilder;
 import de.anycook.recipe.Recipe;
 import de.anycook.tag.Tag;
 

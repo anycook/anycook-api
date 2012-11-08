@@ -14,5 +14,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/aitools3-aq-check"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/thirdparty-google-guava-13.0.1"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/thirdparty-apache-commons-logging-1.1.1"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-messages"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-user"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-utils"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-news"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-couchdb"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

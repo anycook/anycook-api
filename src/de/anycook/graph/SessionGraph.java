@@ -19,7 +19,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
-import de.anycook.misc.JsonpBuilder;
+import de.anycook.utils.JsonpBuilder;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.User.Userfields;
