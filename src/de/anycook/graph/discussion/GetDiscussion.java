@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import de.aitools.aq.check.A;
+import com.google.common.base.Preconditions;
+
 import de.anycook.graph.discussion.checker.NewDiscussionChecker;
 import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.session.Session;
@@ -55,7 +56,7 @@ public class GetDiscussion extends HttpServlet {
 		if(recipe!=null){
 			recipe = recipe.toLowerCase();
 			AsyncContext context = request.startAsync();
-			A.CHECK_NOT_NULL(context);
+			Preconditions.checkNotNull(context);
 			context.setTimeout(20000);
 			NewDiscussionChecker.addContext(context, recipe, maxid, callback);
 		}
