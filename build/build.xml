@@ -3,32 +3,14 @@
 <project name="anycook-graph" default="dist" basedir="..">
 	
 	<!-- properties -->
+	<loadproperties srcFile="${basedir}/../../code-generic/code-build/anycook.properties" prefix="anycook"/>
+	<loadproperties srcFile="${basedir}/../../code-generic/code-build/thirdparty.properties" prefix="thirdparty"/>
+	
 	<property name="keeponly" value="de.anycook.**" />
 	<property name="tomcat.lib" location="../../tomcat7/lib" />
 	<property name="project.webxml" location="WebContent/WEB-INF/web.xml"/>
 
-	<property name="anycook" location=".." />
-	<property name="anycook.main" location="${anycook}/anycook-main" />
-	<property name="anycook.couchdb" location="${anycook}/anycook-couchdb" />
-	<property name="anycook.mysqldb" location="${anycook}/anycook-mysqldb" />
-	<property name="anycook.messages" location="${anycook}/anycook-messages" />
-	<property name="anycook.news" location="${anycook}/anycook-news" />
-	<property name="anycook.utils" location="${anycook}/anycook-utils" />
-	<property name="anycook.user" location="${anycook}/anycook-user" />
 	<property name="build.sysclasspath" value="last" />
-	<property name="thirdparty" location="../../thirdparty"/>
-	<property name="thirdparty.jersey" location="${thirdparty}/thirdparty-jersey-1.13"/>
-	<property name="thirdparty.jersey.contrib" location="${thirdparty.jersey}/contribs"/>
-	<property name="thirdparty.guava" location="${thirdparty}/thirdparty-google-guava-13.0.1"/>
-	<property name="thirdparty.log4j" location="${thirdparty}/thirdparty-apache-log4j-1.2.17"/>
-	<property name="thirdparty.commons.lang3" location="${thirdparty}/thirdparty-apache-commons-lang3-3.1"/>
-	<property name="thirdparty.commons.math3" location="${thirdparty}/thirdparty-apache-commons-math3-3.0"/>
-	<property name="thirdparty.commons.dbcp" location="${thirdparty}/thirdparty-apache-commons-dbcp-1.4"/>
-	<property name="thirdparty.commons.logging" location="${thirdparty}/thirdparty-apache-commons-logging-1.1.1"/>
-	<property name="thirdparty.commons.pool" location="${thirdparty}/thirdparty-apache-commons-pool-1.6"/>
-	<property name="thirdparty.mysql.jdbc" location="${thirdparty}//thirdparty-mysql-connector-java-5.1.21"/>
-	<property name="aitools3" location="../../aitools3"/>
-	<property name="aitools3.check" location="${aitools3}/aitools3-aq-check"/>
 	<!--<ant antfile="${anycook.build}" dir="${anycook}"/>-->
 
 	<path id="sources">
@@ -36,7 +18,7 @@
 	</path>
 	<path id="libraries">
 		<fileset dir="${tomcat.lib}" includes="*.jar"/>
-		<fileset dir="${thirdparty.guava}" includes="guava-13.0.1.jar"/>
+		<fileset dir="${thirdparty.google.guava}" includes="guava-13.0.1.jar"/>
 		<fileset dir="${thirdparty.log4j}" includes="*.jar"/>
 		<fileset dir="${thirdparty.commons.lang3}" includes="*.jar"/>
 		<fileset dir="${thirdparty.jersey}/lib" includes="*.jar"/>
@@ -64,9 +46,6 @@
             <lib dir="build">
                    <include name="anycook-graph.jar" />
             </lib>
-			<lib dir="lib">
-				<include name="aitools3-aq-check.jar" />
-			</lib>
 			<lib dir="${thirdparty.log4j}">
 				<include name="*.jar" />
 			</lib>
@@ -82,7 +61,7 @@
 			<lib dir="${thirdparty.commons.dbcp}">
 				<include name="commons-dbcp-1.4.jar" />
 			</lib>
-			<lib dir="${thirdparty.guava}">
+			<lib dir="${thirdparty.google.guava}">
 				<include name="guava-13.0.1.jar" />
 			</lib>
 			<lib dir="${thirdparty.commons.pool}">
