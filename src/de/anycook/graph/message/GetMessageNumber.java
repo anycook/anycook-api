@@ -34,7 +34,7 @@ public class GetMessageNumber extends HttpServlet {
 		User user = session.getUser();
 		AsyncContext async = request.startAsync();
 		async.setTimeout(60000);
-		MessageChecker.addContext(async, lastnum, user.id, callback);
+		MessageChecker.addContext(async, lastnum, user.getId(), callback);
 	}
 
 }

@@ -36,7 +36,7 @@ public class DiscoverGraph {
 		try {
 			session.checkLogin(hh.getCookies());
 			User user = session.getUser();
-			recipes = DiscoverHandler.getDiscoverRecipes(recipenum, user.id);
+			recipes = DiscoverHandler.getDiscoverRecipes(recipenum, user.getId());
 		} catch (WebApplicationException e) {
 			recipes = DiscoverHandler.getDiscoverRecipes(recipenum);
 		}

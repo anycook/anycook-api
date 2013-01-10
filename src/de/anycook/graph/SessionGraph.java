@@ -62,7 +62,7 @@ public class SessionGraph {
 			User user = session.getUser();
 			ResponseBuilder response = Response.ok(JsonpBuilder.build(callback, user));
 			if(stayloggedin){
-				NewCookie cookie = new NewCookie("de.anycook", session.makePermanentCookieId(user.id), "/", ".anycook.de", "", 7 * 24 * 60 *60, true);
+				NewCookie cookie = new NewCookie("de.anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, true);
 				response.cookie(cookie);				
 			}
 			
@@ -103,7 +103,7 @@ public class SessionGraph {
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
 		User user = session.getUser();
-		MailSettings mailsettings = MailSettings.init(user.id);
+		MailSettings mailsettings = MailSettings.init(user.getId());
 		Map<String, Settings> settings = new HashMap<>();
 		settings.put("mail", mailsettings);
 		return JsonpBuilder.buildResponse(callback, settings);
@@ -142,7 +142,7 @@ public class SessionGraph {
 			@FormParam("value") boolean value){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
-		MailSettings settings = MailSettings.init(session.getUser().id);
+		MailSettings settings = MailSettings.init(session.getUser().getId());
 		if(type.equals("all")){
 			settings.changeAll(value);
 		}else{

@@ -34,7 +34,8 @@ public class DraftGraph {
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		RecipeDrafts recipeDrafts = new RecipeDrafts();
-		JSONObject json = recipeDrafts.loadDraft(draft_id, session.getUser().id);
+		int userid = session.getUser().getId();
+		JSONObject json = recipeDrafts.loadDraft(draft_id, userid);
 		return JsonpBuilder.buildResponse(callback, json.toJSONString());
 	}
 	
@@ -44,7 +45,7 @@ public class DraftGraph {
 		RecipeDrafts recipeDrafts = new RecipeDrafts();
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
-		return recipeDrafts.newDraft(session.getUser().id);
+		return recipeDrafts.newDraft(session.getUser().getId());
 	}
 	
 	@POST
@@ -58,7 +59,8 @@ public class DraftGraph {
 		try {
 			JSONObject json = (JSONObject)parser.parse(data);
 			RecipeDrafts drafts = new RecipeDrafts();
-			drafts.update(json, session.getUser().id, draft_id);
+			int userid = session.getUser().getId();
+			drafts.update(json, userid, draft_id);
 			
 		} catch (ParseException e) {
 			throw new WebApplicationException(400);

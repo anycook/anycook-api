@@ -31,7 +31,6 @@ import de.anycook.messages.checker.NewMessageChecker;
 import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.messages.Messagesession;
 import de.anycook.session.Session;
-import de.anycook.user.User;
 
 @Path("/writemessage")
 public class MessageGraph  {
@@ -89,7 +88,7 @@ public class MessageGraph  {
 			List<Integer> recipients = new LinkedList<>();
 			for(Object recipientString : recipientsJSON)
 				recipients.add(Integer.parseInt(recipientString.toString()));
-			int userid = session.getUser().id;
+			int userid = session.getUser().getId();
 			recipients.add(userid);
 			Messagesession.getSession(recipients).newMessage(userid, message);
 		} catch (ParseException | UnsupportedEncodingException e) {
@@ -117,8 +116,8 @@ public class MessageGraph  {
 		
 		Session session = Session.init(req.getSession());
 		session.checkLogin(hh.getCookies());
-		User user = session.getUser();
-		Messagesession.getSession(sessionid, user.id).newMessage(user.id, message);
+		int userid = session.getUser().getId();
+		Messagesession.getSession(sessionid, userid).newMessage(userid, message);
 	}
 	
 	@PUT
@@ -130,8 +129,8 @@ public class MessageGraph  {
 			@Context HttpServletRequest req){
 		Session session = Session.init(req.getSession());
 		session.checkLogin(hh.getCookies());
-		User user = session.getUser();
-		Message.read(sessionid, messageid, user.id);
+		int userid = session.getUser().getId();
+		Message.read(sessionid, messageid, userid);
 	}
 	
 //	private static Response addAllowOriginHeaders(ResponseBuilder response, 

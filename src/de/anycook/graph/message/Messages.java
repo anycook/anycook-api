@@ -63,7 +63,7 @@ public class Messages extends HttpServlet{
 		User user = session.getUser();		
 		AsyncContext async = req.startAsync();
 		async.setTimeout(20000);
-		NewMessageChecker.addContext(lastid, user.id, sessionid, async, callback);
+		NewMessageChecker.addContext(lastid, user.getId(), sessionid, async, callback);
 	}
 	
 //	@Override

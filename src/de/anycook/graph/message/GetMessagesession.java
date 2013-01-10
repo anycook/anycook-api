@@ -63,7 +63,7 @@ public class GetMessagesession extends HttpServlet{
 		User user = session.getUser();		
 		AsyncContext async = req.startAsync();
 		async.setTimeout(20000);
-		MessagesessionChecker.addContext(lastchange, user.id, async, callback);
+		MessagesessionChecker.addContext(lastchange, user.getId(), async, callback);
 	}
 	
 	@Override
@@ -94,7 +94,7 @@ public class GetMessagesession extends HttpServlet{
 			List<Integer> recipients = new LinkedList<>();
 			for(Object recipientString : recipientsJSON)
 				recipients.add(Integer.parseInt(recipientString.toString()));
-			int userid = session.getUser().id;
+			int userid = session.getUser().getId();
 			recipients.add(userid);
 			Messagesession.getSession(recipients).newMessage(userid, message);
 		} catch (ParseException e) {
