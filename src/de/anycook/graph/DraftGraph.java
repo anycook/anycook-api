@@ -1,5 +1,7 @@
 package de.anycook.graph;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -7,10 +9,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.json.simple.JSONObject;
@@ -26,17 +30,15 @@ import de.anycook.utils.JsonpBuilder;
 public class DraftGraph {
 	
 	@GET
-	@Path("{id}")
-	public Response getDraft(@PathParam("id") String draft_id,
-			@QueryParam("callback") String callback,
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response get(@QueryParam("callback") String callback,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
-		RecipeDrafts recipeDrafts = new RecipeDrafts();
-		int userid = session.getUser().getId();
-		JSONObject json = recipeDrafts.loadDraft(draft_id, userid);
-		return JsonpBuilder.buildResponse(callback, json.toJSONString());
+		RecipeDrafts drafts = new RecipeDrafts();
+		List<JSONObject> list = drafts.getAll(session.getUser().getId());
+		return JsonpBuilder.buildResponse(callback, list);
 	}
 	
 	@PUT
@@ -65,5 +67,32 @@ public class DraftGraph {
 		} catch (ParseException e) {
 			throw new WebApplicationException(400);
 		}
+	}
+	
+	@GET
+	@Path("num")
+	public Response getDraftNumber(@QueryParam("callback") String callback,
+			@Context HttpHeaders hh,
+			@Context HttpServletRequest request){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		RecipeDrafts drafts = new RecipeDrafts();
+		int draftNum = drafts.count(session.getUser().getId());
+		return JsonpBuilder.buildResponse(callback, draftNum);
+	}
+	
+	@GET
+	@Path("{id}")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getDraft(@PathParam("id") String draft_id,
+			@QueryParam("callback") String callback,
+			@Context HttpHeaders hh,
+			@Context HttpServletRequest request){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		RecipeDrafts recipeDrafts = new RecipeDrafts();
+		int userid = session.getUser().getId();
+		JSONObject json = recipeDrafts.loadDraft(draft_id, userid);
+		return JsonpBuilder.buildResponse(callback, json.toJSONString());
 	}
 }
