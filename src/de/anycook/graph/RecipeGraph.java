@@ -43,9 +43,16 @@ public class RecipeGraph {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getAll(@QueryParam("callback") String callback){
+	public Response getAll(@QueryParam("userid") Integer userid,
+			@QueryParam("callback") String callback){
 		JSONObject json = new JSONObject();
-		List<String> recipes = Recipe.getAll();
+		
+		List<String> recipes;
+		if(userid != null)
+			recipes = Recipe.getRecipenamesfromUser(userid);
+		else
+			recipes = Recipe.getAll();
+		
 		json.put("names", recipes);
 		json.put("total", recipes.size());
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
@@ -191,7 +198,7 @@ public class RecipeGraph {
 		if(userid != -1){
 			if(session.checkLogin(cookies)){
 				 User user = session.getUser();
-				 if(user.id != userid)
+				 if(user.getId() != userid)
 					 throw new WebApplicationException(401);
 			}
 		}
