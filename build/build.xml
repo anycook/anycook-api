@@ -31,6 +31,7 @@
 		<pathelement location="${anycook.messages}" />
 		<pathelement location="${anycook.mysqldb}" />
 		<pathelement location="${anycook.news}" />
+		<pathelement location="${anycook.upload}" />
 		<pathelement location="${anycook.user}" />
 		<pathelement location="${anycook.utils}" />
 	</path>

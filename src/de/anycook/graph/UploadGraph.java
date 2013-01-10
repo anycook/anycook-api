@@ -10,12 +10,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
 import de.anycook.session.Session;
 import de.anycook.upload.RecipeUploader;
 import de.anycook.upload.UploadHandler;
 import de.anycook.upload.UserUploader;
+import de.anycook.user.User.Userfields;
 
 
 @Path("upload")
@@ -27,33 +26,34 @@ public class UploadGraph {
 			@Context HttpHeaders hh,
 			@PathParam("type") String type){
 		
-		
-		ResponseBuilder response = null;
 		UploadHandler upload = null;
+		Session session = Session.init(request.getSession());
 		try{
 			switch (type) {
 			case "recipe":
 				upload = new RecipeUploader();
 				break;
 			case "user":
-				Session session = Session.init(request.getSession());
+				
 				session.checkLogin(hh.getCookies());
-				upload = new UserUploader(session.getUser());
+				upload = new UserUploader();
 				break;
 			default:
-				return Response.status(400).entity("unknown type").build();
+				throw new WebApplicationException(400);
 			}
 			File tempfile = upload.uploadFile(request);		
 			if(tempfile!=null){
 				String newFilename = upload.saveFile(tempfile);
-				response =  Response.ok("{success:\""+newFilename+"\"}");									
+				if(type.equals("user"))
+					session.getUser().changeSetting(Userfields.IMAGE, newFilename);
+				
+				return  Response.ok("{success:\""+newFilename+"\"}").build();									
 			}
 			else
-				response = Response.status(400).entity("{error:\"upload failed\"}");
+				return Response.status(400).entity("{error:\"upload failed\"}").build();
 		}catch(WebApplicationException e){
-			response = Response.status(401);
+			throw new WebApplicationException(401);
 		}
-		return response.build();
 		
 	}
 	

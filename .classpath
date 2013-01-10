@@ -19,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/anycook-news"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/anycook-mongodb"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/thirdparty-mongo-2.10.1"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-upload"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
