@@ -29,7 +29,6 @@ import org.json.simple.parser.ParseException;
 
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.utils.enumerations.ImageType;
-import de.anycook.couchdb.CouchDB;
 import de.anycook.newrecipe.NewRecipe;
 import de.anycook.newrecipe.NewRecipe.NewRecipeException;
 import de.anycook.recipe.Recipe;
@@ -212,9 +211,9 @@ public class RecipeGraph {
 					throw new WebApplicationException(Response.status(400).entity(e.getMessage()).build());
 				}
 				newRecipe.saveNewVersion();
-				if(json.containsKey("mongoid"))
-					CouchDB.delete(json.get("mongoid").toString(), 
-							Integer.parseInt(json.get("userid").toString()));
+//				if(json.containsKey("mongoid"))
+//					CouchDB.delete(json.get("mongoid").toString(), 
+//							Integer.parseInt(json.get("userid").toString()));
 			}
 		}
 		

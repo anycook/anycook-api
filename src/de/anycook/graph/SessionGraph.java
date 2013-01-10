@@ -93,21 +93,6 @@ public class SessionGraph {
 		return response.entity(JsonpBuilder.build(callback, "true")).build();
 	}
 	
-	@GET
-	@Path("couchdb")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getCouchDBCookie(@Context HttpServletRequest request,
-			@QueryParam("callback") String callback){
-		Session session = Session.init(request.getSession());
-		session.checkLogin();
-		User user = session.getUser();
-		String couchdbAuthToken = user.getCouchDBAuthToken();
-		Cookie cookie = new Cookie("AuthSession", couchdbAuthToken, "/", ".anycook.de");
-		return Response.ok(JsonpBuilder.build(callback, true)).cookie(new NewCookie(cookie))
-				.build();
-		
-	}
-	
 	
 	//settings
 	
