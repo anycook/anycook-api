@@ -18,6 +18,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,6 +30,12 @@ import de.anycook.utils.JsonpBuilder;
 
 @Path("/drafts")
 public class DraftGraph {
+	
+	private Logger logger;
+	
+	public DraftGraph(){
+		logger = Logger.getLogger(getClass());
+	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
@@ -49,25 +56,6 @@ public class DraftGraph {
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		return recipeDrafts.newDraft(session.getUser().getId());
-	}
-	
-	@POST
-	public void setData(@FormParam("data") String data, 
-			@FormParam("id") String draft_id,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){		
-		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		JSONParser parser = new JSONParser();
-		try {
-			JSONObject json = (JSONObject)parser.parse(data);
-			RecipeDrafts drafts = new RecipeDrafts();
-			int userid = session.getUser().getId();
-			drafts.update(json, userid, draft_id);
-			
-		} catch (ParseException e) {
-			throw new WebApplicationException(400);
-		}
 	}
 	
 	@GET
@@ -94,8 +82,35 @@ public class DraftGraph {
 		session.checkLogin(hh.getCookies());
 		RecipeDrafts recipeDrafts = new RecipeDrafts();
 		int userid = session.getUser().getId();
-		JSONObject json = recipeDrafts.loadDraft(draft_id, userid);
-		return JsonpBuilder.buildResponse(callback, json.toJSONString());
+		
+		try {
+			JSONObject json = recipeDrafts.loadDraft(draft_id, userid);
+			return JsonpBuilder.buildResponse(callback, json.toJSONString());
+		} catch (ParseException e) {
+			logger.error(e);
+			throw new WebApplicationException(400);
+		}
+		
+	}
+	
+	@POST
+	@Path("{id}")
+	public void setData(@FormParam("data") String data, 
+			@PathParam("id") String draft_id,
+			@Context HttpHeaders hh,
+			@Context HttpServletRequest request){		
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		JSONParser parser = new JSONParser();
+		try {
+			JSONObject json = (JSONObject)parser.parse(data);
+			RecipeDrafts drafts = new RecipeDrafts();
+			int userid = session.getUser().getId();
+			drafts.update(json, userid, draft_id);
+			
+		} catch (ParseException e) {
+			throw new WebApplicationException(400);
+		}
 	}
 	
 	@DELETE

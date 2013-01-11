@@ -138,17 +138,6 @@ public class RecipeGraph {
 		
 	}
 	
-//	@OPTIONS 
-//    @Path("{recipename}/schmeckt") 
-//    public Response testt(@Context HttpServletResponse servletResponse) { 
-//        servletResponse.addHeader("Access-Control-Allow-Methods", "PUT,DELETE,GET,OPTIONS"); 
-//        servletResponse.addHeader("Access-Control-Allow-Credentials", "true"); 
-//        servletResponse.addHeader("Access-Control-Allow-Origin", "test.anycook.de"); 
-//        servletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type,X-Requested-With"); 
-//        servletResponse.addHeader("Access-Control-Max-Age", "60"); 
-//        return Response.ok().build(); 
-//    }
-	
 	@PUT
 	@Path("{recipename}/schmeckt")
 	public void schmeckt(@PathParam("recipename") String recipeName,
