@@ -3,6 +3,7 @@ package de.anycook.graph;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -71,6 +72,7 @@ public class DraftGraph {
 	
 	@GET
 	@Path("num")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getDraftNumber(@QueryParam("callback") String callback,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
@@ -95,4 +97,17 @@ public class DraftGraph {
 		JSONObject json = recipeDrafts.loadDraft(draft_id, userid);
 		return JsonpBuilder.buildResponse(callback, json.toJSONString());
 	}
+	
+	@DELETE
+	@Path("{id}")
+	public void remove(@PathParam("id") String draft_id,
+			@Context HttpHeaders hh,
+			@Context HttpServletRequest request){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		RecipeDrafts recipeDrafts = new RecipeDrafts();
+		int user_id = session.getUser().getId();
+		recipeDrafts.remove(user_id, draft_id);
+	}
+	
 }
