@@ -56,6 +56,9 @@
 			<lib dir="${thirdparty.mongo}">
 				<include name="*.jar" />
 			</lib>
+			<lib dir="${thirdparty.snowball}">
+				<include name="*.jar" />
+			</lib>
 			<lib dir="${thirdparty.commons.lang3}">
 				<include name="commons-lang3-3.1.jar" />
 			</lib>
