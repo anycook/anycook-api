@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.google.common.base.Preconditions;
 
+import de.anycook.discussion.Discussion;
 import de.anycook.graph.discussion.checker.NewDiscussionChecker;
 import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.session.Session;
@@ -73,11 +74,14 @@ public class GetDiscussion extends HttpServlet {
 			String recipe = path.split("/")[3];
 			recipe = URLDecoder.decode(recipe, "UTF-8");
 			if(text!=null && recipe != null){
-				String pid = request.getParameter("pid");
-				if(pid == null)
-					shandler.discuss(text, recipe);
-				else
-					shandler.answerDiscuss(text, recipe, pid);
+				String pidS = request.getParameter("pid");
+				int userid = shandler.getUser().getId();
+				if(pidS == null)
+					Discussion.discuss(text, userid, recipe);
+				else{
+					int pid = Integer.parseInt(pidS);
+					Discussion.answer(text, pid, userid, recipe);
+				}
 			}
 		}
 	}

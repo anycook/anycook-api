@@ -9,8 +9,8 @@ import javax.servlet.AsyncContext;
 import javax.servlet.ServletResponse;
 import javax.ws.rs.core.MediaType;
 
-import de.anycook.db.mysql.DBDiscussion;
 import de.anycook.discussion.Discussion;
+import de.anycook.discussion.db.DBDiscussion;
 import de.anycook.messages.checker.Checker;
 import de.anycook.utils.JsonpBuilder;
 

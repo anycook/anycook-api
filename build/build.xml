@@ -34,6 +34,7 @@
 		<pathelement location="${anycook.upload}" />
 		<pathelement location="${anycook.user}" />
 		<pathelement location="${anycook.utils}" />
+		<pathelement location="${anycook.discussion}" />
 	</path>
 	
 	<!-- upload war file to anycook.de -->

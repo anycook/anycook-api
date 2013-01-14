@@ -23,6 +23,7 @@ import org.json.simple.JSONObject;
 
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.utils.enumerations.ImageType;
+import de.anycook.discussion.Discussion;
 import de.anycook.recipe.Recipe;
 import de.anycook.recommendation.Recommendation;
 import de.anycook.session.Session;
@@ -127,5 +128,14 @@ public class UserGraph {
 			@QueryParam("callback") String callback){
 		List<String> schmeckt = Recipe.getSchmecktRecipesfromUser(userid);
 		return JsonpBuilder.buildResponse(callback, schmeckt);
+	}
+	
+	@GET
+	@Path("{userid}/discussionnum")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getDiscussionNum(@PathParam("userid") int userid,
+			@QueryParam("callback") String callback){
+		int discNum = Discussion.getDiscussionNumforUser(userid);
+		return JsonpBuilder.buildResponse(callback, discNum);
 	}
 }
