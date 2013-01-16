@@ -46,6 +46,7 @@ public class DraftGraph {
 		session.checkLogin(hh.getCookies());
 		RecipeDrafts drafts = new RecipeDrafts();
 		List<JSONObject> list = drafts.getAll(session.getUser().getId());
+		drafts.close();
 		return JsonpBuilder.buildResponse(callback, list);
 	}
 	
@@ -68,6 +69,7 @@ public class DraftGraph {
 		session.checkLogin(hh.getCookies());
 		RecipeDrafts drafts = new RecipeDrafts();
 		int draftNum = drafts.count(session.getUser().getId());
+		drafts.close();
 		return JsonpBuilder.buildResponse(callback, draftNum);
 	}
 	
@@ -84,11 +86,13 @@ public class DraftGraph {
 		int userid = session.getUser().getId();
 		
 		try {
-			JSONObject json = recipeDrafts.loadDraft(draft_id, userid);
+			JSONObject json = recipeDrafts.loadDraft(draft_id, userid);			
 			return JsonpBuilder.buildResponse(callback, json.toJSONString());
 		} catch (ParseException e) {
 			logger.error(e);
 			throw new WebApplicationException(400);
+		} finally{
+			recipeDrafts.close();
 		}
 		
 	}
@@ -102,14 +106,17 @@ public class DraftGraph {
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		JSONParser parser = new JSONParser();
+		RecipeDrafts drafts = new RecipeDrafts();
 		try {
 			JSONObject json = (JSONObject)parser.parse(data);
-			RecipeDrafts drafts = new RecipeDrafts();
+			
 			int userid = session.getUser().getId();
 			drafts.update(json, userid, draft_id);
 			
 		} catch (ParseException e) {
 			throw new WebApplicationException(400);
+		} finally{
+			drafts.close();
 		}
 	}
 	
@@ -123,6 +130,7 @@ public class DraftGraph {
 		RecipeDrafts recipeDrafts = new RecipeDrafts();
 		int user_id = session.getUser().getId();
 		recipeDrafts.remove(user_id, draft_id);
+		recipeDrafts.close();
 	}
 	
 }
