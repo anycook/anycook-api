@@ -21,5 +21,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/thirdparty-mongo-2.10.1"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/anycook-upload"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/anycook-discussion"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-search"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

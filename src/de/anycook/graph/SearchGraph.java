@@ -12,7 +12,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -21,6 +20,7 @@ import com.google.common.collect.Multimap;
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.recipe.Recipe;
 import de.anycook.search.Search;
+import de.anycook.search.SearchResult;
 
 
 @Path("search")
@@ -74,15 +74,15 @@ public class SearchGraph {
 		search.setSkill(skill);
 		search.setTime(time);
 		
-		Pair<Integer, List<String>> resultPair = search.search(start, num);
+		SearchResult result = search.search(start, num);
 		JSONObject json = new JSONObject();
 		JSONArray recipes = new JSONArray();
-		List<String> results = resultPair.getRight();
-		for(String result : results){
-			recipes.add(Recipe.getJSONforSearch(result));
+		List<String> results = result.getResults();
+		for(String recipe : results){
+			recipes.add(Recipe.getJSONforSearch(recipe));
 		}
 		
-		json.put("size", resultPair.getLeft());
+		json.put("size", result.getResultLength());
 		json.put("recipes", recipes);
 		
 		return Response.ok(JsonpBuilder.build(callback, json)).build();

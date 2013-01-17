@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response;
 
 import de.anycook.user.User;
 import de.anycook.utils.JsonpBuilder;
-import de.anycook.search.DiscoverHandler;
+import de.anycook.discover.DiscoverHandler;
 import de.anycook.session.Session;
 
 
