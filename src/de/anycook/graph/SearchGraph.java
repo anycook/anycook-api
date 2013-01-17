@@ -57,6 +57,8 @@ public class SearchGraph {
 		JSONObject json = new JSONObject();
 		JSONArray recipes = new JSONArray();
 		List<String> results = result.getResults();
+		
+		
 		for(String recipe : results){
 			recipes.add(Recipe.getJSONforSearch(recipe));
 		}
