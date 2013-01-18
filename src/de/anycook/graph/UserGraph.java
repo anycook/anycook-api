@@ -51,7 +51,6 @@ public class UserGraph {
 	}
 	
 	@PUT
-	@Produces(MediaType.APPLICATION_JSON)
 	public Response newUser(@FormParam("mail") String mail, 
 			@FormParam("username") String username,
 			@FormParam("password") String password){

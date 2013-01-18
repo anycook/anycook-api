@@ -32,6 +32,7 @@ public class SearchGraph {
 	public Response search(@QueryParam("callback") String callback, 
 			@QueryParam("tags") StringSet tags,
 			@QueryParam("ingredients") StringSet ingredients,
+			@QueryParam("excludedingredients") StringSet excludedIngredients,
 			@QueryParam("terms") StringSet terms,
 			@QueryParam("category") String category,
 			@QueryParam("calorie") int calorie,
@@ -44,7 +45,9 @@ public class SearchGraph {
 		if(tags!= null && !tags.isEmpty())
 			search.addTags(tags);
 		if(ingredients != null && !ingredients.isEmpty())
-			search.addZutaten(ingredients);
+			search.setIngredients(ingredients);
+		if(excludedIngredients != null && !excludedIngredients.isEmpty())
+			search.setExcludedIngredients(excludedIngredients);
 		if(terms != null && !terms.isEmpty())
 			search.addTerms(terms);
 		search.setKategorie(category);
