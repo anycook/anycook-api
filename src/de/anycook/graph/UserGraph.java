@@ -6,8 +6,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -46,6 +48,33 @@ public class UserGraph {
 		json.put("total", users.size());
 		
 		return Response.ok(JsonpBuilder.build(callback, json)).build();
+	}
+	
+	@PUT
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response newUser(@FormParam("mail") String mail, 
+			@FormParam("username") String username,
+			@FormParam("password") String password){
+		boolean response = User.newUser(mail, password, username);
+		if(response)
+			return Response.ok().build();
+		else throw new WebApplicationException(400);
+	}
+	
+	@GET
+	@Path("mail")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkMail(@QueryParam("mail") String mail,
+			@QueryParam("callback") String callback){
+		return JsonpBuilder.buildResponse(callback, User.checkMail(mail));
+	}
+	
+	@GET
+	@Path("name")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkUsername(@QueryParam("username") String username,
+			@QueryParam("callback") String callback){
+		return JsonpBuilder.buildResponse(callback, User.checkUsername(username));
 	}
 	
 	/**
