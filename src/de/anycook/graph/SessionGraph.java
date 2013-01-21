@@ -20,12 +20,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import de.anycook.utils.JsonpBuilder;
+import de.anycook.utils.enumerations.NotificationType;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.User.Userfields;
 import de.anycook.user.settings.MailSettings;
 import de.anycook.user.settings.Settings;
-import de.anycook.user.settings.MailSettings.Field;
 
 
 @Path("session")
@@ -138,15 +138,15 @@ public class SessionGraph {
 	@Path("settings/mail/{type}")
 	public void changeMailSettings(@Context HttpServletRequest request,
 			@Context HttpHeaders hh, 
-			@PathParam("type") String type,
+			@PathParam("type") NotificationType type,
 			@FormParam("value") boolean value){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		MailSettings settings = MailSettings.init(session.getUser().getId());
 		if(type.equals("all")){
-			settings.changeAll(value);
+//			TODO settings.changeAll(value);
 		}else{
-			settings.change(Field.valueOf(type), value);
+			settings.change(type, value);
 		}		
 	}
 }
