@@ -93,6 +93,14 @@ public class SessionGraph {
 		return response.entity(JsonpBuilder.build(callback, "true")).build();
 	}
 	
+	@POST
+	@Path("activate")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response activateAccount(@FormParam("activationkey") String activationKey){
+		boolean check = User.activateById(activationKey);
+		return Response.ok(check).build();
+	}
+	
 	
 	//settings
 	
