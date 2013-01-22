@@ -98,7 +98,7 @@ public class SessionGraph {
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response activateAccount(@FormParam("activationkey") String activationKey){
 		boolean check = User.activateById(activationKey);
-		return Response.ok(check).build();
+		return Response.ok(Boolean.toString(check)).build();
 	}
 	
 	
