@@ -2,8 +2,6 @@ package de.anycook.graph;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -62,17 +60,13 @@ public class AutocompleteGraph {
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocompleteUser(@QueryParam("q") String query,
-			@QueryParam("exclude") List<Integer> exclude,
+			@QueryParam("exclude") IntSet exclude,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
 		
-		Set<Integer> excludeIds = null;
-		if(exclude != null)
-			excludeIds = new HashSet<>(exclude);
-		
-		List<User> data = Autocomplete.autocompleteUsernames(query, maxresults, excludeIds);
+		List<User> data = Autocomplete.autocompleteUsernames(query, maxresults, exclude);
 		return JsonpBuilder.buildResponse(callback, data);
 	}
 	
@@ -86,5 +80,20 @@ public class AutocompleteGraph {
 			throw new WebApplicationException(401);
 		List<String> data = Autocomplete.autocompleteTag(query, maxresults);
 		return JsonpBuilder.buildResponse(callback, data);
+	}
+	
+	public static class IntSet extends HashSet<Integer>{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		public IntSet(String in) {
+			super();
+			if(in != null){
+				for(String split : in.split(","))
+					add(Integer.parseInt(split));
+			}
+		}
 	}
 }
