@@ -1,6 +1,8 @@
 package de.anycook.graph;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -60,11 +62,17 @@ public class AutocompleteGraph {
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocompleteUser(@QueryParam("q") String query,
+			@QueryParam("exclude") List<Integer> exclude,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		List<User> data = Autocomplete.autocompleteUsernames(query, maxresults);
+		
+		Set<Integer> excludeIds = null;
+		if(exclude != null)
+			excludeIds = new HashSet<>(exclude);
+		
+		List<User> data = Autocomplete.autocompleteUsernames(query, maxresults, excludeIds);
 		return JsonpBuilder.buildResponse(callback, data);
 	}
 	
