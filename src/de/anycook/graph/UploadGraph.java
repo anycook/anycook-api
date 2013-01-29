@@ -33,8 +33,7 @@ public class UploadGraph {
 			case "recipe":
 				upload = new RecipeUploader();
 				break;
-			case "user":
-				
+			case "user":				
 				session.checkLogin(hh.getCookies());
 				upload = new UserUploader();
 				break;
