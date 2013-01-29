@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 
 import de.anycook.autocomplete.Autocomplete;
+import de.anycook.graph.SearchGraph.StringSet;
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.user.User;
 
@@ -36,11 +37,16 @@ public class AutocompleteGraph {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocomplete(@QueryParam("q") String query,
+			@QueryParam("excludedUsers") IntSet excludedUsers,
+			@QueryParam("excludedTags") StringSet excludedTags,
+			@QueryParam("excludedIngredients") StringSet excludedIngredients,
+			@QueryParam("excludedCategorie") String excludedCategorie,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		JSONObject data = Autocomplete.autocompleteAll(query, maxresults);
+		JSONObject data = Autocomplete.autocompleteAll(query, maxresults, 
+				excludedIngredients, excludedTags, excludedUsers, excludedCategorie);
 		return JsonpBuilder.buildResponse(callback, data.toJSONString());
 	}
 	
@@ -52,7 +58,7 @@ public class AutocompleteGraph {
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		List<String> data = Autocomplete.autocompleteZutat(query, maxresults);
+		List<String> data = Autocomplete.autocompleteZutat(query, maxresults, null);
 		return JsonpBuilder.buildResponse(callback, data);
 	}
 	
@@ -78,7 +84,7 @@ public class AutocompleteGraph {
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		List<String> data = Autocomplete.autocompleteTag(query, maxresults);
+		List<String> data = Autocomplete.autocompleteTag(query, maxresults, null);
 		return JsonpBuilder.buildResponse(callback, data);
 	}
 	
