@@ -21,6 +21,7 @@
 		<fileset dir="${thirdparty.google.guava}" includes="guava-13.0.1.jar"/>
 		<fileset dir="${thirdparty.log4j}" includes="*.jar"/>
 		<fileset dir="${thirdparty.commons.lang3}" includes="*.jar"/>
+		<fileset dir="${thirdparty.commons.io}" includes="*.jar"/>
 		<fileset dir="${thirdparty.jersey}/lib" includes="*.jar"/>
 		<fileset dir="${thirdparty.jersey.contrib}" includes="oauth*.jar"/>
 	</path>

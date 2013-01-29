@@ -43,7 +43,7 @@ public class UserGraph {
 	public Response getUsers(@QueryParam("appid") int appid,
 			@QueryParam("callback") String callback){
 		JSONObject json = new JSONObject();
-		List<User> users = User.getAll();
+		List<Integer> users = User.getAll();
 		json.put("users", users);
 		json.put("total", users.size());
 		
