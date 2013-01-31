@@ -54,12 +54,12 @@ public class AutocompleteGraph {
 	@Path("ingredient")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocompleteIngredient(@QueryParam("q") String query,
-			@QueryParam("excluded") StringSet excluded,
+			@QueryParam("exclude") StringSet exclude,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		List<String> data = Autocomplete.autocompleteZutat(query, maxresults, excluded);
+		List<String> data = Autocomplete.autocompleteZutat(query, maxresults, exclude);
 		return JsonpBuilder.buildResponse(callback, data);
 	}
 	
@@ -81,11 +81,12 @@ public class AutocompleteGraph {
 	@Path("tag")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response autocompleteTags(@QueryParam("q") String query,
+			@QueryParam("exclude") StringSet exclude,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		List<String> data = Autocomplete.autocompleteTag(query, maxresults, null);
+		List<String> data = Autocomplete.autocompleteTag(query, maxresults, exclude);
 		return JsonpBuilder.buildResponse(callback, data);
 	}
 	
