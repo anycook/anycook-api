@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.mailprovider.MailProvider;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.User.Userfields;
@@ -115,6 +116,19 @@ public class SessionGraph {
 		Map<String, Settings> settings = new HashMap<>();
 		settings.put("mail", mailsettings);
 		return JsonpBuilder.buildResponse(callback, settings);
+	}
+	
+	@GET
+	@Path("mailprovider")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response checkMailAnbieter(@QueryParam("domain") String domain){
+		if(domain == null) 
+			throw new WebApplicationException(400);
+		MailProvider provider = MailProvider.getMailanbieterfromDomain(domain);
+		
+		if(provider != null)
+			return JsonpBuilder.buildResponse(null, provider);
+		return JsonpBuilder.buildResponse(null, ""); 
 	}
 	
 	@POST

@@ -79,7 +79,8 @@ public class RecipeGraph {
 	@Path("oftheday")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getRecipeOfTheDay(@QueryParam("callback") String callback){
-		Recipe recipeOfTheDay = Recipe.getTagesRezept();
+		String recipeOfTheDay = Recipe.getTagesRezept();
+		recipeOfTheDay = String.format("\"%s\"", recipeOfTheDay);		
 		return JsonpBuilder.buildResponse(callback, recipeOfTheDay);
 	}
 	

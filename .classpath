@@ -22,5 +22,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/anycook-upload"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/anycook-discussion"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/anycook-search"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/anycook-mailprovider"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
