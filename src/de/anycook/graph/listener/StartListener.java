@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebListener;
 
 import org.apache.log4j.Logger;
 
+import de.anycook.db.mysql.DBHandler;
 import de.anycook.graph.MessageGraph;
 
 
@@ -37,6 +38,7 @@ public class StartListener implements ServletContextListener {
      */
     public void contextDestroyed(ServletContextEvent arg0) {
     	MessageGraph.stop();
+    	DBHandler.closeSource();
     	logger.info("Server stopped");
     }
 	

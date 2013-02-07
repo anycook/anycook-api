@@ -43,7 +43,7 @@ public class NewDiscussionChecker extends Checker {
 	
 	@Override
 	public void run() {
-		while(running){
+		while(!Thread.currentThread().isInterrupted()){
 			timeout = false;
 			DiscussionContextObject data = getContext();
 			if(data == null)
@@ -86,7 +86,7 @@ public class NewDiscussionChecker extends Checker {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
 					db.close();
-					stop();					
+					Thread.currentThread().interrupt();				
 					return null;
 				}
 			}
