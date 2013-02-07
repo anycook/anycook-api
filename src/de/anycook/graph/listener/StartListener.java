@@ -30,7 +30,6 @@ public class StartListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent arg0) {
     	 logger.info("Server started");
     	 MessageGraph.init();
-//         CouchDB.start();
     }
 
 	/**
