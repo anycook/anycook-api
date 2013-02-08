@@ -27,12 +27,15 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import de.anycook.tag.Tag;
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.utils.enumerations.ImageType;
+import de.anycook.ingredient.Ingredient;
 import de.anycook.newrecipe.NewRecipe;
 import de.anycook.newrecipe.NewRecipe.NewRecipeException;
 import de.anycook.recipe.Recipe;
 import de.anycook.session.Session;
+import de.anycook.step.Step;
 import de.anycook.user.User;
 
 
@@ -97,7 +100,34 @@ public class RecipeGraph {
 			recipe = Recipe.init(recipeName);
 		if(recipe == null)
 			throw new WebApplicationException(400);
-		return Response.ok(JsonpBuilder.build(callback, recipe)).build();
+		return JsonpBuilder.buildResponse(callback, recipe);
+	}
+	
+	@GET
+	@Path("{recipename}/ingredients")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getRecipeIngredients(@PathParam("recipename") String recipeName,
+			@QueryParam("callback") String callback){
+		List<Ingredient> ingredients = Ingredient.loadByRecipe(recipeName);
+		return JsonpBuilder.buildResponse(callback, ingredients);
+	}
+	
+	@GET
+	@Path("{recipename}/tags")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getRecipeTags(@PathParam("recipename") String recipeName,
+			@QueryParam("callback") String callback){
+		List<String> tags = Tag.loadTagsFromRecipe(recipeName);
+		return JsonpBuilder.buildResponse(callback, tags);
+	}
+	
+	@GET
+	@Path("{recipename}/steps")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getRecipeSteps(@PathParam("recipename") String recipeName,
+			@QueryParam("callback") String callback){
+		List<Step> steps = Step.loadRecipeSteps(recipeName);
+		return JsonpBuilder.buildResponse(callback, steps);
 	}
 	
 	
