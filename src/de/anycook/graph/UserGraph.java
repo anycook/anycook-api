@@ -95,8 +95,8 @@ public class UserGraph {
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
-		Recommendation rec = new Recommendation(session.getUser().getId());
-		return JsonpBuilder.buildResponse(callback, rec.recommend());
+		int userid = session.getUser().getId();
+		return JsonpBuilder.buildResponse(callback, Recommendation.recommend(userid));
 	}
 	
 	@GET

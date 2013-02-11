@@ -42,4 +42,45 @@ public class DiscoverGraph {
 		
 		return JsonpBuilder.buildResponse(callback, recipes);
 	}
+	
+	@GET
+	@Path("recommended")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getDiscoverRecommended(@Context HttpHeaders hh,
+			@Context HttpServletRequest request,
+			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
+			@QueryParam("callback") String callback){
+		Session session = Session.init(request.getSession());
+		List<String> recipes;
+		try {
+			session.checkLogin(hh.getCookies());
+			User user = session.getUser();
+			recipes = DiscoverHandler.getRecommendedRecipes(recipenum, user.getId());
+		} catch (WebApplicationException e) {
+			recipes = DiscoverHandler.getPopularRecipes(recipenum);
+		}
+		
+		return JsonpBuilder.buildResponse(callback, recipes);
+	}
+	
+	@GET
+	@Path("tasty")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getDiscoverTasty(
+			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
+			@QueryParam("callback") String callback){
+		List<String> recipes = DiscoverHandler.getTastyRecipes(recipenum);
+		
+		return JsonpBuilder.buildResponse(callback, recipes);
+	}
+	
+	@GET
+	@Path("new")
+	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	public Response getDiscoverNew(
+			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
+			@QueryParam("callback") String callback){
+		List<String> recipes = DiscoverHandler.getNewestRecipes(recipenum);		
+		return JsonpBuilder.buildResponse(callback, recipes);
+	}
 }
