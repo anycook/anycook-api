@@ -12,13 +12,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import com.google.common.collect.Multimap;
 
 import de.anycook.utils.JsonpBuilder;
-import de.anycook.recipe.Recipe;
 import de.anycook.search.Search;
 import de.anycook.search.SearchResult;
 
@@ -41,6 +39,7 @@ public class SearchGraph {
 			@QueryParam("user") String user,
 			@DefaultValue("0") @QueryParam("start") int start,
 			@DefaultValue("10") @QueryParam("num") int num){
+		
 		Search search = new Search();
 		if(tags!= null && !tags.isEmpty())
 			search.addTags(tags);
@@ -48,8 +47,8 @@ public class SearchGraph {
 			search.setIngredients(ingredients);
 		if(excludedIngredients != null && !excludedIngredients.isEmpty())
 			search.setExcludedIngredients(excludedIngredients);
-		if(terms != null && !terms.isEmpty())
-			search.addTerms(terms);
+//		if(terms != null && !terms.isEmpty())
+//			search.addTerms(terms);
 		search.setKategorie(category);
 		search.setCalorie(calorie);
 		search.setSkill(skill);
@@ -58,18 +57,18 @@ public class SearchGraph {
 		
 		SearchResult result = search.search(start, num);
 		JSONObject json = new JSONObject();
-		JSONArray recipes = new JSONArray();
+//		JSONArray recipes = new JSONArray();
 		List<String> results = result.getResults();
 		
 		
-		for(String recipe : results){
-			recipes.add(Recipe.getJSONforSearch(recipe));
-		}
+//		for(String recipe : results)
+//			recipes.add(Recipe.getJSONforSearch(recipe));
+		
 		
 		json.put("size", result.getResultLength());
-		json.put("recipes", recipes);
+		json.put("recipes", results);
 		
-		return Response.ok(JsonpBuilder.build(callback, json)).build();
+		return JsonpBuilder.buildResponse(callback, json.toJSONString());
 	}
 	
 	
