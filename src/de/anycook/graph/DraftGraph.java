@@ -1,6 +1,8 @@
 package de.anycook.graph;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -25,13 +27,31 @@ import org.json.simple.parser.ParseException;
 
 
 import de.anycook.db.mongo.RecipeDrafts;
+import de.anycook.graph.drafts.DraftChecker;
 import de.anycook.session.Session;
+import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.utils.JsonpBuilder;
 
 @Path("/drafts")
 public class DraftGraph {
 	
+	
+	
 	private Logger logger;
+	
+	private static ExecutorService exec;
+    private static final int numThreads = 10;
+	
+	public static void init() {
+		exec = Executors.newCachedThreadPool(DaemonThreadFactory.singleton());
+        for(int i = 0; i<numThreads; i++){
+        	exec.execute(new DraftChecker());
+        }
+	}
+	
+	public static void stop() {
+		exec.shutdownNow();
+	}
 	
 	public DraftGraph(){
 		logger = Logger.getLogger(getClass());
@@ -59,19 +79,19 @@ public class DraftGraph {
 		return recipeDrafts.newDraft(session.getUser().getId());
 	}
 	
-	@GET
-	@Path("num")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getDraftNumber(@QueryParam("callback") String callback,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
-		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		RecipeDrafts drafts = new RecipeDrafts();
-		int draftNum = drafts.count(session.getUser().getId());
-		drafts.close();
-		return JsonpBuilder.buildResponse(callback, draftNum);
-	}
+//	@GET
+//	@Path("num")
+//	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+//	public Response getDraftNumber(@QueryParam("callback") String callback,
+//			@Context HttpHeaders hh,
+//			@Context HttpServletRequest request){
+//		Session session = Session.init(request.getSession());
+//		session.checkLogin(hh.getCookies());
+//		RecipeDrafts drafts = new RecipeDrafts();
+//		int draftNum = drafts.count(session.getUser().getId());
+//		drafts.close();
+//		return JsonpBuilder.buildResponse(callback, draftNum);
+//	}
 	
 	@GET
 	@Path("{id}")

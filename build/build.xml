@@ -41,7 +41,7 @@
 	
 	<!-- upload war file to anycook.de -->
 	<target name="upload" depends="dist">
-		  <scp file="build/ROOT.war" todir="${user}@test.anycook.de:/usr/share/apache-tomcat-7.0.34/webapps/" keyfile="../../../../../.ssh/id_rsa" />
+		  <scp file="build/ROOT.war" todir="ec2-user@test.anycook.de:/usr/share/tomcat7/webapps/" keyfile="../../../../../.ssh/anycook.pem" />
 	</target>
 	
 	<!-- distribution -->
