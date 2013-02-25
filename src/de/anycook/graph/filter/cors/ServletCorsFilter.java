@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
 
-@WebFilter(servletNames={"Messages", "MessageSession", "MessageNumber", "GetDraftNumber"})
+@WebFilter(servletNames={"Messages", "MessageSession", "MessageNumber", "GetDraftNumber", "Discussion"})
 public class ServletCorsFilter implements Filter {
 
 	@Override
