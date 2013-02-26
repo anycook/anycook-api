@@ -3,9 +3,11 @@ package de.anycook.graph;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -19,8 +21,9 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.apache.log4j.Logger;
+
 import de.anycook.utils.JsonpBuilder;
-import de.anycook.utils.enumerations.NotificationType;
 import de.anycook.mailprovider.MailProvider;
 import de.anycook.session.Session;
 import de.anycook.user.User;
@@ -31,6 +34,12 @@ import de.anycook.user.settings.Settings;
 
 @Path("session")
 public class SessionGraph {
+	
+	private final Logger logger;
+	
+	public SessionGraph() {
+		logger = Logger.getLogger(getClass());
+	}
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
@@ -156,41 +165,85 @@ public class SessionGraph {
 		
 	}
 	
-	@POST
+	@PUT
 	@Path("settings/mail/{type}")
-	public void changeMailSettings(@Context HttpServletRequest request,
+	public Response addMailSettings(@Context HttpServletRequest request,
 			@Context HttpHeaders hh, 
-			@PathParam("type") NotificationType type,
-			@FormParam("value") boolean value){
+			@PathParam("type") String type){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		MailSettings settings = MailSettings.init(session.getUser().getId());
+		logger.debug("add mailtype:"+type);
+		
 		if(type.equals("all")){
-			settings.changeAll(value);
+			settings.changeAll(true);
 		}else{
-			switch (type) {
-			case RECIPEACTIVATION:
-				settings.setRecipeactivation(value);				
+			switch (type.toLowerCase()) {
+			case "recipeactivation":
+				settings.setRecipeactivation(true);				
 				break;
-			case RECIPEDISCUSSION:
-				settings.setRecipediscussion(value);				
+			case "recipediscussion":
+				settings.setRecipediscussion(true);				
 				break;
-			case TAGACCEPTED:
-				settings.setTagaccepted(value);				
+			case "tagaccepted":
+				settings.setTagaccepted(true);				
 				break;
-			case TAGDENIED:
-				settings.setTagdenied(value);				
+			case "tagdenied":
+				settings.setTagdenied(true);				
 				break;
-			case DISCUSSIONANSWER:
-				settings.setDiscussionanswer(value);				
+			case "discussionanswer":
+				settings.setDiscussionanswer(true);				
 				break;
-			case SCHMECKT:
-				settings.setSchmeckt(value);				
+			case "schmeckt":
+				settings.setSchmeckt(true);				
 				break;
 
 			default:
 				break;
 			}
-		}		
+		}
+		
+		return Response.ok().build();
+	}
+	
+	@DELETE
+	@Path("settings/mail/{type}")
+	public Response removeMailSettings(@Context HttpServletRequest request,
+			@Context HttpHeaders hh, 
+			@PathParam("type") String type){
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		MailSettings settings = MailSettings.init(session.getUser().getId());
+		logger.debug("remove mailtype:"+type);
+		
+		if(type.equals("all")){
+			settings.changeAll(false);
+		}else{
+			switch (type.toLowerCase()) {
+			case "recipeactivation":
+				settings.setRecipeactivation(false);				
+				break;
+			case "recipediscussion":
+				settings.setRecipediscussion(false);				
+				break;
+			case "tagaccepted":
+				settings.setTagaccepted(false);				
+				break;
+			case "tagdenied":
+				settings.setTagdenied(false);				
+				break;
+			case "discussionanswer":
+				settings.setDiscussionanswer(false);				
+				break;
+			case "schmeckt":
+				settings.setSchmeckt(false);				
+				break;
+
+			default:
+				break;
+			}
+		}
+		
+		return Response.ok().build();
 	}
 }
