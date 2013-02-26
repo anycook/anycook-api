@@ -166,9 +166,31 @@ public class SessionGraph {
 		session.checkLogin(hh.getCookies());
 		MailSettings settings = MailSettings.init(session.getUser().getId());
 		if(type.equals("all")){
-//			TODO settings.changeAll(value);
+			settings.changeAll(value);
 		}else{
-			settings.change(type, value);
+			switch (type) {
+			case RECIPEACTIVATION:
+				settings.setRecipeactivation(value);				
+				break;
+			case RECIPEDISCUSSION:
+				settings.setRecipediscussion(value);				
+				break;
+			case TAGACCEPTED:
+				settings.setTagaccepted(value);				
+				break;
+			case TAGDENIED:
+				settings.setTagdenied(value);				
+				break;
+			case DISCUSSIONANSWER:
+				settings.setDiscussionanswer(value);				
+				break;
+			case SCHMECKT:
+				settings.setSchmeckt(value);				
+				break;
+
+			default:
+				break;
+			}
 		}		
 	}
 }
