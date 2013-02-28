@@ -91,13 +91,16 @@ public class CorsFilter implements ContainerResponseFilter {
 		
 		String requestHeaders = 
 				request.getHeaderValue("Access-Control-Request-Headers");
+		logger.info("requestHeader: "+requestHeaders);
 		
 		ResponseBuilder respBuilder = Response.fromResponse(resp.getResponse());
 		respBuilder.header("Access-Control-Allow-Origin", origin);
 		respBuilder.header("Access-Control-Allow-Credentials", "true");
 		respBuilder.header("Access-Control-Allow-Methods", methodHeader);
-		if(requestHeaders != null && requestHeaders.length() > 0)
-			respBuilder.header("Access-Control-Allow-Headers", requestHeaders);
+//		if(requestHeaders != null && requestHeaders.length() > 0)
+//			respBuilder.header("Access-Control-Allow-Headers", requestHeaders);
+		respBuilder.header("Access-Control-Allow-Headers", "x-requested-with,"+
+				(requestHeaders == null ? "" : requestHeaders));
 		resp.setResponse(respBuilder.build());
 		
 		return resp;

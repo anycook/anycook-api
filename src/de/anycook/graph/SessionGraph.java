@@ -27,7 +27,6 @@ import de.anycook.utils.JsonpBuilder;
 import de.anycook.mailprovider.MailProvider;
 import de.anycook.session.Session;
 import de.anycook.user.User;
-import de.anycook.user.User.Userfields;
 import de.anycook.user.settings.MailSettings;
 import de.anycook.user.settings.Settings;
 
@@ -141,27 +140,41 @@ public class SessionGraph {
 	}
 	
 	@POST
-	@Path("settings/account")
+	@Path("settings/account/{type}")
 	public Response changeAccountSettings(@Context HttpServletRequest request,
 			@Context HttpHeaders hh,
-			@FormParam("username") String username,
-			@FormParam("text") String text,
-			@FormParam("place") String place){
+			@PathParam("type") String type,
+			@FormParam("value") String value){
 		Session session = Session.init(request.getSession());
-		ResponseBuilder response = null;
-		try{
-			session.checkLogin(hh.getCookies());
-			
-			User user = session.getUser();
-			user.changeSetting(Userfields.NAME, username);
-			user.changeSetting(Userfields.TEXT, text);
-			user.changeSetting(Userfields.PLACE, place);
-			response = Response.ok();
-		}catch(WebApplicationException e){
-			response = Response.status(401);
+		
+		session.checkLogin(hh.getCookies());
+		
+		
+		User user = session.getUser();
+		boolean check = false;
+		
+		switch (type) {
+		case "text":
+			check = user.setText(value);
+			break;
+		case "place":
+			check = user.setPlace(value);
+			break;
+		case "name":
+			check = user.setName(value);
+			break;
+
+		default:
+			break;
 		}
 		
-		return response.build();
+		
+		if(!check){
+			logger.warn("check failed");
+			throw new WebApplicationException(400);
+		}
+		
+		return Response.ok("true").build();
 		
 	}
 	

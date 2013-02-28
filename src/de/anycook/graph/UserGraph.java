@@ -5,10 +5,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -109,28 +109,30 @@ public class UserGraph {
 		return JsonpBuilder.buildResponse(callback, jsonString);
 	}
 	
-	@POST
+	@PUT
 	@Path("{userid}/follow")
-	@Produces(MediaType.APPLICATION_JSON)
-	public void follow(@PathParam("userid") int userid,
+	public Response follow(@PathParam("userid") int userid,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		User user = session.getUser();
 		user.follow(userid);
+		
+		return Response.ok().build();
 	}
 	
-	@POST
-	@Path("{userid}/unfollow")
-	@Produces(MediaType.APPLICATION_JSON)
-	public void unfollow(@PathParam("userid") int userid,
+	@DELETE
+	@Path("{userid}/follow")
+	public Response unfollow(@PathParam("userid") int userid,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		User user = session.getUser();
 		user.unfollow(userid);
+		
+		return Response.ok().build();
 	}
 	
 	@GET

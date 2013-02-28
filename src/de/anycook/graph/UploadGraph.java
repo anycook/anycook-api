@@ -17,7 +17,6 @@ import de.anycook.session.Session;
 import de.anycook.upload.RecipeUploader;
 import de.anycook.upload.UploadHandler;
 import de.anycook.upload.UserUploader;
-import de.anycook.user.User.Userfields;
 
 
 @Path("upload")
@@ -53,7 +52,7 @@ public class UploadGraph {
 		if(tempfile!=null){
 			String newFilename = upload.saveFile(tempfile);
 			if(type.equals("user"))
-				session.getUser().changeSetting(Userfields.IMAGE, newFilename);
+				session.getUser().setImage(newFilename);
 			
 			return  Response.ok("{success:\""+newFilename+"\"}").build();									
 		}
