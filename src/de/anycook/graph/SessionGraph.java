@@ -165,7 +165,7 @@ public class SessionGraph {
 			break;
 
 		default:
-			break;
+			throw new WebApplicationException(404);
 		}
 		
 		

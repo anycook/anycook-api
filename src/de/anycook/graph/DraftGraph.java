@@ -119,7 +119,7 @@ public class DraftGraph {
 	
 	@POST
 	@Path("{id}")
-	public void setData(@FormParam("data") String data, 
+	public Response setData(@FormParam("data") String data, 
 			@PathParam("id") String draft_id,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){		
@@ -138,6 +138,8 @@ public class DraftGraph {
 		} finally{
 			drafts.close();
 		}
+		
+		return Response.ok("true").build();
 	}
 	
 	@DELETE
