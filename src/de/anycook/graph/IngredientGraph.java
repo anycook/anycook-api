@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response;
 import org.json.simple.JSONObject;
 
 import de.anycook.ingredient.Ingredient;
-import de.anycook.newrecipe.NewRecipe;
 import de.anycook.utils.JsonpBuilder;
 
 
@@ -56,7 +55,7 @@ public class IngredientGraph {
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response extractIngredients(@QueryParam("q") String query,
 			@QueryParam("callback") String callback){
-		Set<String> ingredients = NewRecipe.searchNGram(query, 3);
+		Set<String> ingredients = Ingredient.searchNGram(query, 3);
 		
 		return JsonpBuilder.buildResponse(callback, new LinkedList<>(ingredients));
 		

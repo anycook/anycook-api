@@ -62,6 +62,9 @@
 			<lib dir="${thirdparty.fastutil}">
 				<include name="*.jar" />
 			</lib>
+			<lib dir="${thirdparty.jackson}">
+				<include name="*.jar" />
+			</lib>
 			<lib dir="${thirdparty.snowball}">
 				<include name="*.jar" />
 			</lib>
