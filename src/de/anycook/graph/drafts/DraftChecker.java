@@ -11,7 +11,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
-import de.anycook.db.mongo.RecipeDrafts;
+import de.anycook.db.mongo.recipedrafts.RecipeDrafts;
 import de.anycook.messages.checker.Checker;
 import de.anycook.utils.JsonpBuilder;
 

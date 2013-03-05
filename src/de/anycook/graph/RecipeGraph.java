@@ -87,8 +87,9 @@ public class RecipeGraph {
 			@QueryParam("callback") String callback){
 		
 		Recipe recipe;
-		if(recipeName.equals("random"))
+		if(recipeName.equals("random")){
 			recipeName = Recipe.getRandomRecipe();
+		}
 		
 		recipe = Recipe.init(recipeName);
 		if(recipe == null)

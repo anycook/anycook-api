@@ -26,8 +26,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 
-import de.anycook.db.mongo.RecipeDrafts;
+import de.anycook.db.mongo.recipedrafts.RecipeDrafts;
 import de.anycook.graph.drafts.DraftChecker;
+import de.anycook.recipe.Recipe;
 import de.anycook.session.Session;
 import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.utils.JsonpBuilder;
@@ -77,6 +78,20 @@ public class DraftGraph {
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		return recipeDrafts.newDraft(session.getUser().getId());
+	}
+	
+	@PUT
+	@Path("{recipename}")
+	public String initWithRecipe(@Context HttpHeaders hh,
+			@Context HttpServletRequest request,
+			@PathParam("recipename") String recipeName,
+			@FormParam("versionid") Integer versionid){
+		if(recipeName == null) throw new WebApplicationException(400);
+		
+		Session session = Session.init(request.getSession());
+		session.checkLogin(hh.getCookies());
+		int user_id = session.getUser().getId();
+		return Recipe.initDraftWithRecipe(recipeName, versionid, user_id);
 	}
 	
 //	@GET
