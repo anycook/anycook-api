@@ -75,8 +75,8 @@ public class RecipeGraph {
 	@Path("oftheday")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getRecipeOfTheDay(@QueryParam("callback") String callback){
-		String recipeOfTheDay = Recipe.getTagesRezept();
-		recipeOfTheDay = String.format("\"%s\"", recipeOfTheDay);		
+		String recipeOfTheDay = Recipe.getTagesRezept();		
+		recipeOfTheDay = org.codehaus.jettison.json.JSONObject.quote(recipeOfTheDay);		
 		return JsonpBuilder.buildResponse(callback, recipeOfTheDay);
 	}
 	
