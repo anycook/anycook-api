@@ -17,7 +17,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.anycook.messages.Messagesession;
+import de.anycook.messages.MessageSession;
 import de.anycook.messages.checker.MessagesessionChecker;
 import de.anycook.session.Session;
 import de.anycook.user.User;
@@ -96,7 +96,7 @@ public class GetMessagesession extends HttpServlet{
 				recipients.add(Integer.parseInt(recipientString.toString()));
 			int userid = session.getUser().getId();
 			recipients.add(userid);
-			Messagesession.getSession(recipients).newMessage(userid, message);
+			MessageSession.getSession(recipients).newMessage(userid, message);
 		} catch (ParseException e) {
 			logger.error(e);
 		}

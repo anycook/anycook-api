@@ -79,7 +79,7 @@ public class Messages extends HttpServlet{
 //			String message = request.getParameter("message");
 //			Session session = Session.init(request.getSession());
 //			User user = session.getUser();
-//			Messagesession.getSession(sessionid, user.id).newMessage(user.id, message);
+//			MessageSession.getSession(sessionid, user.id).newMessage(user.id, message);
 //		}else if(path.length ==4){
 //			Integer sessionid = Integer.parseInt(path[3]);
 //			Integer messageid = Integer.parseInt(path[4]);

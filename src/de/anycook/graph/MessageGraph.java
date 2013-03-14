@@ -18,6 +18,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+
+import de.anycook.messages.MessageSession;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -29,7 +31,6 @@ import de.anycook.messages.checker.MessageChecker;
 import de.anycook.messages.checker.MessagesessionChecker;
 import de.anycook.messages.checker.NewMessageChecker;
 import de.anycook.utils.DaemonThreadFactory;
-import de.anycook.messages.Messagesession;
 import de.anycook.session.Session;
 
 @Path("/writemessage")
@@ -90,7 +91,7 @@ public class MessageGraph  {
 				recipients.add(Integer.parseInt(recipientString.toString()));
 			int userid = session.getUser().getId();
 			recipients.add(userid);
-			Messagesession.getSession(recipients).newMessage(userid, message);
+			MessageSession.getSession(recipients).newMessage(userid, message);
 		} catch (ParseException | UnsupportedEncodingException e) {
 			logger.error(e);
 			throw new WebApplicationException(400);
@@ -117,7 +118,7 @@ public class MessageGraph  {
 		Session session = Session.init(req.getSession());
 		session.checkLogin(hh.getCookies());
 		int userid = session.getUser().getId();
-		Messagesession.getSession(sessionid, userid).newMessage(userid, message);
+		MessageSession.getSession(sessionid, userid).newMessage(userid, message);
 	}
 	
 	@PUT

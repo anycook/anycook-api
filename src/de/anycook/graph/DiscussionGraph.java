@@ -62,7 +62,7 @@ public class DiscussionGraph {
 		shandler.checkLogin(hh.getCookies());
 		int userid = shandler.getUser().getId();
 		
-		Discussion.unlike(userid, recipe, userid);
+		Discussion.unlike(userid, recipe, id);
 		
 		return Response.ok("true").build();		
 	}
