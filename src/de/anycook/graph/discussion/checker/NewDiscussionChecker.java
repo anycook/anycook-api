@@ -19,8 +19,11 @@ public class NewDiscussionChecker extends Checker {
 	private static Queue<DiscussionContextObject> contextQueue = new LinkedList<>();
 	
 	
-	public static void addContext(AsyncContext context, String recipename, int lastnum, String callback){
-		DiscussionContextObject contextObject = new DiscussionContextObject(recipename, lastnum, context, callback);
+	public static void addContext(AsyncContext context, String recipename, 
+			int lastnum, int userid, String callback){
+		DiscussionContextObject contextObject = 
+				new DiscussionContextObject(recipename, lastnum, userid,
+						context, callback);
 		synchronized (contextQueue) {
 			contextQueue.add(contextObject);
 			contextQueue.notify();
@@ -51,9 +54,11 @@ public class NewDiscussionChecker extends Checker {
 			
 			int lastnum = data.lastnum;
 			String recipename = data.recipename;
+			int userid = data.userid;
 			AsyncContext context = data.context;
 			context.addListener(new CheckerListener());
-			Discussion newDiscussion = getNewDiscussion(recipename, lastnum);
+			Discussion newDiscussion = 
+					getNewDiscussion(recipename, lastnum, userid);
 			if(newDiscussion!=null){
 				String callback = data.callback;
 				logger.debug("found new disscussion elements");
@@ -76,7 +81,8 @@ public class NewDiscussionChecker extends Checker {
 
 	}
 	
-	private Discussion getNewDiscussion(String recipename, int lastnum) {
+	private Discussion getNewDiscussion(String recipename, int lastnum, 
+			int userid) {
 		DBDiscussion db = new DBDiscussion();
 		Discussion newDiscussion = null;
 		int countdown = 20;
@@ -90,7 +96,7 @@ public class NewDiscussionChecker extends Checker {
 					return null;
 				}
 			}
-			newDiscussion = db.getDiscussion(recipename, lastnum);
+			newDiscussion = db.getDiscussion(recipename, lastnum, userid);
 			countdown--;
 		}while(newDiscussion.isEmpty() && !timeout && countdown>0);
 		
@@ -101,11 +107,14 @@ public class NewDiscussionChecker extends Checker {
 	protected static class DiscussionContextObject extends ContextObject{
 		public final int lastnum;
 		public final String recipename;
+		public final int userid;
 		
-		public DiscussionContextObject(String recipename, int lastnum, AsyncContext context, String callback) {
+		public DiscussionContextObject(String recipename, int lastnum, 
+				int userid,	AsyncContext context, String callback) {
 			super(context, callback);
 			this.lastnum = lastnum;
 			this.recipename = recipename;
+			this.userid = userid;
 		}
 	}
 

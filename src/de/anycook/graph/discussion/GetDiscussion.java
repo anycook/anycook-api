@@ -11,20 +11,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.WebApplicationException;
 
 import com.google.common.base.Preconditions;
 
-import de.anycook.discussion.Discussion;
 import de.anycook.graph.discussion.checker.NewDiscussionChecker;
-import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.session.Session;
+import de.anycook.utils.DaemonThreadFactory;
 
 
 
 /**
  * Servlet implementation class GetDiscussion
  */
-@WebServlet(urlPatterns = "/discussion/*", asyncSupported=true, name="Discussion")
+@WebServlet(urlPatterns = "/getdiscussion/*", asyncSupported=true, name="Discussion")
 public class GetDiscussion extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
@@ -54,35 +54,22 @@ public class GetDiscussion extends HttpServlet {
 		String callback = request.getParameter("callback");
 		int maxid = maxidString == null ? -1 : Integer.parseInt(maxidString);
 		
+		Session session = Session.init(request.getSession());		
+		int userid;
+		try{
+			session.checkLogin(request.getCookies());
+			userid = session.getUser().getId();
+		}catch(WebApplicationException e){
+			userid = -1;
+		}
+		
+		
 		if(recipe!=null){
 			recipe = recipe.toLowerCase();
 			AsyncContext context = request.startAsync();
 			Preconditions.checkNotNull(context);
 			context.setTimeout(20000);
-			NewDiscussionChecker.addContext(context, recipe, maxid, callback);
-		}
-	}
-	
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		request.setCharacterEncoding("UTF-8");
-		Session shandler = Session.init(request.getSession());
-		if(shandler.checkLogin()){
-			String text = request.getParameter("comment");
-			String path = request.getRequestURI();
-			String recipe = path.split("/")[3];
-			recipe = URLDecoder.decode(recipe, "UTF-8");
-			if(text!=null && recipe != null){
-				String pidS = request.getParameter("pid");
-				int userid = shandler.getUser().getId();
-				if(pidS == null)
-					Discussion.discuss(text, userid, recipe);
-				else{
-					int pid = Integer.parseInt(pidS);
-					Discussion.answer(text, pid, userid, recipe);
-				}
-			}
+			NewDiscussionChecker.addContext(context, recipe, maxid, userid,callback);
 		}
 	}
 	
