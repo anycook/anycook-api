@@ -139,8 +139,7 @@ public class RecipeGraph {
 	@Path("{recipename}/image")
 	@Produces("image/png")
 	public Response getImage(@PathParam("recipename") String recipeName,
-			@DefaultValue("small") @QueryParam("type") String typeString, 
-			@QueryParam("callback") String callback){
+			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
 		try {
 			return Response.temporaryRedirect(Recipe.getRecipeImage(recipeName, type)).build();

@@ -58,26 +58,25 @@ public class SessionGraph {
 	@GET
 	@Path("login")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response login(@Context HttpHeaders hh,
-			@Context HttpServletRequest request,
-			@QueryParam("callback") String callback,
+	public Response login(@Context HttpServletRequest request,
 			@QueryParam("username") String username,
 			@QueryParam("password") String password,
-			@QueryParam("stayloggedin") boolean stayloggedin){
+			@QueryParam("stayLoggedIn") boolean stayLoggedIn){
 		
 		Session session = Session.init(request.getSession(true));
 		try{
 			session.login(username, password);
 			User user = session.getUser();
-			ResponseBuilder response = Response.ok(JsonpBuilder.build(callback, user));
-			if(stayloggedin){
-				NewCookie cookie = new NewCookie("de.anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, true);
+			ResponseBuilder response = Response.ok(user.getProfileInfoJSON());
+            logger.info(String.format("stayLoggedIn is %s", stayLoggedIn));
+			if(stayLoggedIn){
+				NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, false);
 				response.cookie(cookie);				
 			}
 			
 			return response.build();
 		}catch(WebApplicationException e){
-			return JsonpBuilder.buildResponse(callback, "false");
+			return Response.ok("false").build();
 		}
 	}
 	
@@ -92,8 +91,8 @@ public class SessionGraph {
 		session.checkLogin(hh.getCookies());
 		
 		ResponseBuilder response = Response.ok();
-		if(cookies.containsKey("de.anycook")){
-			Cookie cookie = cookies.get("de.anycook");
+		if(cookies.containsKey("anycook")){
+			Cookie cookie = cookies.get("anycook");
 			session.deleteCookieID(cookie.getValue());
 			NewCookie newCookie = new NewCookie(cookie, "", -1, false);
 			response.cookie(newCookie);
