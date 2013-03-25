@@ -124,7 +124,8 @@ public class RecipeGraph {
 		return JsonpBuilder.buildResponse(callback, steps);
 	}
 	
-	
+
+    //version
 	@GET
 	@Path("{recipename}/{versionid}")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
@@ -134,6 +135,26 @@ public class RecipeGraph {
 		Recipe recipe = Recipe.init(recipeName, versionid);
 		return JsonpBuilder.buildResponse(callback, recipe);
 	}
+
+    @GET
+    @Path("{recipeName}/{versionId}/ingredients")
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    public Response getVersionIngredients(@PathParam("recipeName") String recipeName,
+                               @PathParam("versionId") int versionId,
+                               @QueryParam("callback") String callback){
+        List<Ingredient> ingredients = Ingredient.loadByRecipe(recipeName, versionId);
+        return JsonpBuilder.buildResponse(callback, ingredients);
+    }
+
+    @GET
+    @Path("{recipeName}/{versionId}/steps")
+    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+    public Response getVersionSteps(@PathParam("recipeName") String recipeName,
+                                    @PathParam("versionId") int versionId,
+                                   @QueryParam("callback") String callback){
+        List<Step> steps = Step.loadRecipeSteps(recipeName, versionId);
+        return JsonpBuilder.buildResponse(callback, steps);
+    }
 	
 	@GET
 	@Path("{recipename}/image")
