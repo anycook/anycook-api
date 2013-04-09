@@ -33,12 +33,12 @@ import de.anycook.step.Step;
 
 
 @Path("/recipe")
+@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 public class RecipeGraph {
 	Logger logger = Logger.getLogger(getClass());
 
 	@SuppressWarnings("unchecked")
 	@GET
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getAll(@QueryParam("userid") Integer userid,
 			@QueryParam("callback") String callback){
 		JSONObject json = new JSONObject();
@@ -61,7 +61,6 @@ public class RecipeGraph {
 	 */
 	@GET
 	@Path("number")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getNum(@QueryParam("callback") String callback){
 		return JsonpBuilder.buildResponse(callback, Recipe.getTotal());
 	}
@@ -73,7 +72,6 @@ public class RecipeGraph {
 	 */
 	@GET
 	@Path("oftheday")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getRecipeOfTheDay(@QueryParam("callback") String callback){
 		String recipeOfTheDay = Recipe.getTagesRezept();		
 		recipeOfTheDay = org.codehaus.jettison.json.JSONObject.quote(recipeOfTheDay);		
@@ -81,26 +79,19 @@ public class RecipeGraph {
 	}
 	
 	@GET
-	@Path("{recipename}")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getRecipe(@PathParam("recipename") String recipeName, 
+	@Path("{recipeName}")
+	public Response getRecipe(@PathParam("recipeName") String recipeName,
 			@QueryParam("callback") String callback){
 		
-		Recipe recipe;
-		if(recipeName.equals("random")){
-			recipeName = Recipe.getRandomRecipe();
-		}
-		
-		recipe = Recipe.init(recipeName);
+		Recipe recipe = Recipe.init(recipeName);
 		if(recipe == null)
 			throw new WebApplicationException(400);
 		return JsonpBuilder.buildResponse(callback, recipe);
 	}
 	
 	@GET
-	@Path("{recipename}/ingredients")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getRecipeIngredients(@PathParam("recipename") String recipeName,
+	@Path("{recipeName}/ingredients")
+	public Response getRecipeIngredients(@PathParam("recipeName") String recipeName,
 			@QueryParam("callback") String callback){
 		List<Ingredient> ingredients = Ingredient.loadByRecipe(recipeName);
 		return JsonpBuilder.buildResponse(callback, ingredients);
@@ -108,7 +99,6 @@ public class RecipeGraph {
 	
 	@GET
 	@Path("{recipename}/tags")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getRecipeTags(@PathParam("recipename") String recipeName,
 			@QueryParam("callback") String callback){
 		List<String> tags = Tag.loadTagsFromRecipe(recipeName);
@@ -117,7 +107,6 @@ public class RecipeGraph {
 	
 	@GET
 	@Path("{recipename}/steps")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getRecipeSteps(@PathParam("recipename") String recipeName,
 			@QueryParam("callback") String callback){
 		List<Step> steps = Step.loadRecipeSteps(recipeName);
@@ -128,7 +117,6 @@ public class RecipeGraph {
     //version
 	@GET
 	@Path("{recipename}/{versionid}")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getVersion(@PathParam("recipename") String recipeName,
 			@PathParam("versionid") int versionid,
 			@QueryParam("callback") String callback){
@@ -138,7 +126,6 @@ public class RecipeGraph {
 
     @GET
     @Path("{recipeName}/{versionId}/ingredients")
-    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
     public Response getVersionIngredients(@PathParam("recipeName") String recipeName,
                                @PathParam("versionId") int versionId,
                                @QueryParam("callback") String callback){
@@ -148,7 +135,6 @@ public class RecipeGraph {
 
     @GET
     @Path("{recipeName}/{versionId}/steps")
-    @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
     public Response getVersionSteps(@PathParam("recipeName") String recipeName,
                                     @PathParam("versionId") int versionId,
                                    @QueryParam("callback") String callback){
@@ -172,7 +158,6 @@ public class RecipeGraph {
 	
 	@GET
 	@Path("{recipename}/schmeckt")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response checkSchmeckt(@PathParam("recipename") String recipeName,
 			@Context HttpServletRequest request,
 			@QueryParam("callback") String callback){
