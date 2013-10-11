@@ -1,0 +1,50 @@
+apply plugin: "war"
+apply plugin: "idea"
+
+//current project version
+version = '1.0.0'
+// base package
+group = 'de.anycook.api'
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+repositories{
+    mavenCentral()
+
+}
+dependencies {
+    compile 'log4j:log4j:1.2.17',
+            'com.google.guava:guava:15.0',
+            'org.apache.commons:commons-math3:3.2',
+            'org.glassfish.jersey.core:jersey-server:2.3',
+            'org.glassfish.jersey.core:jersey-client:2.3',
+            'org.apache.commons:commons-lang3:3.1',
+            'com.fasterxml.jackson.core:jackson-core:2.2.3',
+            'com.fasterxml.jackson.core:jackson-databind:2.2.3',
+            'com.fasterxml.jackson.core:jackson-annotations:2.2.3',
+            'javax.ws.rs:javax.ws.rs-api:2.0',
+            project(":anycook-core")
+
+    testCompile 'junit:junit:4.11'
+}
+
+task packageJavadoc(type: Jar, dependsOn: 'javadoc') {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+task packageSources(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+// includes javadoc and sources as artifacts.
+artifacts {
+    archives packageJavadoc
+    archives packageSources
+}
