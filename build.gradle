@@ -2,7 +2,7 @@ apply plugin: "war"
 apply plugin: "idea"
 
 //current project version
-version = '1.0.0'
+version = '0.1.0'
 // base package
 group = 'de.anycook.api'
 
