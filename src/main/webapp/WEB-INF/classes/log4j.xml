@@ -31,11 +31,6 @@
   	<appender-ref ref="GRAPH-DaRoPi" />
    </logger>
    
-   <logger name="de.anycook.snapshot">
-  	<level value="DEBUG" />
-  	<appender-ref ref="snapshot-DaRoPi" />
-   </logger>
-   
   <root> 
     <priority value="DEBUG" /> 
     <appender-ref ref="console" />    
