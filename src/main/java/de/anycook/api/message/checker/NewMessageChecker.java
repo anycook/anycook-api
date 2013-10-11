@@ -5,7 +5,10 @@ import de.anycook.api.message.checker.MessageChecker.MessageContextObject;
 import org.apache.log4j.Logger;
 
 import javax.servlet.AsyncContext;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -47,16 +50,22 @@ public class NewMessageChecker extends Checker {
 			NewMessageContextObject data = getContextObject();
 			if(data == null)return;
 			AsyncResponse asyncResponse = data.response;
-			MessageSession session =
-					checkMessages(data.sessionId, data.lastNumber, data.userId);
-			if(session != null){
-				logger.info("found new messages");
-                asyncResponse.resume(session);
+
+            try {
+                MessageSession session =
+                        checkMessages(data.sessionId, data.lastNumber, data.userId);
+                if(session != null){
+                    logger.info("found new messages");
+                    asyncResponse.resume(session);
+                }
+            } catch (SQLException e){
+                logger.error(e);
+                asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
             }
 		}
 	}
 	
-	private MessageSession checkMessages(int sessionid, int lastid, int userid){
+	private MessageSession checkMessages(int sessionid, int lastid, int userid) throws SQLException {
 		MessageSession session = null;
 		timeout = false;
 		int countdown = 20;

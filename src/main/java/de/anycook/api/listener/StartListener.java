@@ -33,6 +33,7 @@ public class StartListener implements ServletContextListener {
     	MessageGraph.init();
         DraftGraph.init();
         DiscussionGraph.init();
+        DBHandler.setupDataSource();
         logger.info("Server started");
     }
 

@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import javax.ws.rs.DefaultValue;
@@ -11,6 +12,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import de.anycook.autocomplete.Autocomplete;
@@ -26,6 +28,8 @@ import de.anycook.user.User;
  */
 @Path("autocomplete")
 public class AutocompleteGraph {
+
+    private final Logger logger = Logger.getLogger(getClass());
 	
 	/**
 	 * autocompletes for all categories
@@ -45,9 +49,15 @@ public class AutocompleteGraph {
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		JSONObject data = Autocomplete.autocompleteAll(query, maxresults, 
-				excludedIngredients, excludedTags, excludedUsers, excludedCategorie);
-		return JsonpBuilder.buildResponse(callback, data.toJSONString());
+        JSONObject data;
+        try {
+            data = Autocomplete.autocompleteAll(query, maxresults,
+                    excludedIngredients, excludedTags, excludedUsers, excludedCategorie);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return JsonpBuilder.buildResponse(callback, data.toJSONString());
 	}
 	
 	@GET
@@ -59,8 +69,14 @@ public class AutocompleteGraph {
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		List<String> data = Autocomplete.autocompleteZutat(query, maxresults, exclude);
-		return JsonpBuilder.buildResponse(callback, data);
+        List<String> data = null;
+        try {
+            data = Autocomplete.autocompleteZutat(query, maxresults, exclude);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return JsonpBuilder.buildResponse(callback, data);
 	}
 	
 	@GET
@@ -72,9 +88,15 @@ public class AutocompleteGraph {
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		
-		List<User> data = Autocomplete.autocompleteUsernames(query, maxresults, exclude);
-		return JsonpBuilder.buildResponse(callback, data);
+
+        List<User> data;
+        try {
+            data = Autocomplete.autocompleteUsernames(query, maxresults, exclude);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return JsonpBuilder.buildResponse(callback, data);
 	}
 	
 	@GET
@@ -86,8 +108,14 @@ public class AutocompleteGraph {
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-		List<String> data = Autocomplete.autocompleteTag(query, maxresults, exclude);
-		return JsonpBuilder.buildResponse(callback, data);
+        List<String> data;
+        try {
+            data = Autocomplete.autocompleteTag(query, maxresults, exclude);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return JsonpBuilder.buildResponse(callback, data);
 	}
 	
 	public static class IntSet extends HashSet<Integer>{

@@ -5,6 +5,7 @@ import de.anycook.api.discussion.checker.NewDiscussionChecker;
 import de.anycook.discussion.Discussion;
 import de.anycook.session.Session;
 import de.anycook.utils.DaemonThreadFactory;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -13,6 +14,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +35,7 @@ public class DiscussionGraph {
         exec.shutdownNow();
     }
 
+    private final Logger logger = Logger.getLogger(getClass());
     @Context HttpHeaders hh;
     @Context HttpServletRequest request;
 
@@ -48,6 +51,9 @@ public class DiscussionGraph {
             userId = session.getUser().getId();
         }catch(WebApplicationException e){
             userId = -1;
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
         recipeName = recipeName.toLowerCase();
@@ -64,8 +70,14 @@ public class DiscussionGraph {
 		Session shandler = Session.init(request.getSession());
 		shandler.checkLogin(hh.getCookies());
 		int userid = shandler.getUser().getId();
-		if(pid == null) Discussion.discuss(comment, userid, recipe);
-		else Discussion.answer(comment, pid, userid, recipe);			
+
+        try {
+            if(pid == null) Discussion.discuss(comment, userid, recipe);
+            else Discussion.answer(comment, pid, userid, recipe);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 
 		return Response.ok("true").build();
 	}
@@ -77,10 +89,15 @@ public class DiscussionGraph {
 		Session shandler = Session.init(request.getSession());
 		shandler.checkLogin(hh.getCookies());
 		int userid = shandler.getUser().getId();
-		
-		Discussion.like(userid, recipe, id);
-		
-		return Response.ok("true").build();		
+
+        try {
+            Discussion.like(userid, recipe, id);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        return Response.ok("true").build();
 	}
 	
 	@DELETE
@@ -92,9 +109,14 @@ public class DiscussionGraph {
 		Session shandler = Session.init(request.getSession());
 		shandler.checkLogin(hh.getCookies());
 		int userid = shandler.getUser().getId();
-		
-		Discussion.unlike(userid, recipe, id);
-		
-		return Response.ok("true").build();		
+
+        try {
+            Discussion.unlike(userid, recipe, id);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        return Response.ok("true").build();
 	}
 }

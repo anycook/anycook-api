@@ -31,7 +31,7 @@ public class SearchGraph {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response search(@QueryParam("callback") String callback, 
+	public SearchResult search(@QueryParam("callback") String callback,
 			@QueryParam("tags") StringSet tags,
 			@QueryParam("ingredients") StringSet ingredients,
 			@QueryParam("excludedingredients") StringSet excludedIngredients,
@@ -58,22 +58,14 @@ public class SearchGraph {
 		search.setSkill(skill);
 		search.setTime(time);
 		search.setUser(user);
-		
-		SearchResult result = search.search(start, num);
-		JSONObject json = new JSONObject();
-//		JSONArray recipes = new JSONArray();
-		List<String> results = result.getResults();
-		
-		
-//		for(String recipe : results)
-//			recipes.add(Recipe.getJSONforSearch(recipe));
-		
-		
-		json.put("size", result.getResultLength());
-		json.put("recipes", results);
-		
-		return JsonpBuilder.buildResponse(callback, json.toJSONString());
-	}
+
+        try {
+            return search.search(start, num);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	
 	/**

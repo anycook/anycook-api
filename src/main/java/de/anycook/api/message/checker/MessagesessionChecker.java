@@ -7,10 +7,13 @@ import org.json.simple.JSONArray;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletResponse;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,7 +53,7 @@ public class MessagesessionChecker extends Checker {
 	public void run() {
 		while(!Thread.currentThread().isInterrupted()){
 			MessagesessionContextObject data = getContextObject();
-			if(data == null)return;
+			if(data == null)continue;
 			AsyncResponse response = data.response;
 
             ResponseListener responseListener = new ResponseListener();
@@ -59,20 +62,31 @@ public class MessagesessionChecker extends Checker {
             response.setTimeoutHandler(responseListener);
 
 
-			List<MessageSession> sessions;
-			if(data.lastchange != null){
-				Date changeDate = new Date(data.lastchange);
-				sessions = checkMessages(changeDate, data.userid);
-			}else
-				sessions = MessageSession.getSessionsFromUser(data.userid);
-			if(sessions != null){
-				logger.info("found new messages");
-                response.resume(sessions);
-			}
+
+
+            try {
+                List<MessageSession> sessions;
+
+                if(data.lastchange != null){
+                    Date changeDate = new Date(data.lastchange);
+                    sessions = checkMessages(changeDate, data.userid);
+                }else{
+                    sessions = MessageSession.getSessionsFromUser(data.userid);
+                }
+
+                if(sessions != null){
+                    logger.info("found new messages");
+                    response.resume(sessions);
+                }
+            } catch (SQLException e) {
+                logger.error(e);
+                response.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+            }
+
 		}
 	}
 	
-	private List<MessageSession> checkMessages(Date lastchange, int userid){
+	private List<MessageSession> checkMessages(Date lastchange, int userid) throws SQLException {
 		List<MessageSession> sessions = null;
 		timeout = false;
 		int countdown = 20;

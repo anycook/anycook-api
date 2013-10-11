@@ -1,6 +1,7 @@
 package de.anycook.api;
 
 import java.io.File;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
@@ -41,21 +42,28 @@ public class UploadGraph {
 		case "recipe":
 			upload = new RecipeUploader();
 			break;
-		case "user":				
-			session.checkLogin(hh.getCookies());
-			upload = new UserUploader();
+		case "user":
+            session.checkLogin(hh.getCookies());
+
+            upload = new UserUploader();
 			break;
 		default:
 			throw new WebApplicationException(400);
 		}
 		File tempfile = upload.uploadFile(request);		
 		if(tempfile!=null){
-			String newFilename = upload.saveFile(tempfile);
-			if(type.equals("user"))
-				session.getUser().setImage(newFilename);
-			
-			return  Response.ok("{success:\""+newFilename+"\"}").build();									
-		}
+            try{
+                String newFilename = upload.saveFile(tempfile);
+                if(type.equals("user"))
+                    session.getUser().setImage(newFilename);
+
+                return  Response.ok("{success:\""+newFilename+"\"}").build();
+            } catch (SQLException e) {
+                logger.error(e);
+                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            }
+
+        }
 		else{
 			logger.warn("upload failed");
 			return Response.status(400).entity("{error:\"upload failed\"}").build();

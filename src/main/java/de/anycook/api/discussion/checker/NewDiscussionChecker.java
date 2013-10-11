@@ -7,6 +7,7 @@ import de.anycook.utils.DaemonThreadFactory;
 
 import javax.servlet.AsyncContext;
 import javax.ws.rs.container.AsyncResponse;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
@@ -61,18 +62,25 @@ public class NewDiscussionChecker extends Checker {
             response.register(listener);
 
 
-			Discussion newDiscussion =
-					getNewDiscussion(recipeName, lastNum, userId);
-			if(newDiscussion!=null){
-				logger.debug("found new disscussion elements");
-                response.resume(newDiscussion);
-			}
+            Discussion newDiscussion;
+            try {
+                newDiscussion = getNewDiscussion(recipeName, lastNum, userId);
+                if(newDiscussion!=null){
+                    logger.debug("found new disscussion elements");
+                    response.resume(newDiscussion);
+                }
+
+            } catch (SQLException e) {
+                logger.error(e);
+
+            }
+
 		}
 
 	}
 	
 	private Discussion getNewDiscussion(String recipename, int lastnum, 
-			int userid) {
+			int userid) throws SQLException {
 		DBDiscussion db = new DBDiscussion();
 		Discussion newDiscussion = null;
 		int countdown = 20;

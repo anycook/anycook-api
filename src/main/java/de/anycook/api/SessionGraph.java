@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +52,7 @@ public class SessionGraph {
 		}catch(WebApplicationException e){
 			return JsonpBuilder.buildResponse(callback, "false");
 		}
-		User user = session.getUser();
+        User user = session.getUser();
 		return JsonpBuilder.buildResponse(callback, user);
 	}
 	
@@ -77,8 +78,11 @@ public class SessionGraph {
 			return response.build();
 		}catch(WebApplicationException e){
 			return Response.ok("false").build();
-		}
-	}
+		} catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("logout")
@@ -88,13 +92,18 @@ public class SessionGraph {
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
 		Map<String, Cookie> cookies = hh.getCookies();
-		session.checkLogin(hh.getCookies());
-		
-		ResponseBuilder response = Response.ok();
+        session.checkLogin(hh.getCookies());
+
+        ResponseBuilder response = Response.ok();
 		if(cookies.containsKey("anycook")){
 			Cookie cookie = cookies.get("anycook");
-			session.deleteCookieID(cookie.getValue());
-			NewCookie newCookie = new NewCookie(cookie, "", -1, false);
+            try {
+                session.deleteCookieID(cookie.getValue());
+            } catch (SQLException e) {
+                logger.error(e);
+                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            }
+            NewCookie newCookie = new NewCookie(cookie, "", -1, false);
 			response.cookie(newCookie);
 		}
 		session.logout();
@@ -105,8 +114,14 @@ public class SessionGraph {
 	@Path("activate")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response activateAccount(@FormParam("activationkey") String activationKey){
-		boolean check = User.activateById(activationKey);
-		return Response.ok(Boolean.toString(check)).build();
+        boolean check;
+        try {
+            check = User.activateById(activationKey);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return Response.ok(Boolean.toString(check)).build();
 	}
 	
 	
@@ -119,8 +134,14 @@ public class SessionGraph {
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
 		User user = session.getUser();
-		MailSettings mailsettings = MailSettings.init(user.getId());
-		Map<String, Settings> settings = new HashMap<>();
+        MailSettings mailsettings;
+        try {
+            mailsettings = MailSettings.init(user.getId());
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        Map<String, Settings> settings = new HashMap<>();
 		settings.put("mail", mailsettings);
 		return JsonpBuilder.buildResponse(callback, settings);
 	}
@@ -130,10 +151,16 @@ public class SessionGraph {
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response checkMailAnbieter(@QueryParam("domain") String domain){
 		if(domain == null) 
-			throw new WebApplicationException(400);
-		MailProvider provider = MailProvider.getMailanbieterfromDomain(domain);
-		
-		if(provider != null)
+			throw new WebApplicationException(401);
+        MailProvider provider = null;
+        try {
+            provider = MailProvider.getMailanbieterfromDomain(domain);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        if(provider != null)
 			return JsonpBuilder.buildResponse(null, provider);
 		return JsonpBuilder.buildResponse(null, ""); 
 	}
@@ -151,24 +178,29 @@ public class SessionGraph {
 		
 		User user = session.getUser();
 		boolean check = false;
-		
-		switch (type) {
-		case "text":
-			check = user.setText(value);
-			break;
-		case "place":
-			check = user.setPlace(value);
-			break;
-		case "name":
-			check = user.setName(value);
-			break;
 
-		default:
-			throw new WebApplicationException(404);
-		}
-		
-		
-		if(!check){
+        try {
+            switch (type) {
+                case "text":
+                    check = user.setText(value);
+                    break;
+                case "place":
+                    check = user.setPlace(value);
+                    break;
+                case "name":
+                    check = user.setName(value);
+                    break;
+
+                default:
+                    throw new WebApplicationException(404);
+            }
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+
+        if(!check){
 			logger.warn("check failed");
 			throw new WebApplicationException(400);
 		}
@@ -184,38 +216,45 @@ public class SessionGraph {
 			@PathParam("type") String type){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
-		MailSettings settings = MailSettings.init(session.getUser().getId());
-		logger.debug("add mailtype:"+type);
-		
-		if(type.equals("all")){
-			settings.changeAll(true);
-		}else{
-			switch (type.toLowerCase()) {
-			case "recipeactivation":
-				settings.setRecipeactivation(true);				
-				break;
-			case "recipediscussion":
-				settings.setRecipediscussion(true);				
-				break;
-			case "tagaccepted":
-				settings.setTagaccepted(true);				
-				break;
-			case "tagdenied":
-				settings.setTagdenied(true);				
-				break;
-			case "discussionanswer":
-				settings.setDiscussionanswer(true);				
-				break;
-			case "schmeckt":
-				settings.setSchmeckt(true);				
-				break;
 
-			default:
-				break;
-			}
-		}
-		
-		return Response.ok().build();
+        try{
+            MailSettings settings = MailSettings.init(session.getUser().getId());
+            logger.debug("add mailtype:"+type);
+
+            if(type.equals("all")){
+                settings.changeAll(true);
+            }else{
+                switch (type.toLowerCase()) {
+                    case "recipeactivation":
+                        settings.setRecipeactivation(true);
+                        break;
+                    case "recipediscussion":
+                        settings.setRecipediscussion(true);
+                        break;
+                    case "tagaccepted":
+                        settings.setTagaccepted(true);
+                        break;
+                    case "tagdenied":
+                        settings.setTagdenied(true);
+                        break;
+                    case "discussionanswer":
+                        settings.setDiscussionanswer(true);
+                        break;
+                    case "schmeckt":
+                        settings.setSchmeckt(true);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+
+        return Response.ok().build();
 	}
 	
 	@DELETE
@@ -225,36 +264,41 @@ public class SessionGraph {
 			@PathParam("type") String type){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
-		MailSettings settings = MailSettings.init(session.getUser().getId());
-		logger.debug("remove mailtype:"+type);
-		
-		if(type.equals("all")){
-			settings.changeAll(false);
-		}else{
-			switch (type.toLowerCase()) {
-			case "recipeactivation":
-				settings.setRecipeactivation(false);				
-				break;
-			case "recipediscussion":
-				settings.setRecipediscussion(false);				
-				break;
-			case "tagaccepted":
-				settings.setTagaccepted(false);				
-				break;
-			case "tagdenied":
-				settings.setTagdenied(false);				
-				break;
-			case "discussionanswer":
-				settings.setDiscussionanswer(false);				
-				break;
-			case "schmeckt":
-				settings.setSchmeckt(false);				
-				break;
+        try{
+            MailSettings settings = MailSettings.init(session.getUser().getId());
+            logger.debug("remove mailtype:"+type);
 
-			default:
-				break;
-			}
-		}
+            if(type.equals("all")){
+                settings.changeAll(false);
+            }else{
+                switch (type.toLowerCase()) {
+                case "recipeactivation":
+                    settings.setRecipeactivation(false);
+                    break;
+                case "recipediscussion":
+                    settings.setRecipediscussion(false);
+                    break;
+                case "tagaccepted":
+                    settings.setTagaccepted(false);
+                    break;
+                case "tagdenied":
+                    settings.setTagdenied(false);
+                    break;
+                case "discussionanswer":
+                    settings.setDiscussionanswer(false);
+                    break;
+                case "schmeckt":
+                    settings.setSchmeckt(false);
+                    break;
+
+                default:
+                    break;
+                }
+            }
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 		
 		return Response.ok().build();
 	}

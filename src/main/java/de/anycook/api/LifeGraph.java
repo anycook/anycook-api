@@ -3,18 +3,17 @@
  */
 package de.anycook.api;
 
+import java.sql.SQLException;
 import java.util.List;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.anycook.news.life.Life;
 import de.anycook.news.life.LifeHandler;
 import de.anycook.utils.JsonpBuilder;
+import org.apache.log4j.Logger;
 
 /**
  * Graph for lifes stream
@@ -22,18 +21,24 @@ import de.anycook.utils.JsonpBuilder;
  *
  */
 @Path("/life")
-public class LifeGraph {	
+public class LifeGraph {
+    private final Logger logger = Logger.getLogger(getClass());
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getLifes(@QueryParam("newestid") Integer newestid,
+	public List<Life> getLifes(@QueryParam("newestid") Integer newestid,
 			@QueryParam("oldestid") Integer oldestid,
 			@QueryParam("callback") String callback){
-		List<Life> lifelist = null;
-		if(newestid != null)
-			lifelist = LifeHandler.getLastLifes(newestid);
-		else
-			lifelist = LifeHandler.getOlderLifes(oldestid);
-		
-		return JsonpBuilder.buildResponse(callback, lifelist);
+
+        try {
+            if(newestid != null)
+                return LifeHandler.getLastLifes(newestid);
+            else
+                return LifeHandler.getOlderLifes(oldestid);
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
 	}
 }

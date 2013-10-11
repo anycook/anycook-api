@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -19,68 +20,80 @@ import de.anycook.user.User;
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.discover.DiscoverHandler;
 import de.anycook.session.Session;
+import org.apache.log4j.Logger;
 
 
 @Path("/discover")
 public class DiscoverGraph {
+
+    private final Logger logger = Logger.getLogger(getClass());
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getDiscover(@Context HttpHeaders hh,
+	public Map<String, List<String>> getDiscover(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
-			@QueryParam("callback") String callback){
+			@DefaultValue("30") @QueryParam("recipenum") int recipenum){
 		Session session = Session.init(request.getSession());
-		Map<String, List<String>> recipes;
-		try {
-			session.checkLogin(hh.getCookies());
-			User user = session.getUser();
-			recipes = DiscoverHandler.getDiscoverRecipes(recipenum, user.getId());
-		} catch (WebApplicationException e) {
-			recipes = DiscoverHandler.getDiscoverRecipes(recipenum);
-		}
-		
-		return JsonpBuilder.buildResponse(callback, recipes);
+        try {
+            try {
+                session.checkLogin(hh.getCookies());
+                User user = session.getUser();
+                return DiscoverHandler.getDiscoverRecipes(recipenum, user.getId());
+            } catch (WebApplicationException e) {
+                return DiscoverHandler.getDiscoverRecipes(recipenum);
+            }
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@GET
 	@Path("recommended")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getDiscoverRecommended(@Context HttpHeaders hh,
+	public List<String> getDiscoverRecommended(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
-			@QueryParam("callback") String callback){
+			@DefaultValue("30") @QueryParam("recipenum") int recipenum){
 		Session session = Session.init(request.getSession());
-		List<String> recipes;
-		try {
-			session.checkLogin(hh.getCookies());
-			User user = session.getUser();
-			recipes = DiscoverHandler.getRecommendedRecipes(recipenum, user.getId());
-		} catch (WebApplicationException e) {
-			recipes = DiscoverHandler.getPopularRecipes(recipenum);
-		}
-		
-		return JsonpBuilder.buildResponse(callback, recipes);
+        try {
+            try {
+                session.checkLogin(hh.getCookies());
+                User user = session.getUser();
+                return DiscoverHandler.getRecommendedRecipes(recipenum, user.getId());
+            } catch (WebApplicationException e) {
+                return DiscoverHandler.getPopularRecipes(recipenum);
+            }
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@GET
 	@Path("tasty")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getDiscoverTasty(
+	public List<String> getDiscoverTasty(
 			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
 			@QueryParam("callback") String callback){
-		List<String> recipes = DiscoverHandler.getTastyRecipes(recipenum);
-		
-		return JsonpBuilder.buildResponse(callback, recipes);
-	}
+        try {
+            return DiscoverHandler.getTastyRecipes(recipenum);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("new")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getDiscoverNew(
+	public List<String> getDiscoverNew(
 			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
 			@QueryParam("callback") String callback){
-		List<String> recipes = DiscoverHandler.getNewestRecipes(recipenum);		
-		return JsonpBuilder.buildResponse(callback, recipes);
-	}
+        try {
+            return DiscoverHandler.getNewestRecipes(recipenum);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

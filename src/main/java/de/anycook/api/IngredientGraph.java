@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +14,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
 import de.anycook.ingredient.Ingredient;
@@ -21,58 +23,60 @@ import de.anycook.utils.JsonpBuilder;
 
 @Path("/ingredient")
 public class IngredientGraph {
+
+    private Logger logger = Logger.getLogger(getClass());
 	
 	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getAll(@QueryParam("callback") String callback, @QueryParam("parent") String parent){
-		List<Ingredient> ingredients;
-		if(parent==null)
-			ingredients = Ingredient.getAll();
-		else
-			ingredients = Ingredient.loadParents();
-		
-		JSONObject json = new JSONObject();
-		json.put("ingredients", ingredients);
-		json.put("total", ingredients.size());
-		return Response.ok(JsonpBuilder.build(callback, json)).build();
+	public List<Ingredient> getAll(@QueryParam("parent") String parent){
+		 try {
+             if(parent==null) return Ingredient.getAll();
+            return Ingredient.loadParents();
+        } catch (SQLException e) {
+            logger.error(e);
+             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	/**
 	 * Number of ingredients
-	 * @param callback
 	 * @return
 	 */
 	@GET
 	@Path("number")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getNum(@QueryParam("callback") String callback){
-		return JsonpBuilder.buildResponse(callback, Ingredient.getTotal());
-	}
+	public Integer getNum(){
+        try {
+            return Ingredient.getTotal();
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("extract")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response extractIngredients(@QueryParam("q") String query,
+	public Set<String> extractIngredients(@QueryParam("q") String query,
 			@QueryParam("callback") String callback){
-		Set<String> ingredients = Ingredient.searchNGram(query, 3);
-		
-		return JsonpBuilder.buildResponse(callback, new LinkedList<>(ingredients));
-		
-	}
+        try {
+            return Ingredient.searchNGram(query, 3);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{ingredientname}")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getIngredient(@PathParam("ingredientname") String ingredientName,
-			@QueryParam("callback") String callback,
-			@QueryParam("children") String children){
-		Ingredient ingredient = Ingredient.init(ingredientName);
-		if(ingredient == null)
-			throw new WebApplicationException(404);
-		
-		if(children == null)
-			return Response.ok(JsonpBuilder.build(callback, ingredient)).build();
-		return Response.ok(JsonpBuilder.build(callback, ingredient.getJSONWithChildRecipes())).build();
+	public Ingredient getIngredient(@PathParam("ingredientname") String ingredientName){
+        try {
+            return Ingredient.init(ingredientName);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 }

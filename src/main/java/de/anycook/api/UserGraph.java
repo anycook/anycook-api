@@ -2,6 +2,7 @@ package de.anycook.api;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,24 +41,25 @@ public class UserGraph {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUsers(@QueryParam("appid") int appid,
-			@QueryParam("callback") String callback){
-		JSONObject json = new JSONObject();
-		List<Integer> users = User.getAll();
-		json.put("users", users);
-		json.put("total", users.size());
-		
-		return Response.ok(JsonpBuilder.build(callback, json)).build();
-	}
+	public List<Integer> getUsers(){
+        try {
+            return User.getAll();
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@PUT
-	public Response newUser(@FormParam("mail") String mail, 
+	public void newUser(@FormParam("mail") String mail,
 			@FormParam("username") String username,
 			@FormParam("password") String password){
-		boolean response = User.newUser(mail, password, username);
-		if(response)
-			return Response.ok().build();
-		else throw new WebApplicationException(400);
+        try {
+            User.newUser(mail, password, username);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@GET
@@ -65,16 +67,26 @@ public class UserGraph {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response checkMail(@QueryParam("mail") String mail,
 			@QueryParam("callback") String callback){
-		return JsonpBuilder.buildResponse(callback, User.checkMail(mail));
-	}
+        try {
+            return JsonpBuilder.buildResponse(callback, User.checkMail(mail));
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("name")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response checkUsername(@QueryParam("username") String username,
 			@QueryParam("callback") String callback){
-		return JsonpBuilder.buildResponse(callback, User.checkUsername(username));
-	}
+        try {
+            return JsonpBuilder.buildResponse(callback, User.checkUsername(username));
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	/**
 	 * returns the number of users
@@ -85,8 +97,13 @@ public class UserGraph {
 	@Path("number")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getNum(@QueryParam("callback") String callback){
-		return JsonpBuilder.buildResponse(callback, User.getTotal());
-	}
+        try {
+            return JsonpBuilder.buildResponse(callback, User.getTotal());
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 	@GET
 	@Path("recommendations")
@@ -96,16 +113,27 @@ public class UserGraph {
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
 		int userid = session.getUser().getId();
-		return JsonpBuilder.buildResponse(callback, Recommendation.recommend(userid));
-	}
+        try {
+            return JsonpBuilder.buildResponse(callback, Recommendation.recommend(userid));
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getUser(@PathParam("userId") int userid,
 			@QueryParam("callback") String callback){
-		User user = User.init(userid);
-		String jsonString = user.getProfileInfoJSON().toJSONString();
+        User user;
+        try {
+            user = User.init(userid);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        String jsonString = user.getProfileInfoJSON().toJSONString();
 		return JsonpBuilder.buildResponse(callback, jsonString);
 	}
 	
@@ -117,9 +145,14 @@ public class UserGraph {
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		User user = session.getUser();
-		user.follow(userid);
-		
-		return Response.ok().build();
+        try {
+            user.follow(userid);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        return Response.ok().build();
 	}
 	
 	@DELETE
@@ -130,9 +163,14 @@ public class UserGraph {
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
 		User user = session.getUser();
-		user.unfollow(userid);
-		
-		return Response.ok().build();
+        try {
+            user.unfollow(userid);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        return Response.ok().build();
 	}
 	
 	@GET
@@ -148,16 +186,25 @@ public class UserGraph {
 		} catch (URISyntaxException e) {
 			logger.warn(e);
 			throw new WebApplicationException(400);
-		}
-	}
+		} catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{userId}/schmeckt")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response schmeckt(@PathParam("userId") int userid,
 			@QueryParam("callback") String callback){
-		List<String> schmeckt = Recipe.getSchmecktRecipesfromUser(userid);
-		return JsonpBuilder.buildResponse(callback, schmeckt);
+        List<String> schmeckt;
+        try {
+            schmeckt = Recipe.getSchmecktRecipesfromUser(userid);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return JsonpBuilder.buildResponse(callback, schmeckt);
 	}
 	
 	@GET
@@ -165,7 +212,13 @@ public class UserGraph {
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response getDiscussionNum(@PathParam("userId") int userid,
 			@QueryParam("callback") String callback){
-		int discNum = Discussion.getDiscussionNumforUser(userid);
-		return JsonpBuilder.buildResponse(callback, discNum);
+        int discNum;
+        try {
+            discNum = Discussion.getDiscussionNumforUser(userid);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+        return JsonpBuilder.buildResponse(callback, discNum);
 	}
 }

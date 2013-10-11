@@ -2,6 +2,7 @@ package de.anycook.api;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +16,7 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import de.anycook.messages.MessageSession;
 import de.anycook.user.User;
@@ -100,9 +102,9 @@ public class MessageGraph  {
 			int userid = session.getUser().getId();
 			recipients.add(userid);
 			MessageSession.getSession(recipients).newMessage(userid, message);
-		} catch (ParseException | UnsupportedEncodingException e) {
+		} catch (ParseException | UnsupportedEncodingException | SQLException e ) {
 			logger.error(e);
-			throw new WebApplicationException(400);
+			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 		}
 //		return CorsFilter.buildResponse(origin);
 	}
@@ -130,8 +132,13 @@ public class MessageGraph  {
 		Session session = Session.init(req.getSession());
 		session.checkLogin(hh.getCookies());
 		int userid = session.getUser().getId();
-		MessageSession.getSession(sessionid, userid).newMessage(userid, message);
-	}
+        try {
+            MessageSession.getSession(sessionid, userid).newMessage(userid, message);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@PUT
 	@Path("{sessionId}/{messageid}")
@@ -141,18 +148,12 @@ public class MessageGraph  {
 		Session session = Session.init(req.getSession());
 		session.checkLogin(hh.getCookies());
 		int userid = session.getUser().getId();
-		Message.read(sessionid, messageid, userid);
-	}
-	
-//	private static Response addAllowOriginHeaders(ResponseBuilder response, 
-//			String origin){
-//		response.header("Access-Control-Allow-Origin", origin)
-////			.header("Access-Control-Allow-Methods", "POST, PUT,DELETE,GET, OPTIONS")
-//			.header("Access-Control-Allow-Credentials", "true");
-//		return response.type(MediaType.APPLICATION_XML).build();
-//			
-//	}
-
-
+        try {
+            Message.read(sessionid, messageid, userid);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

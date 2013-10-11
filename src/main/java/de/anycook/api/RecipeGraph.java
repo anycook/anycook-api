@@ -42,10 +42,15 @@ public class RecipeGraph {
 	@SuppressWarnings("unchecked")
 	@GET
 	public List<String> getAll(@QueryParam("userId") Integer userId){
-		if(userId != null)
-			return Recipe.getRecipenamesfromUser(userId);
-		else
-			return Recipe.getAll();
+        try{
+            if(userId != null)
+                return Recipe.getRecipenamesfromUser(userId);
+            else
+                return Recipe.getAll();
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	/**
@@ -55,8 +60,13 @@ public class RecipeGraph {
 	@GET
 	@Path("number")
 	public Integer getNum(){
-		return Recipe.getTotal();
-	}
+        try {
+            return Recipe.getTotal();
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	/**
 	 * returns the recipe of the day
@@ -65,8 +75,13 @@ public class RecipeGraph {
 	@GET
 	@Path("oftheday")
 	public String getRecipeOfTheDay(){
-		return Recipe.getTagesRezept();
-	}
+        try {
+            return Recipe.getTagesRezept();
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{recipeName}")
@@ -85,20 +100,35 @@ public class RecipeGraph {
 	@GET
 	@Path("{recipeName}/ingredients")
 	public List<Ingredient> getRecipeIngredients(@PathParam("recipeName") String recipeName){
-		return Ingredient.loadByRecipe(recipeName);
-	}
+        try {
+            return Ingredient.loadByRecipe(recipeName);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{recipeName}/tags")
 	public List<String> getRecipeTags(@PathParam("recipeName") String recipeName){
-		return Tag.loadTagsFromRecipe(recipeName);
-	}
+        try {
+            return Tag.loadTagsFromRecipe(recipeName);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{recipeName}/steps")
 	public List<Step> getRecipeSteps(@PathParam("recipeName") String recipeName){
-		return Step.loadRecipeSteps(recipeName);
-	}
+        try {
+            return Step.loadRecipeSteps(recipeName);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 
     //version
@@ -121,14 +151,24 @@ public class RecipeGraph {
     @Path("{recipeName}/{versionId}/ingredients")
     public List<Ingredient> getVersionIngredients(@PathParam("recipeName") String recipeName,
                                @PathParam("versionId") int versionId){
-        return Ingredient.loadByRecipe(recipeName, versionId);
+        try {
+            return Ingredient.loadByRecipe(recipeName, versionId);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GET
     @Path("{recipeName}/{versionId}/steps")
     public List<Step> getVersionSteps(@PathParam("recipeName") String recipeName,
                                     @PathParam("versionId") int versionId){
-        return Step.loadRecipeSteps(recipeName, versionId);
+        try {
+            return Step.loadRecipeSteps(recipeName, versionId);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
 	
 	@GET
@@ -142,8 +182,11 @@ public class RecipeGraph {
 		} catch (URISyntaxException e) {
 			logger.error(e);
 			throw new WebApplicationException(400);
-		}
-	}
+		} catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{recipeName}/schmeckt")
@@ -151,8 +194,13 @@ public class RecipeGraph {
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
-		return session.checkSchmeckt(recipeName);
-	}
+        try {
+            return session.checkSchmeckt(recipeName);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@PUT
 	@Path("{recipeName}/schmeckt")
@@ -162,9 +210,15 @@ public class RecipeGraph {
 		
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
-		boolean schmeckt = session.checkSchmeckt(recipeName);
-		if(!schmeckt)
-			session.makeSchmeckt(recipeName);
+        try {
+            boolean schmeckt = session.checkSchmeckt(recipeName);
+            if(!schmeckt)
+                session.makeSchmeckt(recipeName);
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
 		
 	}
 	
@@ -175,10 +229,17 @@ public class RecipeGraph {
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin(hh.getCookies());
-		boolean schmeckt = session.checkSchmeckt(recipeName);
-		if(schmeckt)
-			session.removeSchmeckt(recipeName);
-		
+
+        try {
+            boolean schmeckt = session.checkSchmeckt(recipeName);
+            if(schmeckt)
+                session.removeSchmeckt(recipeName);
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+
 	}
 	
 	@POST

@@ -35,34 +35,37 @@ public class TagGraph {
 	
 	/**
 	 * Number of tags
-	 * @param callback
 	 * @return
 	 */
 	@GET
 	@Path("number")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getNum(@QueryParam("callback") String callback){
-		return JsonpBuilder.buildResponse(callback, Tag.getTotal());
-	}
+	public int getNum(){
+        try {
+            return Tag.getTotal();
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	/**
 	 * Tags ordered by popularity.
 	 * @param recipe If set tags of this recipe are excluded
-	 * @param callback 
 	 * @return Map of tags ordered by popularity with number of recipes
 	 */
 	@GET
 	@Path("popular")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPopularTags(@QueryParam("recipe") String recipe,
-			@QueryParam("callback") String callback){
-			Map<String, Integer> tagmap = null;
-		if(recipe==null)
-				 tagmap = Recipe.getPopularTags();		
-		else
-			tagmap = Recipe.getPopularTags(recipe);	
-		return JsonpBuilder.buildResponse(callback, tagmap);
-		
+	public Map<String, Integer> getPopularTags(@QueryParam("recipe") String recipe){
+		try {
+            if(recipe==null)
+                return Recipe.getPopularTags();
+            return Recipe.getPopularTags(recipe);
+        } catch (SQLException e){
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@GET

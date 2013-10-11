@@ -3,7 +3,10 @@ package de.anycook.api.message.checker;
 import de.anycook.db.mysql.DBMessage;
 import org.apache.log4j.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
@@ -56,15 +59,20 @@ public class MessageChecker extends Checker {
             response.setTimeoutHandler(responseListener);
 
 			int userId = data.userId;
-			Integer newMessages = getNewNum(userId, lastNumber);
-			if(newMessages!=null){
-				logger.info("found new number:"+newMessages);
-				response.resume(newMessages);
-			}
+            try{
+                Integer newMessages = getNewNum(userId, lastNumber);
+                if(newMessages!=null){
+                    logger.info("found new number:"+newMessages);
+                    response.resume(newMessages);
+                }
+            } catch (SQLException e){
+                logger.error(e);
+                response.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+            }
 		}
 	}
 	
-	private Integer getNewNum(int userid, int lastnum){
+	private Integer getNewNum(int userid, int lastnum) throws SQLException {
         try(DBMessage dbmessage = new DBMessage()){
             timeout = false;
             int countdown = 12;
