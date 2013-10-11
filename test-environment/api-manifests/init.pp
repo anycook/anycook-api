@@ -111,18 +111,9 @@ class tomcat7 {
 	file { "war":
 		ensure => link,
 		path => "/var/lib/tomcat7/webapps/ROOT.war",
-		target => "/war/picapica-landingpage.war",
+		target => "/war/anycook-api-0.1.0.war",
 		force => true,
 		require => [Package["tomcat7"], File["/var/lib/tomcat7/webapps/ROOT"]],
-	}
-
-	# a fuller example, including permissions and ownership
-	file { "/db":
-	    ensure => "directory",
-	    owner  => "tomcat7",
-	    group  => "tomcat7",
-	    mode   => 755,
-	    require => Package["tomcat7"],
 	}
 
 	service { "tomcat7":
@@ -130,17 +121,8 @@ class tomcat7 {
 		ensure => running,
 		#hasrestart => true,
 		#hasstatus => true,
-		require => [Package["tomcat7"], File["war"], Class["sqlite"], File["/db"]],
+		require => [Package["tomcat7"], File["war"]],
 		subscribe => [File["server.xml"], File["war"]],
-	}
-}
-
-# Class: sqlite
-#
-#
-class sqlite {
-	package { "sqlite3":
-		ensure => present,
 	}
 }
 
@@ -167,7 +149,6 @@ class sass {
 }
 
 include apache2
-include sqlite
 include java7
 include tomcat7
 include sass

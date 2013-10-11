@@ -2,13 +2,7 @@
 	ServerAdmin webmaster@localhost
 	AddDefaultCharset utf-8
 
-	DocumentRoot /var/www/picapica-landingpage
-	SetEnvIf Request_URI "/favicon.ico" no-jk
-	SetEnvIf Request_URI "/templates/*" no-jk
-	SetEnvIf Request_URI "/css/*" no-jk
-	SetEnvIf Request_URI "/js/*" no-jk
-	SetEnvIf Request_URI "/img/*" no-jk
-	SetEnvIf Request_URI "/data/*" no-jk
+	DocumentRoot /var/www
 	JkMount /* worker1
 
 
@@ -16,7 +10,7 @@
 		Options FollowSymLinks
 		AllowOverride None
 	</Directory>
-	<Directory /var/www/picapica-landingpage>
+	<Directory /var/www>
 		Options Indexes FollowSymLinks MultiViews
 		AllowOverride All
 		Order allow,deny

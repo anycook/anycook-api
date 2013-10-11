@@ -2,6 +2,7 @@ bin/
 dist/
 build/
 .gradle/
+.vagrant/
 *.iml
 *.ipr
 *.iws
