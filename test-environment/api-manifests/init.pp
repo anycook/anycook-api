@@ -102,6 +102,14 @@ class tomcat7 {
 		target => "/tmp/vagrant-puppet/manifests/tomcat-conf/server.xml",
 	}
 
+	file { "setenv.sh":
+        ensure => link,
+        force => true,
+        path => "/usr/share/tomcat7/bin/setenv.sh",
+        require => Package["tomcat7"],
+        target => "/tmp/vagrant-puppet/manifests/tomcat-conf/setenv.sh",
+    }
+
 	file { "/var/lib/tomcat7/webapps/ROOT":
 		ensure => absent,
 		require => Package["tomcat7"],
@@ -121,7 +129,7 @@ class tomcat7 {
 		ensure => running,
 		#hasrestart => true,
 		#hasstatus => true,
-		require => [Package["tomcat7"], File["war"]],
+		require => [Package["tomcat7"], File["war"], File["setenv.sh"]],
 		subscribe => [File["server.xml"], File["war"]],
 	}
 }
@@ -151,5 +159,5 @@ class sass {
 include apache2
 include java7
 include tomcat7
-include sass
+#include sass
 

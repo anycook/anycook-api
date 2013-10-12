@@ -4,6 +4,11 @@ Vagrant.configure("2") do |config|
     api.vm.box = "precise64"
     api.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
+    api.vm.provider :virtualbox do |vb|
+    #   vb.gui = true
+        vb.customize ["modifyvm", :id, "--memory", "1024"]
+    end
+
     api.vm.network :private_network, ip: "54.228.218.83"
 
     api.vm.synced_folder "build/libs", "/war"

@@ -5,18 +5,20 @@
   version="3.0"> 
   <display-name>anycook-api</display-name>
   <servlet>
-    <servlet-name>JerseyBackend</servlet-name>
-    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-    <init-param>
-      <param-name>com.sun.jersey.config.property.packages</param-name>
-      <param-value>de.anycook.api</param-value>
-    </init-param>
-    <init-param>
-      <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+    <servlet-name>anycook-api</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+      <init-param>
+          <param-name>jersey.config.server.provider.packages</param-name>
+          <param-value>de.anycook.api</param-value>
+      </init-param>
+      <load-on-startup>1</load-on-startup>
+
+      <init-param>
+      <param-name>javax.ws.rs.container.ContainerRequestFilters</param-name>
       <param-value>de.anycook.api.filter.OAuthAuthenticationFilter</param-value>
     </init-param>
      <init-param>
-      <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+      <param-name>javax.ws.rs.container.ContainerResponseFilter</param-name>
       <param-value>de.anycook.api.filter.cors.CorsFilter</param-value>
   </init-param>
   	<init-param>
