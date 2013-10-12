@@ -10,6 +10,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
  * @author Jan Graßegger <jan@anycook.de>
  *
  */
+@Provider
 public class CorsFilter implements ContainerResponseFilter {
 	public final static Pattern hostPattern = Pattern.compile("http://(.*)anycook\\.de");
 	private final Logger logger;
