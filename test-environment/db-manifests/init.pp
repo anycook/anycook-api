@@ -1,5 +1,6 @@
 exec { "apt-get update" :
 	path => "/usr/bin",
+	before => Class["install_mysql"],
 }
 
 class install_mysql {
