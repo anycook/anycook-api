@@ -9,7 +9,8 @@ Vagrant.configure("2") do |config|
         vb.customize ["modifyvm", :id, "--memory", "1024"]
     end
 
-    api.vm.network :private_network, ip: "54.228.218.83"
+    api.vm.network :private_network, ip: "10.1.0.200"
+    api.vm.network "forwarded_port", guest: 80, host: 8080
 
     api.vm.synced_folder "build/libs", "/war"
 
@@ -24,7 +25,7 @@ Vagrant.configure("2") do |config|
      db.vm.box = "precise64"
      db.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
-     db.vm.network :private_network, ip: "54.228.12.221"
+     db.vm.network :private_network, ip: "10.1.0.201"
 
      db.vm.synced_folder "../anycook-core/doc/mysql", "/mysql"
 
