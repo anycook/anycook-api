@@ -28,7 +28,7 @@
 		$.extend(data, {appid : settings.appid});
 		
 		return $.ajax({
-		  url: settings.baseurl+graph+"?callback=?",
+		  url: settings.baseUrl+graph+"?callback=?",
 		  async:true,
 		  dataType: 'json',
 		  data: data,
@@ -47,7 +47,7 @@
 		//data[settings.callbackName] = "?";		
 		$.extend(data, {appid : settings.appid});
 		return $.ajax({
-		    url: settings.baseurl+graph,
+		    url: settings.baseUrl+graph,
 		    type: 'GET',
 		    dataType:"json",
 		    data:data,
@@ -70,7 +70,7 @@
 
 
 		return $.ajax({
-		    url: settings.baseurl+graph,
+		    url: settings.baseUrl+graph,
 		    type: 'POST',
 		    data:data,
 		    dataType:"json",
@@ -94,7 +94,7 @@
 
 
 		return $.ajax({
-		    url: settings.baseurl+graph,
+		    url: settings.baseUrl+graph,
 		    type: 'POST',
 		    data:JSON.stringify(data),
 		    dataType:"json",
@@ -115,7 +115,7 @@
 		var callback = callback || function(){};
 		
 		var settings = $.anycook.graph._settings();
-		var url = settings.baseurl+graph;		
+		var url = settings.baseUrl+graph;
 		$.extend(data, {appid : settings.appid});
 		
 		return $.ajax({
@@ -142,7 +142,7 @@
 		//data[settings.callbackName] = "?";		
 		$.extend(data, {appid : settings.appid});
 		return $.ajax({
-		    url: settings.baseurl+graph,
+		    url: settings.baseUrl+graph,
 		    type: 'DELETE',
 		    data:data,
 		    xhrFields:{
@@ -156,7 +156,7 @@
 		var dfd = $.Deferred();
 		var settings = {
 			appid: -1,
-			baseurl: "http://api.anycook.de",
+			baseUrl: "http://api.anycook.de",
 			callbackName: "callback",
 			// frameId:"anycook-graph-frame"
 			scripts: ["autocomplete","category","discover","discussion", "ingredient", "life","message", "recipe", "search", "session", "tag", "user"]
@@ -171,7 +171,7 @@
 		var numLoaded = 0;
 		for(var i in settings.scripts){
 			var script = settings.scripts[i];
-			$.getScript('/js/jquery.anycook.api.'+script+'.js',function(){
+			$.getScript(settings.baseUrl+'/js/jquery.anycook.api.'+script+'.js',function(){
 				numLoaded++;
 				if(numLoaded == numScripts) dfd.resolve();
 			});
