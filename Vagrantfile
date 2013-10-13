@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
     api.vm.network "forwarded_port", guest: 80, host: 8080
 
     api.vm.synced_folder "build/libs", "/war"
+    api.vm.synced_folder "web", "/web"
 
     api.vm.provision :puppet do |puppet|
         puppet.manifests_path = "test-environment/api-manifests"
