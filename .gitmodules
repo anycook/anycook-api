@@ -1,0 +1,6 @@
+[submodule "test-environment/db-puppet-modules/mysql"]
+	path = test-environment/db-puppet-modules/mysql
+	url = https://github.com/puppetlabs/puppetlabs-mysql.git
+[submodule "test-environment/db-puppet-modules/stdlib"]
+	path = test-environment/db-puppet-modules/stdlib
+	url = https://github.com/puppetlabs/puppetlabs-stdlib.git
