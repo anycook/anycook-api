@@ -1,17 +1,13 @@
 package de.anycook.api.discussion.checker;
 
-import de.anycook.api.message.checker.Checker;
+import de.anycook.messages.Checker;
 import de.anycook.discussion.Discussion;
 import de.anycook.discussion.db.DBDiscussion;
-import de.anycook.utils.DaemonThreadFactory;
 
-import javax.servlet.AsyncContext;
 import javax.ws.rs.container.AsyncResponse;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 

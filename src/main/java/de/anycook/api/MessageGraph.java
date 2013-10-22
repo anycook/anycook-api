@@ -11,7 +11,6 @@ import java.util.concurrent.Executors;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -25,11 +24,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import de.anycook.api.filter.cors.CorsFilter;
 import de.anycook.messages.Message;
-import de.anycook.api.message.checker.MessageChecker;
-import de.anycook.api.message.checker.MessagesessionChecker;
-import de.anycook.api.message.checker.NewMessageChecker;
+import de.anycook.messages.MessageChecker;
+import de.anycook.messages.MessagesessionChecker;
+import de.anycook.messages.NewMessageChecker;
 import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.session.Session;
 

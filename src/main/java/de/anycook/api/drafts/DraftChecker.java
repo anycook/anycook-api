@@ -4,13 +4,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.AsyncContext;
 import javax.ws.rs.container.AsyncResponse;
 
 import org.apache.log4j.Logger;
 
 import de.anycook.db.mongo.recipedrafts.RecipeDrafts;
-import de.anycook.api.message.checker.Checker;
+import de.anycook.messages.Checker;
 
 public class DraftChecker extends Checker {
 	private final static Queue<DraftContextObject> contextQueue = new LinkedList<>();
