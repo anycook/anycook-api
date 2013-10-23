@@ -1,5 +1,6 @@
 bin/
 dist/
+out/
 build/
 .gradle/
 .vagrant/
