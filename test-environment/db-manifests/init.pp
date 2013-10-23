@@ -7,31 +7,36 @@ class install_mysql {
     $user = 'anycook'
     $mysql_schema = "/mysql/anycook_db.sql"
 
-    require mysql
+    #include '::mysql::server'
 
 
-    class { 'mysql::server':
-        config_hash => {
-            'root_password' => 'foo',
-            'bind_address'  => '0.0.0.0'
+    class { '::mysql::server':
+        
+        override_options => { 
+            'mysqld' => { 
+                'bind_address'  => '0.0.0.0',
+            },
         },
         require => Exec["apt-get update"],
     }
 
     exec { "schema":
         path => "/usr/bin",
-        command => "mysql -uroot -pfoo < ${mysql_schema}",
-        require => Class['mysql::server']
+        command => "mysql -uroot < ${mysql_schema}",
+        require => Class['::mysql::server']
 
     }
 
-    database_user { 'anycook@10.1.0.200':
-      ensure                   => 'present',
+    mysql_user { 'anycook@10.1.0.200':
+      ensure    => 'present',
+      require   => Class['mysql::server'],
     }
 
-    database_grant { 'anycook@10.1.0.200/anycook_db':
+    mysql_grant { 'anycook@10.1.0.200/anycook_db':
       privileges => ['ALL'],
-      require   => Exec["schema"],
+      table     => "anycook_db.*",
+      user      => 'anycook@10.1.0.200',
+      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.200']],
     }
 
     #exec { "testdata":
