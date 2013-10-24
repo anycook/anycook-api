@@ -27,6 +27,7 @@ Vagrant.configure("2") do |config|
      db.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
      db.vm.network :private_network, ip: "10.1.0.201"
+     db.vm.network "forwarded_port", guest: 3306, host: 3333
 
      db.vm.synced_folder "../anycook-core/doc/mysql", "/mysql"
 

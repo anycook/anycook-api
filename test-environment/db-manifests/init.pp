@@ -39,13 +39,25 @@ class install_mysql {
       require   => [Exec["schema"], Mysql_user['anycook@10.1.0.200']],
     }
 
+    mysql_user { 'root@%':
+      ensure    => 'present',
+      require   => Class['mysql::server'],
+    }
+
+    mysql_grant { 'root@%/*.*':
+      privileges => ['ALL'],
+      table     => "*.*",
+      user      => 'root@%',
+      require   => [Exec["schema"], Mysql_user['root@%']],
+    }
+
     mysql_user { 'anycook@10.1.0.202':
       ensure    => 'present',
       require   => Class['mysql::server'],
     }
 
     mysql_grant { 'anycook@10.1.0.202/anycook_db':
-      privileges => ['ALL'],
+      privileges => ['ALL', 'SELECT'],
       table     => "anycook_db.*",
       user      => 'anycook@10.1.0.202',
       require   => [Exec["schema"], Mysql_user['anycook@10.1.0.202']],
@@ -72,6 +84,21 @@ class install_mysql {
     #          require => Exec["schema"]
     #
     #}
+
+
+    # Table for old backup data
+    mysql_database { 'zombiecooking_db':
+      ensure  => 'present',
+      charset => 'utf8',
+      collate => 'utf8_unicode_ci',
+    }
+
+    mysql_grant { 'anycook@10.1.0.202/zombiecooking_db.*':
+      privileges => ['SELECT'],
+      table     => 'zombiecooking_db.*',
+      user      => 'anycook@10.1.0.202',
+      require   => [Mysql_database['zombiecooking_db'], Mysql_user['anycook@10.1.0.202']],
+    }
 
 }
 
