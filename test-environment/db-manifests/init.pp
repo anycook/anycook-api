@@ -39,6 +39,18 @@ class install_mysql {
       require   => [Exec["schema"], Mysql_user['anycook@10.1.0.200']],
     }
 
+    mysql_user { 'anycook@10.1.0.202':
+      ensure    => 'present',
+      require   => Class['mysql::server'],
+    }
+
+    mysql_grant { 'anycook@10.1.0.202/anycook_db':
+      privileges => ['ALL'],
+      table     => "anycook_db.*",
+      user      => 'anycook@10.1.0.202',
+      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.202']],
+    }
+
     #exec { "testdata":
     #    path => "/usr/bin",
     #          command => "mysql -u${user} -p${password} picapica_cases < ${testData}",
