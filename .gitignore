@@ -4,6 +4,7 @@ out/
 build/
 .gradle/
 .vagrant/
+.idea/
 *.iml
 *.ipr
 *.iws
