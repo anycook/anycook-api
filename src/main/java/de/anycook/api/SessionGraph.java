@@ -22,6 +22,7 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import de.anycook.db.mysql.DBUser;
 import org.apache.log4j.Logger;
 
 import de.anycook.utils.JsonpBuilder;
@@ -65,20 +66,20 @@ public class SessionGraph {
 			@QueryParam("stayLoggedIn") boolean stayLoggedIn){
 		
 		Session session = Session.init(request.getSession(true));
-		try{
-			session.login(username, password);
-			User user = session.getUser();
-			ResponseBuilder response = Response.ok(user.getProfileInfoJSON());
+        try{
+            session.login(username, password);
+            User user = session.getUser();
+            ResponseBuilder response = Response.ok(user.getProfileInfoJSON());
             logger.info(String.format("stayLoggedIn is %s", stayLoggedIn));
-			if(stayLoggedIn){
-				NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, false);
-				response.cookie(cookie);				
-			}
-			
-			return response.build();
-		}catch(WebApplicationException e){
-			return Response.ok("false").build();
-		} catch (SQLException e) {
+            if(stayLoggedIn){
+                NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, false);
+                response.cookie(cookie);
+            }
+
+            return response.build();
+        }catch(DBUser.UserNotFoundException | WebApplicationException e){
+            return Response.ok("false").build();
+        } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
