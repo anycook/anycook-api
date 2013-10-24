@@ -51,6 +51,21 @@ class install_mysql {
       require   => [Exec["schema"], Mysql_user['anycook@10.1.0.202']],
     }
 
+    #GRANT SELECT ON mysql.proc TO 'user'@'localhost';;
+    mysql_grant { 'anycook@10.1.0.200/mysql.proc':
+      privileges => ['SELECT'],
+      table     => 'mysql.proc',
+      user      => 'anycook@10.1.0.200',
+      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.200']],
+    }
+
+    mysql_grant { 'anycook@10.1.0.202/mysql.proc':
+      privileges => ['SELECT'],
+      table     => 'mysql.proc',
+      user      => 'anycook@10.1.0.202',
+      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.202']],
+    }
+
     #exec { "testdata":
     #    path => "/usr/bin",
     #          command => "mysql -u${user} -p${password} picapica_cases < ${testData}",
