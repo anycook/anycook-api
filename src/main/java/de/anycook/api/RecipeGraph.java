@@ -74,12 +74,15 @@ public class RecipeGraph {
 	 */
 	@GET
 	@Path("oftheday")
-	public String getRecipeOfTheDay(){
+	public Recipe getRecipeOfTheDay(){
         try {
-            return Recipe.getTagesRezept();
+            return Recipe.getRecipeOfTheDay();
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBRecipe.RecipeNotFoundException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
 	
