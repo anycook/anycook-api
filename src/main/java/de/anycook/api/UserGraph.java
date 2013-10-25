@@ -124,17 +124,13 @@ public class UserGraph {
 	@GET
 	@Path("{userId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getUser(@PathParam("userId") int userid,
-			@QueryParam("callback") String callback){
-        User user;
+	public User getUser(@PathParam("userId") int userId){
         try {
-            user = User.init(userid);
+            return User.init(userId);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        String jsonString = user.getProfileInfoJSON().toJSONString();
-		return JsonpBuilder.buildResponse(callback, jsonString);
 	}
 	
 	@PUT

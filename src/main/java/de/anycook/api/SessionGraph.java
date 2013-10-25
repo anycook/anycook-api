@@ -22,7 +22,9 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.db.mysql.DBUser;
+import de.anycook.views.Views;
 import org.apache.log4j.Logger;
 
 import de.anycook.utils.JsonpBuilder;
@@ -43,22 +45,18 @@ public class SessionGraph {
 	}
 	
 	@GET
+    @JsonView(Views.PrivateUserView.class)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getSession(@Context HttpHeaders hh,
-			@Context HttpServletRequest request,
-			@QueryParam("callback") String callback){
+	public User getSession(@Context HttpHeaders hh,
+			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession(true));
-		try{
-			session.checkLogin(hh.getCookies());
-		}catch(WebApplicationException e){
-			return JsonpBuilder.buildResponse(callback, "false");
-		}
-        User user = session.getUser();
-		return JsonpBuilder.buildResponse(callback, user);
+        session.checkLogin(hh.getCookies());
+        return session.getUser();
 	}
 	
 	@GET
 	@Path("login")
+    @JsonView(Views.PrivateUserView.class)
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response login(@Context HttpServletRequest request,
 			@QueryParam("username") String username,
@@ -69,7 +67,7 @@ public class SessionGraph {
         try{
             session.login(username, password);
             User user = session.getUser();
-            ResponseBuilder response = Response.ok(user.getProfileInfoJSON());
+            ResponseBuilder response = Response.ok(user);
             logger.info(String.format("stayLoggedIn is %s", stayLoggedIn));
             if(stayLoggedIn){
                 NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, false);
@@ -77,8 +75,8 @@ public class SessionGraph {
             }
 
             return response.build();
-        }catch(DBUser.UserNotFoundException | WebApplicationException e){
-            return Response.ok("false").build();
+        }catch(DBUser.UserNotFoundException e){
+            throw new WebApplicationException(Response.Status.FORBIDDEN);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
