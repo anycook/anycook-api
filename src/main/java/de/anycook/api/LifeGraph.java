@@ -12,7 +12,6 @@ import javax.ws.rs.core.Response;
 
 import de.anycook.news.life.Life;
 import de.anycook.news.life.LifeHandler;
-import de.anycook.utils.JsonpBuilder;
 import org.apache.log4j.Logger;
 
 /**
@@ -27,14 +26,13 @@ public class LifeGraph {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public List<Life> getLifes(@QueryParam("newestid") Integer newestid,
-			@QueryParam("oldestid") Integer oldestid,
-			@QueryParam("callback") String callback){
+			@QueryParam("oldestid") Integer oldestid){
 
         try {
             if(newestid != null)
-                return LifeHandler.getLastLifes(newestid);
+                return LifeHandler.getLastLives(newestid);
             else
-                return LifeHandler.getOlderLifes(oldestid);
+                return LifeHandler.getOlderLives(oldestid);
         } catch (SQLException e){
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
