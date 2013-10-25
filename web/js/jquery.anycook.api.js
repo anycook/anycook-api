@@ -18,12 +18,15 @@
 			return $(document).data("anycook.graph");
 	}
 	
-	$.anycook.graph._getJSON  = function(graph, data, callback){
+	$.anycook.graph._getJSON  = function(graph, data, callback, error){
 		if(!graph) graph = "";
 		if(!data) data = {};
 		if(!callback) callback = function(){};
+
 		
 		var settings = $.anycook.graph._settings();
+		var error = error || settings.error;
+		
 		//data[settings.callbackName] = "?";		
 		$.extend(data, {appid : settings.appid});
 		
@@ -32,18 +35,20 @@
 		  async:true,
 		  dataType: 'json',
 		  data: data,
-		  success: callback
+		  success: callback,
+		  error : error
 		});
 		// return $.getJSON(settings.baseurl+graph+"?callback=?", data);
 		
 	}
 	
-	$.anycook.graph._get = function(graph, data, callback){
+	$.anycook.graph._get = function(graph, data, callback, error){
 		if(!graph) graph = "";
 		if(!data) data = {};
 		var callback = callback || function(){};
 		
 		var settings = $.anycook.graph._settings();
+		var error = error || settings.error;
 		//data[settings.callbackName] = "?";		
 		$.extend(data, {appid : settings.appid});
 		return $.ajax({
@@ -55,9 +60,7 @@
                 withCredentials: true
            },
 		    success: callback,
-		    error: function(xhr) {
-              console.error(xhr.getAllResponseHeaders());
-           	}
+		    error: error
 		});
 	}
 	
@@ -65,8 +68,11 @@
 		if(!graph) graph = "";
 		if(!data) data = {};
 		var callback = callback || function(){};
+		
 		var settings = $.anycook.graph._settings();
 		$.extend(data, {appid : settings.appid});
+
+		var error = error || settings.error;
 
 
 		return $.ajax({
@@ -79,9 +85,7 @@
                 withCredentials: true
            },
 		    success: callback,
-		    error: function(xhr) {
-              console.error(xhr.getAllResponseHeaders());
-          	}
+		    error: error
 		});
 	}
 
@@ -89,6 +93,7 @@
 		if(!graph) graph = "";
 		if(!data) data = {};
 		var callback = callback || function(){};
+		var error = error || settings.error;
 		var settings = $.anycook.graph._settings();
 		// $.extend(data, {appid : settings.appid});
 
@@ -103,9 +108,7 @@
                 withCredentials: true
            },
 		    success: callback,
-		    error: function(xhr) {
-              console.error(xhr.getAllResponseHeaders());
-          	}
+		    error: error
 		});
 	}
 	
@@ -113,8 +116,10 @@
 		if(!graph) graph = "";
 		if(!data) data = {};
 		var callback = callback || function(){};
-		
+
 		var settings = $.anycook.graph._settings();
+		var error = error || settings.error;
+
 		var url = settings.baseUrl+graph;
 		$.extend(data, {appid : settings.appid});
 		
@@ -127,9 +132,7 @@
                 withCredentials: true
            },
 		    success: callback,
-	     	error: function(xhr) {
-              console.error(xhr.getAllResponseHeaders());
-           }
+	     	error: error
 		});
 	}
 	
@@ -138,7 +141,9 @@
 		if(!data) data = {};
 		var callback = callback || function(){};
 		
+		
 		var settings = $.anycook.graph._settings();
+		var error = error || settings.error;
 		//data[settings.callbackName] = "?";		
 		$.extend(data, {appid : settings.appid});
 		return $.ajax({
@@ -148,7 +153,8 @@
 		    xhrFields:{
                 withCredentials: true
            	},
-		    success: callback
+		    success: callback,
+		    error : error
 		});
 	}
 	
@@ -159,7 +165,8 @@
 			baseUrl: "http://api.anycook.de",
 			callbackName: "callback",
 			// frameId:"anycook-graph-frame"
-			scripts: ["autocomplete","category","discover","discussion", "ingredient", "life","message", "recipe", "search", "session", "tag", "user"]
+			scripts: ["autocomplete","category","discover","discussion", "ingredient", "life","message", "recipe", "search", "session", "tag", "user"],
+			error : function(xhr){console.error(xhr.getAllResponseHeaders());}
 		};
 		
 		if(options)

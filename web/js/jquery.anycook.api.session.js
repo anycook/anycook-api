@@ -3,10 +3,10 @@
  */
 
 //session([callback])
-$.anycook.graph.session = function(callback){
+$.anycook.graph.session = function(callback,error){
 	var dfd = $.Deferred();
 	var graph = "/session";
-	return $.anycook.graph._get(graph, {}, callback);
+	return $.anycook.graph._get(graph, {}, callback, error);
 }
 
 //login(username, password, stayloggedin [,callback])
