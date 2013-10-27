@@ -44,7 +44,7 @@ public class RecipeGraph {
 	public List<String> getAll(@QueryParam("userId") Integer userId){
         try{
             if(userId != null)
-                return Recipe.getRecipenamesfromUser(userId);
+                return Recipe.getRecipeNamesFromUser(userId);
             else
                 return Recipe.getAll();
         } catch (SQLException e){
