@@ -24,7 +24,8 @@ dependencies {
             'org.glassfish.jersey.core:jersey-server:2.3.1',
             'org.glassfish.jersey.containers:jersey-container-servlet:2.3.1',
             'org.glassfish.jersey.core:jersey-common:2.3.1',
-            'org.glassfish.jersey.media:jersey-media-json-jackson:2.3.1',
+            'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.2.3',
+            //'org.glassfish.jersey.media:jersey-media-json-jackson:2.3.1',
             'org.apache.commons:commons-lang3:3.1',
             'javax.ws.rs:javax.ws.rs-api:2.0',
             project(":anycook-core")

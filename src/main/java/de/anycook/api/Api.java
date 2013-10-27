@@ -18,7 +18,6 @@
 
 package de.anycook.api;
 
-import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import javax.ws.rs.ApplicationPath;
@@ -29,6 +28,6 @@ import javax.ws.rs.ApplicationPath;
 @ApplicationPath("/*")
 public class Api extends ResourceConfig{
     public Api(){
-        packages("de.anycook.api").register(JacksonFeature.class);
+        packages("de.anycook.api");
     }
 }
