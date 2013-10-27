@@ -48,7 +48,7 @@ public class RecipeGraph {
             else
                 return Recipe.getAll();
         } catch (SQLException e){
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
@@ -63,7 +63,7 @@ public class RecipeGraph {
         try {
             return Recipe.getTotal();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -78,10 +78,10 @@ public class RecipeGraph {
         try {
             return Recipe.getRecipeOfTheDay();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
@@ -92,10 +92,10 @@ public class RecipeGraph {
         try {
             return Recipe.init(recipeName);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
-            logger.warn(e);
+            logger.warn(e, e);
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
@@ -106,7 +106,7 @@ public class RecipeGraph {
         try {
             return Ingredient.loadByRecipe(recipeName);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -117,7 +117,7 @@ public class RecipeGraph {
         try {
             return Tag.loadTagsFromRecipe(recipeName);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -128,7 +128,7 @@ public class RecipeGraph {
         try {
             return Step.loadRecipeSteps(recipeName);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e ,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -142,10 +142,10 @@ public class RecipeGraph {
         try {
             return Recipe.init(recipeName, versionid);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
-            logger.warn(e);
+            logger.warn(e, e);
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
@@ -157,7 +157,7 @@ public class RecipeGraph {
         try {
             return Ingredient.loadByRecipe(recipeName, versionId);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -169,7 +169,7 @@ public class RecipeGraph {
         try {
             return Step.loadRecipeSteps(recipeName, versionId);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -183,10 +183,10 @@ public class RecipeGraph {
 		try {
 			return Response.temporaryRedirect(Recipe.getRecipeImage(recipeName, type)).build();
 		} catch (URISyntaxException e) {
-			logger.error(e);
+			logger.error(e, e);
 			throw new WebApplicationException(400);
 		} catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -200,7 +200,7 @@ public class RecipeGraph {
         try {
             return session.checkSchmeckt(recipeName);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -218,7 +218,7 @@ public class RecipeGraph {
             if(!schmeckt)
                 session.makeSchmeckt(recipeName);
         } catch (SQLException e){
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
@@ -238,7 +238,7 @@ public class RecipeGraph {
             if(schmeckt)
                 session.removeSchmeckt(recipeName);
         } catch (SQLException e){
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
@@ -264,7 +264,7 @@ public class RecipeGraph {
             if(!newRecipe.save(user.getId()))
                 throw new WebApplicationException(Response.Status.BAD_REQUEST);
         } catch (SQLException | IOException | ParseException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
