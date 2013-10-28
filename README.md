@@ -18,7 +18,7 @@ More soon!
 
 
 ### Starting
-- Compile Java sources with ```$ gradle war```
+- Compile Java sources with ```$ gradle war``
 - Run ```$ vagrant up``` in project root directory
-- The anycook API can be accessed via port 8080
+- The anycook API can be accessed on [http://localhost:8080](http://localhost:8080)
 - The MySQL server via port 3333
