@@ -1,6 +1,7 @@
 package de.anycook.api;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.log4j.Logger;
 
 import de.anycook.session.Session;
@@ -35,7 +37,7 @@ public class UploadGraph {
 			@Context HttpHeaders hh,
 			@PathParam("type") String type){
 		
-		UploadHandler upload = null;
+		UploadHandler upload;
 		Session session = Session.init(request.getSession());
 		
 		switch (type) {
@@ -44,16 +46,22 @@ public class UploadGraph {
 			break;
 		case "user":
             session.checkLogin(hh.getCookies());
-
             upload = new UserUploader();
 			break;
 		default:
 			throw new WebApplicationException(400);
 		}
-		File tempfile = upload.uploadFile(request);		
-		if(tempfile!=null){
+        File tempFile;
+        try {
+            tempFile = upload.uploadFile(request);
+        } catch (IOException | FileUploadException e) {
+            logger.error(e,e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+        if(tempFile!=null){
             try{
-                String newFilename = upload.saveFile(tempfile);
+                String newFilename = upload.saveFile(tempFile);
                 if(type.equals("user"))
                     session.getUser().setImage(newFilename);
 

@@ -3,6 +3,7 @@ dist/
 out/
 build/
 .gradle/
+/images/*
 .vagrant/
 .idea/
 *.iml

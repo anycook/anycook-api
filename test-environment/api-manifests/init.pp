@@ -124,6 +124,14 @@ class tomcat7 {
 		require => [Package["tomcat7"], File["/var/lib/tomcat7/webapps/ROOT"]],
 	}
 
+    file { "/images":
+        ensure => directory,
+        owner => "tomcat7",
+        recurse => true,
+        require => Package["tomcat7"],
+
+    }
+
 	service { "tomcat7":
 	    enable => true,
 		ensure => running,

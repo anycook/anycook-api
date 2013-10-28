@@ -143,7 +143,7 @@ $.anycook.graph.recipe.image = function(recipe, type){
 	var settings = $.anycook.graph._settings();
 	if(!type)
 		type = "small";
-	return settings.baseurl+"/recipe/"+encodeURIComponent(recipe)+"/image?type="+type+"&appid="+settings.appid;
+	return settings.baseUrl+"/recipe/"+encodeURIComponent(recipe)+"/image?type="+type+"&appid="+settings.appid;
 };
 
 //schmeckt(recipename, [callback])

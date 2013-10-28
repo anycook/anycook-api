@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
 
     api.vm.synced_folder "build/libs", "/war"
     api.vm.synced_folder "web", "/web"
+    api.vm.synced_folder "images", "/images"
 
     api.vm.provision :puppet do |puppet|
         puppet.manifests_path = "test-environment/api-manifests"
