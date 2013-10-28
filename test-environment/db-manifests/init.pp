@@ -20,12 +20,12 @@ class install_mysql {
         require => Exec["apt-get update"],
     }
 
-    exec { "schema":
-        path => "/usr/bin",
-        command => "mysql -uroot < ${mysql_schema}",
-        require => Class['::mysql::server']
-
-    }
+    #exec { "schema":
+    #    path => "/usr/bin",
+    #    command => "mysql -uroot < ${mysql_schema}",
+    #    require => Class['::mysql::server']
+    #
+    #}
 
     mysql_user { 'anycook@10.1.0.200':
       ensure    => 'present',
@@ -36,7 +36,7 @@ class install_mysql {
       privileges => ['ALL'],
       table     => "anycook_db.*",
       user      => 'anycook@10.1.0.200',
-      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.200']],
+      require   => [Mysql_user['anycook@10.1.0.200']],
     }
 
     mysql_user { 'root@%':
@@ -48,7 +48,7 @@ class install_mysql {
       privileges => ['ALL'],
       table     => "*.*",
       user      => 'root@%',
-      require   => [Exec["schema"], Mysql_user['root@%']],
+      require   => [Mysql_user['root@%']],
     }
 
     mysql_user { 'anycook@10.1.0.202':
@@ -60,7 +60,7 @@ class install_mysql {
       privileges => ['ALL', 'SELECT'],
       table     => "anycook_db.*",
       user      => 'anycook@10.1.0.202',
-      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.202']],
+      require   => [Mysql_user['anycook@10.1.0.202']],
     }
 
     #GRANT SELECT ON mysql.proc TO 'user'@'localhost';;
@@ -68,14 +68,14 @@ class install_mysql {
       privileges => ['SELECT'],
       table     => 'mysql.proc',
       user      => 'anycook@10.1.0.200',
-      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.200']],
+      require   => [Mysql_user['anycook@10.1.0.200']],
     }
 
     mysql_grant { 'anycook@10.1.0.202/mysql.proc':
       privileges => ['SELECT'],
       table     => 'mysql.proc',
       user      => 'anycook@10.1.0.202',
-      require   => [Exec["schema"], Mysql_user['anycook@10.1.0.202']],
+      require   => [Mysql_user['anycook@10.1.0.202']],
     }
 
     #exec { "testdata":
