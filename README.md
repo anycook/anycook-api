@@ -26,3 +26,7 @@ More soon!
 - You can import a db schema by 
   - using a terminal command: ```$ mysql -P 3333 -u root anycook_db < sql-file.sql```
   - using MySQL Workbench (can be downloaded [here](https://www.mysql.com/products/workbench/))
+    1. In the menu 'Database' select 'Connect to Database...'
+    2. Change the port to 3333 and click OK
+    3. Load the latest testdump. (For anycook internals: Latest dump is located in the root of the BTSync folder)
+    4. Click on the lighning symbol
