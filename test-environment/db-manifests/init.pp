@@ -20,12 +20,12 @@ class install_mysql {
         require => Exec["apt-get update"],
     }
 
-    #exec { "schema":
-    #    path => "/usr/bin",
-    #    command => "mysql -uroot < ${mysql_schema}",
-    #    require => Class['::mysql::server']
-    #
-    #}
+    exec { "schema":
+        path => "/usr/bin",
+        command => "mysql -uroot < ${mysql_schema}",
+        require => Class['::mysql::server']
+
+    }
 
     mysql_user { 'anycook@10.1.0.200':
       ensure    => 'present',

@@ -142,6 +142,23 @@ class tomcat7 {
 	}
 }
 
+class glassfish {
+  file { "war":
+    ensure => link,
+    path => "/home/vagrant/glassfish4/glassfish/domains/domain1/autodeploy/anycook-api.war",
+    target => "/war/anycook-api-0.1.0.war",
+    force => true,
+    #require => [Package["tomcat7"], File["/var/lib/tomcat7/webapps/ROOT"]],
+  }
+
+  exec{ "glassfish":
+      command => "asadmin start-domain",
+      path => "/home/vagrant/glassfish4/glassfish/bin",
+
+  }
+
+}
+
 
 
 
@@ -167,5 +184,6 @@ class sass {
 include apache2
 include java7
 include tomcat7
+#include glassfish
 #include sass
 
