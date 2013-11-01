@@ -31,3 +31,32 @@ public class Api extends ResourceConfig{
         packages("de.anycook.api");
     }
 }
+
+/*@ApplicationPath("/")
+public class Api extends Application{
+
+
+    @Override
+    public Set<Class<?>> getClasses() {
+        final HashSet<Class<?>> classes = new HashSet<>();
+        classes.add(AutocompleteGraph.class);
+        classes.add(CategoryGraph.class);
+        classes.add(DiscoverGraph.class);
+        classes.add(DiscussionGraph.class);
+        classes.add(DraftGraph.class);
+        classes.add(IngredientGraph.class);
+        classes.add(LifeGraph.class);
+        classes.add(MessageGraph.class);
+        classes.add(RecipeGraph.class);
+        classes.add(SearchGraph.class);
+        classes.add(SessionGraph.class);
+        classes.add(TagGraph.class);
+        classes.add(UploadGraph.class);
+        classes.add(UserGraph.class);
+
+
+
+        return classes;
+    }
+
+}  */

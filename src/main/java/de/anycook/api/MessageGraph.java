@@ -65,7 +65,7 @@ public class MessageGraph  {
     public void get(@Suspended final AsyncResponse asyncResponse,
                     @QueryParam("lastChange") Long lastChange){
         User user = Session.init(req.getSession()).getUser();
-        MessagesessionChecker.addContext(lastChange, user.getId(), asyncResponse);
+        //MessagesessionChecker.addContext(lastChange, user.getId(), asyncResponse);
     }
 	
 	@PUT
@@ -113,7 +113,7 @@ public class MessageGraph  {
                                  @QueryParam("lastNum") int lastNumber){
         Session session = Session.init(req.getSession());
         session.checkLogin(hh.getCookies());
-        MessageChecker.addContext(asyncResponse, lastNumber, session.getUser().getId());
+        //MessageChecker.addContext(asyncResponse, lastNumber, session.getUser().getId());
 
     }
 	

@@ -89,7 +89,7 @@ public class DraftGraph {
                             @Suspended AsyncResponse asyncResponse){
         Session session = Session.init(request.getSession(true));
         session.checkLogin();
-        DraftChecker.addContext(asyncResponse, lastNum, session.getUser().getId());
+        //DraftChecker.addContext(asyncResponse, lastNum, session.getUser().getId());
     }
 	
 	@PUT

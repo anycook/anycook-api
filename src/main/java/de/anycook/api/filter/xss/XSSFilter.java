@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletRequest;
  * Servlet Filter implementation class XSSFilter
  */
 
-@WebFilter("*")
+@WebFilter(urlPatterns =  "/*", asyncSupported = true)
 public class XSSFilter implements Filter {
 
     /**

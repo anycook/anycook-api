@@ -1,38 +1,21 @@
 package de.anycook.api;
 
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
-import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.db.mysql.DBUser;
-import de.anycook.views.Views;
-import org.apache.log4j.Logger;
-
-import de.anycook.utils.JsonpBuilder;
 import de.anycook.mailprovider.MailProvider;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.settings.MailSettings;
 import de.anycook.user.settings.Settings;
+import de.anycook.utils.JsonpBuilder;
+import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Path("session")
@@ -45,7 +28,6 @@ public class SessionGraph {
 	}
 	
 	@GET
-    @JsonView(Views.PrivateUserView.class)
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getSession(@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
@@ -56,7 +38,6 @@ public class SessionGraph {
 	
 	@GET
 	@Path("login")
-    @JsonView(Views.PrivateUserView.class)
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response login(@Context HttpServletRequest request,
 			@QueryParam("username") String username,

@@ -1,14 +1,16 @@
 package de.anycook.api.discussion.checker;
 
-import de.anycook.messages.Checker;
 import de.anycook.discussion.Discussion;
 import de.anycook.discussion.db.DBDiscussion;
+import de.anycook.messages.Checker;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.TimeUnit;
 
 
 public class NewDiscussionChecker extends Checker {
@@ -26,15 +28,10 @@ public class NewDiscussionChecker extends Checker {
 		}
 	}
 	
-	private static DiscussionContextObject getContext(){
+	private static DiscussionContextObject getContext() throws InterruptedException {
 		synchronized (contextQueue) {
 			if(contextQueue.isEmpty()){
-				try {
-					contextQueue.wait();
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-					return null;
-				}
+                contextQueue.wait();
 			}
 			return contextQueue.poll();
 		}
@@ -42,60 +39,44 @@ public class NewDiscussionChecker extends Checker {
 	
 	@Override
 	public void run() {
-		while(!Thread.currentThread().isInterrupted()){
-			timeout = false;
-			DiscussionContextObject data = getContext();
-			if(data == null)
-				return;
-			
-			int lastNum = data.lastNum;
-			String recipeName = data.recipeName;
-			int userId = data.userId;
-			AsyncResponse response = data.response;
-            ResponseListener listener = new ResponseListener();
-            response.setTimeout(1, TimeUnit.MINUTES);
-            response.setTimeoutHandler(listener);
-            response.register(listener);
+        try{
+            while(!Thread.currentThread().isInterrupted()){
 
+                DiscussionContextObject data = getContext();
+                logger.debug("checking discussion");
 
-            Discussion newDiscussion;
-            try {
-                newDiscussion = getNewDiscussion(recipeName, lastNum, userId);
-                if(newDiscussion!=null){
-                    logger.debug("found new disscussion elements");
-                    response.resume(newDiscussion);
+                int lastNum = data.lastNum;
+                String recipeName = data.recipeName;
+                int userId = data.userId;
+                AsyncResponse asyncResponse = data.response;
+                while (!asyncResponse.isDone() && !asyncResponse.isCancelled()){
+                    Discussion newDiscussion;
+                    try {
+                        newDiscussion = getNewDiscussion(recipeName, lastNum, userId);
+                        if(newDiscussion.size() > 0){
+                            logger.debug("found new disscussion elements");
+                            asyncResponse.resume(Response.ok(newDiscussion, MediaType.APPLICATION_JSON_TYPE).build());
+                            break;
+                        } else
+                            Thread.currentThread().wait(1000);
+                    } catch (SQLException e) {
+                        logger.error(e);
+                        asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+                        break;
+                    }
                 }
-
-            } catch (SQLException e) {
-                logger.error(e);
-
             }
-
-		}
+        } catch (InterruptedException e) {
+            logger.debug("Thread is closing");
+        }
 
 	}
 	
-	private Discussion getNewDiscussion(String recipename, int lastnum, 
-			int userid) throws SQLException {
-		DBDiscussion db = new DBDiscussion();
-		Discussion newDiscussion = null;
-		int countdown = 20;
-		do{
-			if(newDiscussion != null){
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					db.close();
-					Thread.currentThread().interrupt();				
-					return null;
-				}
-			}
-			newDiscussion = db.getDiscussion(recipename, lastnum, userid);
-			countdown--;
-		}while(newDiscussion.isEmpty() && !timeout && countdown>0);
-		
-		db.close();
-		return newDiscussion;
+	private Discussion getNewDiscussion(String recipeName, int lastNum, int userId) throws SQLException {
+
+		try(DBDiscussion db = new DBDiscussion()){
+            return db.getDiscussion(recipeName, lastNum, userId);
+        }
 	}
 
 	protected static class DiscussionContextObject extends ContextObject{
@@ -104,8 +85,8 @@ public class NewDiscussionChecker extends Checker {
 		public final int userId;
 		
 		public DiscussionContextObject(String recipeName, int lastNum,
-				int userId,	AsyncResponse response) {
-			super(response);
+				int userId,	AsyncResponse asyncResponse) {
+			super(asyncResponse);
 			this.lastNum = lastNum;
 			this.recipeName = recipeName;
 			this.userId = userId;

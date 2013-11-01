@@ -47,7 +47,7 @@ public class RecipeGraph {
                 return Recipe.getRecipeNamesFromUser(userId);
             else
                 return Recipe.getAll();
-        } catch (SQLException e){
+        } catch (Exception e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

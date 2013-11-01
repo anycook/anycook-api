@@ -50,8 +50,8 @@ public class StartListener implements ServletContextListener {
      */
     public void contextInitialized(ServletContextEvent arg0) {
         DBHandler.init();
-        MessageGraph.init();
-        DraftGraph.init();
+        //MessageGraph.init();
+        //DraftGraph.init();
         DiscussionGraph.init();
 
 
@@ -63,9 +63,9 @@ public class StartListener implements ServletContextListener {
      * @see ServletContextListener#contextDestroyed(ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent arg0) {
-    	MessageGraph.destroyThreadPool();
+    	//MessageGraph.destroyThreadPool();
         DiscussionGraph.destroyThreadPool();
-    	DraftGraph.destroyThreadPool();
+    	//DraftGraph.destroyThreadPool();
     	DBHandler.closeSource();
     	logger.info("Server stopped");
     }

@@ -71,6 +71,7 @@ public class CorsFilter implements ContainerResponseFilter {
 
     private void filterPreFlight(ContainerRequestContext requestContext,
                                  ContainerResponseContext responseContext) {
+        logger.debug("filtering preflight for "+requestContext.getUriInfo().getPath());
         String origin = requestContext.getHeaderString("Origin");
         if(!checkOrigin(origin))
             responseContext.setStatusInfo(Response.Status.FORBIDDEN);

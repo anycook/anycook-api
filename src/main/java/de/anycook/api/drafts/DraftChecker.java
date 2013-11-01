@@ -1,15 +1,12 @@
 package de.anycook.api.drafts;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.TimeUnit;
-
-import javax.ws.rs.container.AsyncResponse;
-
-import org.apache.log4j.Logger;
-
 import de.anycook.db.mongo.recipedrafts.RecipeDrafts;
 import de.anycook.messages.Checker;
+import org.apache.log4j.Logger;
+
+import javax.ws.rs.container.AsyncResponse;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class DraftChecker extends Checker {
 	private final static Queue<DraftContextObject> contextQueue = new LinkedList<>();
@@ -44,17 +41,16 @@ public class DraftChecker extends Checker {
 	
 	@Override
 	public void run() {
+
 		while(!Thread.currentThread().isInterrupted()){
-			DraftContextObject data = getContext();
+			/*DraftContextObject data = getContext();
 			if(data == null)
 				return;
 			
 			int lastNum = data.lastNum;
 			AsyncResponse asyncResponse = data.response;
             ResponseListener listener = new ResponseListener();
-            asyncResponse.setTimeout(1, TimeUnit.MINUTES);
             asyncResponse.register(listener);
-            asyncResponse.setTimeoutHandler(listener);
 
             int userId = data.userId;
 			Integer newNum = getNewNum(userId, lastNum);
@@ -62,7 +58,7 @@ public class DraftChecker extends Checker {
             if(newNum!=null){
 				logger.info("found new number:" + newNum);
 				asyncResponse.resume(newNum);
-			}
+			} */
 		}
 	}
 	
