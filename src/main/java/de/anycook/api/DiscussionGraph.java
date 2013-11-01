@@ -69,7 +69,7 @@ public class DiscussionGraph {
                         asyncResponse.resume(Response.ok(newDiscussion, MediaType.APPLICATION_JSON_TYPE).build());
                     break;
                 } else
-                    Thread.currentThread().wait(2000);
+                    Thread.sleep(2000);
             } catch (SQLException e) {
                 logger.error(e);
                 if(asyncResponse.isSuspended())
