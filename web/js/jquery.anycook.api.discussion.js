@@ -4,9 +4,9 @@
 
 //discussion(recipename [, callback])
 $.anycook.graph.discussion = function(recipename, lastid, callback){
-	var graph = "/getdiscussion/"+recipename;
+	var graph = "/discussion/"+recipename;
 	var data = {lastid:lastid};
-	return $.anycook.graph._getJSON(graph, data, callback);
+	return $.anycook.graph._get(graph, data, callback);
 }
 
 //answer(recipename, text, [, parentid] [, callback])

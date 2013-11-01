@@ -166,7 +166,7 @@
 			callbackName: "callback",
 			// frameId:"anycook-graph-frame"
 			scripts: ["autocomplete","category","discover","discussion", "ingredient", "life","message", "recipe", "search", "session", "tag", "user"],
-			error : function(xhr){console.error(xhr.getAllResponseHeaders());}
+			error : function(xhr){console.error(xhr)}
 		};
 		
 		if(options)
