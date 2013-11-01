@@ -1,11 +1,9 @@
 package de.anycook.api;
 
 import com.google.common.base.Preconditions;
-import de.anycook.api.discussion.checker.NewDiscussionChecker;
 import de.anycook.discussion.Discussion;
 import de.anycook.discussion.db.DBDiscussion;
 import de.anycook.session.Session;
-import de.anycook.utils.DaemonThreadFactory;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
 
@@ -20,27 +18,11 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
 @Path("discussion")
 public class DiscussionGraph {
-
-    private static ExecutorService exec;
-    private static final int numThreads = 20;
-
-    public static void init() {
-        exec = Executors.newCachedThreadPool(DaemonThreadFactory.singleton());
-        for(int i = 0; i<numThreads; i++){
-            exec.execute(new NewDiscussionChecker());
-        }
-    }
-
-    public static void destroyThreadPool() {
-       exec.shutdownNow();
-    }
 
     private final Logger logger = Logger.getLogger(getClass());
     @Context HttpHeaders hh;
