@@ -17,7 +17,7 @@
  
     <!-- GraphApi Logging -->
   <appender name="API-DaRoPi" class="org.apache.log4j.DailyRollingFileAppender">
-  <param name="File"  value="anycook-api.log" />
+  <param name="File"  value="/var/log/tomcat7/anycook-api.log" />
   <param name="Append" value="true" />
   <param name="DatePattern"  value="'.'yyyy-MM" />
     <layout class="org.apache.log4j.PatternLayout">
