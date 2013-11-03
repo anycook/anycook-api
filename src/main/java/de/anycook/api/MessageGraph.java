@@ -3,20 +3,22 @@ package de.anycook.api;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.MessageSession;
 import de.anycook.user.User;
 import org.apache.log4j.Logger;
@@ -25,30 +27,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import de.anycook.messages.Message;
-import de.anycook.messages.MessageChecker;
-import de.anycook.messages.MessagesessionChecker;
-import de.anycook.messages.NewMessageChecker;
-import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.session.Session;
 
 @Path("/message")
 public class MessageGraph  {
-	
-	private static ExecutorService exec;
-    private static final int numThreads = 30;
-	
-	public static void init() {
-		exec = Executors.newCachedThreadPool(DaemonThreadFactory.singleton());
-        for(int i = 0; i<numThreads/3; i++){
-        	exec.execute(new NewMessageChecker());
-        	exec.execute(new MessageChecker());
-        	exec.execute(new MessagesessionChecker());
-        }
-	}
-
-    public static void destroyThreadPool() {
-        exec.shutdownNow();
-    }
 	
 	private final Logger logger;
     @Context private HttpServletRequest req;
@@ -62,10 +44,43 @@ public class MessageGraph  {
 	}
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse,
                     @QueryParam("lastChange") Long lastChange){
+        asyncResponse.setTimeoutHandler(new TimeoutHandler() {
+            @Override
+            public void handleTimeout(AsyncResponse asyncResponse) {
+                asyncResponse.resume(Response.ok().build());
+            }
+        });
+
+        asyncResponse.setTimeout(5, TimeUnit.MINUTES);
+
+
         User user = Session.init(req.getSession()).getUser();
-        //MessagesessionChecker.addContext(lastChange, user.getId(), asyncResponse);
+
+        if(lastChange == null){
+            try {
+                asyncResponse.resume(MessageSession.getSessionsFromUser(user.getId()));
+            } catch (SQLException e) {
+                logger.error(e,e);
+                asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+            }
+            return;
+        }
+
+        Date changeDate = new Date(lastChange);
+        try{
+            while(!asyncResponse.isCancelled() && !asyncResponse.isDone()){
+                List<MessageSession> sessions = MessageSession.getSessionsFromUser(user.getId(), changeDate);
+                if(!sessions.isEmpty() && asyncResponse.isSuspended()) asyncResponse.resume(sessions);
+                else Thread.sleep(1000);
+            }
+        } catch (SQLException | InterruptedException e){
+            logger.error(e,e);
+            asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+        }
+
     }
 	
 	@PUT
@@ -109,11 +124,30 @@ public class MessageGraph  {
 
     @GET
     @Path("number")
+    @Produces(MediaType.APPLICATION_JSON)
     public void getMessageNumber(@Suspended AsyncResponse asyncResponse,
                                  @QueryParam("lastNum") int lastNumber){
         Session session = Session.init(req.getSession());
         session.checkLogin(hh.getCookies());
-        //MessageChecker.addContext(asyncResponse, lastNumber, session.getUser().getId());
+
+        int userId = session.getUser().getId();
+
+        try(DBMessage dbmessage = new DBMessage()){
+            int newNumber = -1;
+            while(!asyncResponse.isCancelled() && !asyncResponse.isDone()){
+                int newMessageNum = dbmessage.getNewMessageNum(userId);
+                if(newMessageNum == lastNumber){
+                    Thread.sleep(2500);
+                    continue;
+                }
+
+                if(asyncResponse.isSuspended())
+                    asyncResponse.resume(newMessageNum);
+            }
+        } catch (InterruptedException | SQLException e) {
+            logger.error(e, e);
+            asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+        }
 
     }
 	
