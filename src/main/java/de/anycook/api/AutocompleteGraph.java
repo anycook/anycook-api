@@ -82,21 +82,18 @@ public class AutocompleteGraph {
 	@GET
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response autocompleteUser(@QueryParam("q") String query,
-			@QueryParam("exclude") IntSet exclude,
-			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
-			@QueryParam("callback")String callback){
+	public List<User> autoCompleteUser(@QueryParam("q") String query,
+                                     @QueryParam("exclude") IntSet exclude,
+                                     @QueryParam("maxresults") @DefaultValue("10") int maxResults){
 		if(query == null)
 			throw new WebApplicationException(401);
 
-        List<User> data;
         try {
-            data = Autocomplete.autocompleteUsernames(query, maxresults, exclude);
+            return Autocomplete.autocompleteUsernames(query, maxResults, exclude);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return JsonpBuilder.buildResponse(callback, data);
 	}
 	
 	@GET
