@@ -48,7 +48,7 @@
 		var settings = $.anycook.graph._settings();
 		if(!type)
 			type = "small";
-		return settings.baseurl+"/user/"+encodeURIComponent(user)+"/image?type="+type+"&appid="+settings.appid+"+&"+Math.random();
+		return settings.baseUrl+"/user/"+encodeURIComponent(user)+"/image?type="+type+"&appid="+settings.appid+"+&"+Math.random();
 	};
 	
 	//follow(userid)
