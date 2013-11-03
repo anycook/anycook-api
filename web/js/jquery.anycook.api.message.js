@@ -20,15 +20,9 @@ $.anycook.graph.message = function(){
 			callback = arguments[0];	
 	}
 	var dfd = $.Deferred();
-	var graph = "/getmessage";
-	var data = {lastchange:lastdate};
-	$.when($.anycook.graph._getJSON(graph, data)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});
-	
-	return dfd.promise();
+	var graph = "/message";
+	var data = {lastChange:lastdate};
+	return $.anycook.graph._get(graph, data, callback);
 }
 
 //session(sessionid [,lastid] [,callback])
@@ -79,21 +73,14 @@ $.anycook.graph.message.number = function(){
 			callback = arguments[1];
 	}
 
-	var graph = "/getmessage/number";
+	var graph = "/message/number";
 	var data = {lastnum : lastnum};
 
 	var settings = $.anycook.graph._settings();
 	//data[settings.callbackName] = "?";		
 	$.extend(data, {appid : settings.appid});
 	
-	return $.ajax({
-		type : "GET",
-	  	url: settings.baseurl+graph+"?callback=?",
-	  	async:true,
-	  	dataType: 'json',
-	  	data: data,
-	  	success: callback
-	});
+	return $.anycook.graph._get(graph, data, callback);
 };
 
 //writeMessage(sessionid, text, [,callback])
