@@ -92,11 +92,12 @@
 	$.anycook.graph._postJSON = function(graph, data, callback){
 		if(!graph) graph = "";
 		if(!data) data = {};
+
+		var settings = $.anycook.graph._settings();
+		$.extend(data, {appid : settings.appid});
+
 		var callback = callback || function(){};
 		var error = error || settings.error;
-		var settings = $.anycook.graph._settings();
-		// $.extend(data, {appid : settings.appid});
-
 
 		return $.ajax({
 		    url: settings.baseUrl+graph,
