@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 
 import de.anycook.db.mysql.DBRecipe;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.server.ManagedAsync;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -85,11 +86,27 @@ public class DraftGraph {
 
     @GET
     @Path("num")
+    @ManagedAsync
+    @Produces(MediaType.APPLICATION_JSON)
     public void getDraftNum(@QueryParam("lastNum") Integer lastNum,
                             @Suspended AsyncResponse asyncResponse){
         Session session = Session.init(request.getSession(true));
-        session.checkLogin();
-        //DraftChecker.addContext(asyncResponse, lastNum, session.getUser().getId());
+        int userId = session.getUser().getId();
+        RecipeDrafts drafts = new RecipeDrafts();
+
+        try {
+            while (!asyncResponse.isCancelled() && !asyncResponse.isDone()){
+                int newNum = drafts.count(userId);
+                if(lastNum == null || newNum != lastNum){
+                    asyncResponse.resume(newNum);
+                } else {
+                    Thread.sleep(1500);
+                }
+            }
+        } catch (InterruptedException e) {
+            logger.error(e, e);
+            asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+        }
     }
 	
 	@PUT
