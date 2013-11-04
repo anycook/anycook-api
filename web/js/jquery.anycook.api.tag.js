@@ -9,10 +9,9 @@ $.anycook.graph.tag.number = function(callback){
 	return $.anycook.graph._get(graph, {}, callback);
 }
 
-$.anycook.graph.tag.suggest = function(recipename, tags, userid, callback){
-	var graph = "/recipe/"+recipename;
-	var data = {tags:JSON.stringify(tags), userid:userid};
-	$.anycook.graph._postMessage(graph, data);
+$.anycook.graph.tag.suggest = function(recipename, tags, callback){
+	var graph = "/recipe/"+recipename+"/tags";
+	return $.anycook.graph._postJSON(graph, tags, callback);
 }
 
 //popularTags([recipe], [callback])
