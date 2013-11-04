@@ -19,7 +19,7 @@ $.anycook.graph.message = function(){
 		else if(type1 == "function")
 			callback = arguments[0];	
 	}
-	var dfd = $.Deferred();
+
 	var graph = "/message";
 	var data = {lastChange:lastdate};
 	return $.anycook.graph._get(graph, data, callback);
@@ -43,16 +43,9 @@ $.anycook.graph.message.session = function(sessionid){
 			callback = arguments[1];
 	}
 	
-	var dfd = $.Deferred();
-	var graph = "/getmessage/"+sessionid;
+	var graph = "/message/"+sessionid;
 	var data = {lastid : lastid};
-	$.when($.anycook.graph._getJSON(graph, data)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});
-	
-	return dfd.promise();
+	return $.anycook.graph._get(graph, data, callback);
 }
 
 //number([lastnum] [,callback])
@@ -85,14 +78,14 @@ $.anycook.graph.message.number = function(){
 
 //writeMessage(sessionid, text, [,callback])
 $.anycook.graph.message.answer = function(sessionid, text, callback){
-	var graph = "/writemessage/"+sessionid;
+	var graph = "/message/"+sessionid;
 	var data = {message:text};
 	$.anycook.graph._put(graph, data);
 }
 
 //writeNewMessage(recipients, text [, callback])
 $.anycook.graph.message.writeNew = function(recipients, text, callback){
-	var graph = "/writemessage";
+	var graph = "/message";
 	var data = {message:text, recipients:JSON.stringify(recipients)};
 	$.anycook.graph._put(graph, data);
 	// $.anycook.graph._put(graph);
@@ -100,6 +93,6 @@ $.anycook.graph.message.writeNew = function(recipients, text, callback){
 
 //readMessage(sessionid, messageid [,callback])
 $.anycook.graph.message.read = function(sessionid, messageid, callback){
-	var graph = "/writemessage/"+sessionid+"/"+messageid;
+	var graph = "/message/"+sessionid+"/"+messageid;
 	$.anycook.graph._put(graph);
 }
