@@ -1,5 +1,9 @@
-exec { "apt-get update" :
+/*exec { "apt-get update" :
 	path => "/usr/bin",
+} */
+
+class { 'apt':
+  always_apt_update    => true,
 }
 
 # Class:  apache2
@@ -8,7 +12,7 @@ exec { "apt-get update" :
 class  apache2 {
 	package { "apache2":
 		ensure => present,
-		require => Exec["apt-get update"],
+		require => Class["apt"],
 	}
 
 	file { "sendfile":
@@ -79,7 +83,7 @@ class java7 {
 	# resources
 	package { "openjdk-7-jdk":
 		ensure => present,
-		require => Exec["apt-get update"],
+		require => Class["apt"],
 	}
 }
 
@@ -181,9 +185,30 @@ class sass {
 	}
 }
 
+class mongodb {
+  apt::source { 'mongodb':
+    location   => 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart',
+    repos      => 'dist 10gen',
+    key        => '7F0CEB10',
+    key_server => 'keyserver.ubuntu.com',
+  }
+
+  package { "mongodb-10gen":
+      ensure => installed,
+      require => Apt::Source["mongodb"],
+  }
+
+  service { "mongodb" :
+      enable => true,
+      ensure => running,
+      require => Package["mongodb-10gen"],
+  }
+}
+
 include apache2
 include java7
 include tomcat7
+include mongodb
 #include glassfish
 #include sass
 

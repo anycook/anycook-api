@@ -19,6 +19,7 @@ Vagrant.configure("2") do |config|
     api.vm.provision :puppet do |puppet|
         puppet.manifests_path = "test-environment/api-manifests"
         puppet.manifest_file  = "init.pp"
+        puppet.module_path = "test-environment/puppet-modules"
     end
   end
 
@@ -35,7 +36,7 @@ Vagrant.configure("2") do |config|
      db.vm.provision :puppet do |puppet|
         puppet.manifests_path = "test-environment/db-manifests"
         puppet.manifest_file  = "init.pp"
-        puppet.module_path = "test-environment/db-puppet-modules"
+        puppet.module_path = "test-environment/puppet-modules"
      end
   end
 
