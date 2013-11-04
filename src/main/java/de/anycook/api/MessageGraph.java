@@ -22,6 +22,7 @@ import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.MessageSession;
 import de.anycook.user.User;
 import org.apache.log4j.Logger;
+import org.glassfish.jersey.server.ManagedAsync;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -44,6 +45,7 @@ public class MessageGraph  {
 	}
 
     @GET
+    @ManagedAsync
     @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse,
                     @QueryParam("lastChange") Long lastChange){
@@ -148,6 +150,37 @@ public class MessageGraph  {
             logger.error(e, e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
+
+    }
+
+    @GET
+    @Path("{sessionId}")
+    @ManagedAsync
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getMessagesFromSession(@Suspended AsyncResponse asyncResponse,
+                                       @PathParam("sessionId") int sessionId,
+                                       @QueryParam("lastId") Integer lastId){
+        Session session = Session.init(req.getSession());
+        int userId = session.getUser().getId();
+
+        try {
+            if(lastId == null) {
+                asyncResponse.resume(MessageSession.getSession(sessionId, userId));
+                return;
+            }
+
+            while (!asyncResponse.isDone() && !asyncResponse.isCancelled()){
+                    MessageSession messageSession = MessageSession.getSession(sessionId, userId, lastId);
+                    if(!messageSession.isEmpty() && asyncResponse.isSuspended())
+                        asyncResponse.resume(messageSession);
+                    else
+                        Thread.sleep(1000);
+            }
+        } catch (InterruptedException | SQLException e) {
+            logger.error(e, e);
+            asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+        }
+
 
     }
 	
