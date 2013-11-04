@@ -22,6 +22,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import de.anycook.db.mysql.DBRecipe;
+import de.anycook.db.mysql.DBSaveRecipe;
+import de.anycook.db.mysql.DBTag;
 import org.apache.log4j.Logger;
 import de.anycook.tag.Tag;
 import de.anycook.user.User;
@@ -39,7 +41,6 @@ import org.apache.lucene.queryparser.classic.ParseException;
 public class RecipeGraph {
 	Logger logger = Logger.getLogger(getClass());
 
-	@SuppressWarnings("unchecked")
 	@GET
 	public List<String> getAll(@QueryParam("userId") Integer userId){
         try{
@@ -116,6 +117,24 @@ public class RecipeGraph {
 	public List<String> getRecipeTags(@PathParam("recipeName") String recipeName){
         try {
             return Tag.loadTagsFromRecipe(recipeName);
+        } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @POST
+    @Path("{recipeName}/tags")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void suggestTags(@Context HttpServletRequest request,
+                            @PathParam("recipeName") String recipeName,
+                            List<String> tags) {
+        Session session = Session.init(request.getSession());
+        int userId = session.getUser().getId();
+
+        try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()){
+            for(String tag : tags)
+                dbSaveRecipe.suggestTag(recipeName, tag, userId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
