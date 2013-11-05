@@ -19,7 +19,7 @@ More soon!
 
 ### Starting
 - Compile Java sources with ```$ gradle war``
-- Run ```$ vagrant up``` in project root directory
+- Run ```$ vagrant up``` in project root directory. Sometimes, especially on OSX, vagrant does not run the provisioners after vm startup. If this happens you have to call ```$ vagrant provision```, too.
 - The anycook API can be accessed on [http://localhost:8080](http://localhost:8080). The MySQL server via port 3333
 
 ### Adding database data
