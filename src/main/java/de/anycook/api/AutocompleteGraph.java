@@ -3,6 +3,7 @@ package de.anycook.api;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -34,30 +35,26 @@ public class AutocompleteGraph {
 	/**
 	 * autocompletes for all categories
 	 * @param query 
-	 * @param maxresults
-	 * @param callback
+	 * @param maxResults
 	 * @return
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response autocomplete(@QueryParam("q") String query,
+	public Map<String, Object> autocomplete(@QueryParam("q") String query,
 			@QueryParam("excludedusers") IntSet excludedUsers,
 			@QueryParam("excludedtags") StringSet excludedTags,
 			@QueryParam("excludedingredients") StringSet excludedIngredients,
-			@QueryParam("excludedcategorie") String excludedCategorie,
-			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
-			@QueryParam("callback")String callback){
+			@QueryParam("excludedcategorie") String excludedCategory,
+			@QueryParam("maxresults") @DefaultValue("10") int maxResults){
 		if(query == null)
 			throw new WebApplicationException(401);
-        JSONObject data;
         try {
-            data = Autocomplete.autocompleteAll(query, maxresults,
-                    excludedIngredients, excludedTags, excludedUsers, excludedCategorie);
+            return Autocomplete.autoCompleteAll(query, maxResults,
+                    excludedIngredients, excludedTags, excludedUsers, excludedCategory);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return JsonpBuilder.buildResponse(callback, data.toJSONString());
 	}
 	
 	@GET
