@@ -66,8 +66,8 @@ public class UploadGraph {
                     session.getUser().setImage(newFilename);
 
                 return  Response.ok("{success:\""+newFilename+"\"}").build();
-            } catch (SQLException e) {
-                logger.error(e);
+            } catch (SQLException | IOException e) {
+                logger.error(e, e);
                 throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
             }
 

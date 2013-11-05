@@ -58,13 +58,14 @@ class  apache2 {
 
 	}
 
-	file { "public":
-		ensure => link,
-		path => "/var/www/picapica-landingpage",
-		require => Package["apache2"],
-		target => "/public",
-		force => true,
-	}
+    file { "/localImages":
+        ensure => directory,
+        owner => "tomcat7",
+        source => "/images",
+        require => Package["tomcat7"],
+        recurse => true,
+        mode => '0644',
+    }
 
 	service { "apache2":
 	    enable => true,
@@ -128,13 +129,7 @@ class tomcat7 {
 		require => [Package["tomcat7"], File["/var/lib/tomcat7/webapps/ROOT"]],
 	}
 
-    file { "/images":
-        ensure => directory,
-        owner => "tomcat7",
-        recurse => true,
-        require => Package["tomcat7"],
 
-    }
 
 	service { "tomcat7":
 	    enable => true,

@@ -4,8 +4,10 @@
 
 	DocumentRoot /web
     SetEnvIf Request_URI "/js/*" no-jk
+    SetEnvIf Request_URI "/images/*" no-jk
 	JkMount /* worker1
 
+    Alias /images /localImages
 
 	<Directory />
 		Options FollowSymLinks
@@ -17,6 +19,8 @@
 		Order allow,deny
 		allow from all
 	</Directory>
+
+
 
 	ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
 	<Directory "/usr/lib/cgi-bin">
