@@ -10,13 +10,13 @@ $.anycook.graph.session = function(callback,error){
 }
 
 //login(username, password, stayloggedin [,callback])
-$.anycook.graph.session.login = function(username, password, stayloggedin, callback){
+$.anycook.graph.session.login = function(username, password, stayloggedin, callback, error){
 	var dfd = $.Deferred();
 	var graph = "/session/login";
 	var data = {username:username, password:password};
 	if(stayloggedin)
 		data.stayLoggedIn = true;
-	return $.anycook.graph._get(graph, data, callback);
+	return $.anycook.graph._get(graph, data, callback, error);
 };
 
 //logout([callback])

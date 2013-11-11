@@ -18,7 +18,7 @@
 			return $(document).data("anycook.graph");
 	}
 	
-	$.anycook.graph._getJSON  = function(graph, data, callback, error){
+	/*$.anycook.graph._getJSON  = function(graph, data, callback, error){
 		if(!graph) graph = "";
 		if(!data) data = {};
 		if(!callback) callback = function(){};
@@ -40,7 +40,7 @@
 		});
 		// return $.getJSON(settings.baseurl+graph+"?callback=?", data);
 		
-	}
+	}*/
 	
 	$.anycook.graph._get = function(graph, data, callback, error){
 		if(!graph) graph = "";
