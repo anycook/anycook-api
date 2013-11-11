@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -68,21 +69,30 @@ public class DraftGraph {
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		RecipeDrafts drafts = new RecipeDrafts();
-		List<JSONObject> list = drafts.getAll(session.getUser().getId());
-		drafts.close();
-		return JsonpBuilder.buildResponse(callback, list);
+
+		try(RecipeDrafts drafts = new RecipeDrafts()){
+            session.checkLogin(hh.getCookies());
+            List<JSONObject> list = drafts.getAll(session.getUser().getId());
+            return JsonpBuilder.buildResponse(callback, list);
+        } catch (IOException e){
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@PUT
 	public String newDraft(@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
-		RecipeDrafts recipeDrafts = new RecipeDrafts();
-		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		return recipeDrafts.newDraft(session.getUser().getId());
-	}
+		try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
+            Session session = Session.init(request.getSession());
+            session.checkLogin(hh.getCookies());
+            return recipeDrafts.newDraft(session.getUser().getId());
+        } catch (IOException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 
     @GET
     @Path("num")
@@ -116,13 +126,14 @@ public class DraftGraph {
 			@PathParam("recipeName") String recipeName,
 			@FormParam("versionid") Integer versionid){
 		if(recipeName == null) throw new WebApplicationException(400);
-		
-		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		int user_id = session.getUser().getId();
+
         try {
+            Session session = Session.init(request.getSession());
+            session.checkLogin(hh.getCookies());
+            int user_id = session.getUser().getId();
+
             return Recipe.initDraftWithRecipe(recipeName, versionid, user_id);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
@@ -152,20 +163,22 @@ public class DraftGraph {
 			@QueryParam("callback") String callback,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
-		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		RecipeDrafts recipeDrafts = new RecipeDrafts();
-		int userid = session.getUser().getId();
+        try (RecipeDrafts recipeDrafts = new RecipeDrafts()) {
+
+            Session session = Session.init(request.getSession());
+            session.checkLogin(hh.getCookies());
+            int userid = session.getUser().getId();
 		
-		try {
+
 			JSONObject json = recipeDrafts.loadDraft(draft_id, userid);			
 			return JsonpBuilder.buildResponse(callback, json.toJSONString());
 		} catch (ParseException e) {
 			logger.error(e);
 			throw new WebApplicationException(400);
-		} finally{
-			recipeDrafts.close();
-		}
+		} catch (IOException e){
+            logger.error(e,e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 		
 	}
 	
@@ -175,11 +188,11 @@ public class DraftGraph {
 			@PathParam("id") String draft_id,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){		
-		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		JSONParser parser = new JSONParser();
-		RecipeDrafts drafts = new RecipeDrafts();
-		try {
+
+		try (RecipeDrafts drafts = new RecipeDrafts()) {
+            Session session = Session.init(request.getSession());
+            session.checkLogin(hh.getCookies());
+            JSONParser parser = new JSONParser();
 			JSONObject json = (JSONObject)parser.parse(data);
 			
 			int userid = session.getUser().getId();
@@ -187,9 +200,10 @@ public class DraftGraph {
 			
 		} catch (ParseException e) {
 			throw new WebApplicationException(400);
-		} finally{
-			drafts.close();
-		}
+		} catch (IOException e){
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 		
 		return Response.ok("true").build();
 	}
@@ -200,11 +214,16 @@ public class DraftGraph {
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		RecipeDrafts recipeDrafts = new RecipeDrafts();
-		int user_id = session.getUser().getId();
-		recipeDrafts.remove(user_id, draft_id);
-		recipeDrafts.close();
-	}
+        try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
+            session.checkLogin(hh.getCookies());
+
+            int user_id = session.getUser().getId();
+            recipeDrafts.remove(user_id, draft_id);
+        } catch (IOException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+
+    }
 	
 }

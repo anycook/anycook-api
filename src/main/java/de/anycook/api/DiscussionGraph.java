@@ -17,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
@@ -42,7 +43,7 @@ public class DiscussionGraph {
             userId = session.getUser().getId();
         }catch(WebApplicationException e){
             userId = -1;
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e){
             logger.error(e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
             return;
@@ -87,15 +88,16 @@ public class DiscussionGraph {
 			@FormParam("comment") String comment, @FormParam("pid") Integer pid){
 		
 		Preconditions.checkNotNull(comment);
-		
-		Session shandler = Session.init(request.getSession());
-		shandler.checkLogin(hh.getCookies());
-		int userid = shandler.getUser().getId();
 
         try {
+            Session shandler = Session.init(request.getSession());
+            shandler.checkLogin(hh.getCookies());
+            int userid = shandler.getUser().getId();
+
+
             if(pid == null) Discussion.discuss(comment, userid, recipe);
             else Discussion.answer(comment, pid, userid, recipe);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e){
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -107,13 +109,13 @@ public class DiscussionGraph {
 	@Path("like/{recipeName}/{id}")
 	public Response like(@PathParam("recipeName") String recipe,
 			@PathParam("id") int id){
-		Session shandler = Session.init(request.getSession());
-		shandler.checkLogin(hh.getCookies());
-		int userid = shandler.getUser().getId();
+        try{
+            Session shandler = Session.init(request.getSession());
+            shandler.checkLogin(hh.getCookies());
+            int userid = shandler.getUser().getId();
 
-        try {
             Discussion.like(userid, recipe, id);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -127,13 +129,14 @@ public class DiscussionGraph {
 			@PathParam("id") int id,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
-		Session shandler = Session.init(request.getSession());
-		shandler.checkLogin(hh.getCookies());
-		int userid = shandler.getUser().getId();
-
         try {
+            Session shandler = Session.init(request.getSession());
+            shandler.checkLogin(hh.getCookies());
+            int userid = shandler.getUser().getId();
+
+
             Discussion.unlike(userid, recipe, id);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

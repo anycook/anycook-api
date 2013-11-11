@@ -231,12 +231,13 @@ public class RecipeGraph {
 			@Context HttpServletRequest request){
 		
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
+
         try {
+            session.checkLogin(hh.getCookies());
             boolean schmeckt = session.checkSchmeckt(recipeName);
             if(!schmeckt)
                 session.makeSchmeckt(recipeName);
-        } catch (SQLException e){
+        } catch (IOException | SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -250,13 +251,14 @@ public class RecipeGraph {
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
+
 
         try {
+            session.checkLogin(hh.getCookies());
             boolean schmeckt = session.checkSchmeckt(recipeName);
             if(schmeckt)
                 session.removeSchmeckt(recipeName);
-        } catch (SQLException e){
+        } catch (IOException | SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -271,15 +273,16 @@ public class RecipeGraph {
 			NewRecipe newRecipe){
 		logger.info("want to save recipe");
 		Session  session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		
-		User user = session.getUser();
+
 		
 		if(newRecipe == null)
 			throw new WebApplicationException(400);
 
 
         try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+
             if(!newRecipe.save(user.getId()))
                 throw new WebApplicationException(Response.Status.BAD_REQUEST);
         } catch (SQLException | IOException | ParseException e) {

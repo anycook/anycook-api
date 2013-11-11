@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class DiscoverGraph {
             } catch (WebApplicationException e) {
                 return DiscoverHandler.getDiscoverRecipes(recipenum);
             }
-        } catch (SQLException e){
+        } catch (IOException | SQLException e){
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -63,7 +64,7 @@ public class DiscoverGraph {
             } catch (WebApplicationException e) {
                 return DiscoverHandler.getPopularRecipes(recipenum);
             }
-        } catch (SQLException e){
+        } catch (IOException | SQLException e){
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

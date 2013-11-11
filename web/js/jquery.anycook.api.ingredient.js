@@ -12,5 +12,5 @@ $.anycook.graph.ingredient.number = function(callback){
 
 $.anycook.graph.ingredient.extract = function(query, callback){
 	var graph = "/ingredient/extract";
-	return $.anycook.graph._getJSON(graph,{q:query}, callback);
+	return $.anycook.graph._get(graph,{q:query}, callback);
 }

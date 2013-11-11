@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +33,13 @@ public class SessionGraph {
 	public User getSession(@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession(true));
-        session.checkLogin(hh.getCookies());
-        return session.getUser();
+        try {
+            session.checkLogin(hh.getCookies());
+            return session.getUser();
+        } catch (IOException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@GET
@@ -58,7 +64,7 @@ public class SessionGraph {
             return response.build();
         }catch(DBUser.UserNotFoundException e){
             throw new WebApplicationException(Response.Status.FORBIDDEN);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -72,7 +78,12 @@ public class SessionGraph {
 			@QueryParam("callback") String callback){
 		Session session = Session.init(request.getSession());
 		Map<String, Cookie> cookies = hh.getCookies();
-        session.checkLogin(hh.getCookies());
+        try {
+            session.checkLogin(hh.getCookies());
+        } catch (IOException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 
         ResponseBuilder response = Response.ok();
 		if(cookies.containsKey("anycook")){
@@ -152,14 +163,12 @@ public class SessionGraph {
 			@PathParam("type") String type,
 			@FormParam("value") String value){
 		Session session = Session.init(request.getSession());
-		
-		session.checkLogin(hh.getCookies());
-		
-		
-		User user = session.getUser();
-		boolean check = false;
 
         try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+            boolean check;
+
             switch (type) {
                 case "text":
                     check = user.setText(value);
@@ -174,18 +183,20 @@ public class SessionGraph {
                 default:
                     throw new WebApplicationException(404);
             }
-        } catch (SQLException e) {
+
+            if(!check){
+                logger.warn("check failed");
+                throw new WebApplicationException(400);
+            }
+
+            return Response.ok("true").build();
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
 
-        if(!check){
-			logger.warn("check failed");
-			throw new WebApplicationException(400);
-		}
-		
-		return Response.ok("true").build();
+
 		
 	}
 	
@@ -195,9 +206,10 @@ public class SessionGraph {
 			@Context HttpHeaders hh, 
 			@PathParam("type") String type){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
+
 
         try{
+            session.checkLogin(hh.getCookies());
             MailSettings settings = MailSettings.init(session.getUser().getId());
             logger.debug("add mailtype:"+type);
 
@@ -228,7 +240,7 @@ public class SessionGraph {
                         break;
                 }
             }
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -243,8 +255,9 @@ public class SessionGraph {
 			@Context HttpHeaders hh, 
 			@PathParam("type") String type){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
+
         try{
+            session.checkLogin(hh.getCookies());
             MailSettings settings = MailSettings.init(session.getUser().getId());
             logger.debug("remove mailtype:"+type);
 
@@ -275,7 +288,7 @@ public class SessionGraph {
                     break;
                 }
             }
-        } catch (SQLException e){
+        } catch (IOException | SQLException e){
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

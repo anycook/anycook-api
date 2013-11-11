@@ -45,7 +45,12 @@ public class UploadGraph {
 			upload = new RecipeUploader();
 			break;
 		case "user":
-            session.checkLogin(hh.getCookies());
+            try {
+                session.checkLogin(hh.getCookies());
+            } catch (IOException e) {
+                logger.error(e, e);
+                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            }
             upload = new UserUploader();
 			break;
 		default:

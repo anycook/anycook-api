@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
@@ -117,7 +118,7 @@ public class MessageGraph  {
 			int userid = session.getUser().getId();
 			recipients.add(userid);
 			MessageSession.getSession(recipients).newMessage(userid, message);
-		} catch (ParseException | UnsupportedEncodingException | SQLException e ) {
+		} catch (IOException | ParseException | SQLException e ) {
 			logger.error(e);
 			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 		}
@@ -130,11 +131,12 @@ public class MessageGraph  {
     public void getMessageNumber(@Suspended AsyncResponse asyncResponse,
                                  @QueryParam("lastNum") int lastNumber){
         Session session = Session.init(req.getSession());
-        session.checkLogin(hh.getCookies());
 
-        int userId = session.getUser().getId();
 
         try(DBMessage dbmessage = new DBMessage()){
+            session.checkLogin(hh.getCookies());
+            int userId = session.getUser().getId();
+
             int newNumber = -1;
             while(!asyncResponse.isCancelled() && !asyncResponse.isDone()){
                 int newMessageNum = dbmessage.getNewMessageNum(userId);
@@ -146,7 +148,7 @@ public class MessageGraph  {
                 if(asyncResponse.isSuspended())
                     asyncResponse.resume(newMessageNum);
             }
-        } catch (InterruptedException | SQLException e) {
+        } catch (IOException | InterruptedException | SQLException e) {
             logger.error(e, e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
@@ -195,11 +197,12 @@ public class MessageGraph  {
 		}
 		
 		Session session = Session.init(req.getSession());
-		session.checkLogin(hh.getCookies());
-		int userid = session.getUser().getId();
+
         try {
-            MessageSession.getSession(sessionid, userid).newMessage(userid, message);
-        } catch (SQLException e) {
+            session.checkLogin(hh.getCookies());
+            int userId = session.getUser().getId();
+            MessageSession.getSession(sessionid, userId).newMessage(userId, message);
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -211,11 +214,12 @@ public class MessageGraph  {
 	public void readMessage(@PathParam("sessionId") int sessionid,
 			@PathParam("messageid") int messageid){
 		Session session = Session.init(req.getSession());
-		session.checkLogin(hh.getCookies());
-		int userid = session.getUser().getId();
+
         try {
+            session.checkLogin(hh.getCookies());
+            int userid = session.getUser().getId();
             Message.read(sessionid, messageid, userid);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

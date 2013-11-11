@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.anycook.db.mysql.DBUser;
 import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 
@@ -127,11 +129,13 @@ public class UserGraph {
 	public User getUser(@PathParam("userId") int userId){
         try {
             return User.init(userId);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBUser.UserNotFoundException e) {
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-	}
+    }
 	
 	@PUT
 	@Path("{userId}/follow")
@@ -139,11 +143,13 @@ public class UserGraph {
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		User user = session.getUser();
+
         try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+
             user.follow(userid);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -157,11 +163,13 @@ public class UserGraph {
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
-		session.checkLogin(hh.getCookies());
-		User user = session.getUser();
+
         try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+
             user.unfollow(userid);
-        } catch (SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -177,14 +185,17 @@ public class UserGraph {
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
 		
 		try {
-			URI uri = new URI("http://images.anycook.de"+User.getUserImage(userid, type));
+			URI uri = new URI(User.getUserImage(userid, type));
 			return Response.temporaryRedirect(uri).build();
 		} catch (URISyntaxException e) {
 			logger.warn(e);
 			throw new WebApplicationException(400);
-		} catch (SQLException e) {
+		} catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBUser.UserNotFoundException e) {
+            logger.warn(e,e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
 	
