@@ -44,7 +44,7 @@ $.anycook.graph.message.session = function(sessionid){
 	}
 	
 	var graph = "/message/"+sessionid;
-	var data = {lastid : lastid};
+	var data = {lastId : lastid};
 	return $.anycook.graph._get(graph, data, callback);
 }
 
