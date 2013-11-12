@@ -280,11 +280,22 @@ public class RecipeGraph {
 
 
         try {
-            session.checkLogin(hh.getCookies());
-            User user = session.getUser();
+            try {
+                session.checkLogin(hh.getCookies());
+                User user = session.getUser();
+                if(!newRecipe.save(user.getId()))
+                    throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            } catch (WebApplicationException e){
+                    logger.debug("user is not authentificated");
+                if(e.getResponse().getStatus() == 401)
+                    if(!newRecipe.save()){
+                        logger.warn("bad request");
+                        throw new WebApplicationException(Response.Status.BAD_REQUEST);
+                    }
+                else
+                    throw new WebApplicationException(e);
 
-            if(!newRecipe.save(user.getId()))
-                throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            }
         } catch (SQLException | IOException | ParseException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
