@@ -6,6 +6,20 @@ class { 'apt':
   always_apt_update    => true,
 }
 
+class anycook {
+  file { '/etc/anycook' :
+      ensure => directory,
+  }
+
+  file { '/etc/anycook/anycook-api.properties' :
+      ensure => present,
+      source => '/tmp/vagrant-puppet/manifests/anycook-api.properties',
+      #onlyif => 'test -f /etc/anycook/anycook-api.properties',
+      require => File['/etc/anycook'],
+      #before => Class['tomcat7'],
+  }
+}
+
 # Class:  apache2
 # install and starts apache2
 #
@@ -204,6 +218,7 @@ class mongodb {
 
 include apache2
 include java7
+include anycook
 include tomcat7
 include mongodb
 #include glassfish
