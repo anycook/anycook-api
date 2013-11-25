@@ -17,6 +17,11 @@ More soon!
   - and their dependency [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
 - Clone [anycook-core](https://github.com/anycook/anycook-core) into the same parent directory
 
+### Configuration
+Available properties can be found [here](https://github.com/anycook/anycook-core/wiki/Configuration-File).
+
+If you want to set your own global conf in the test environment place it in the project as ```test-environment/api-manifests/anycook.properties```
+
 ### Starting
 - Compile Java sources with ```$ gradle war``
 - Run ```$ vagrant up``` in project root directory. Sometimes, especially on OSX, vagrant does not run the provisioners after vm startup. If this happens you have to call ```$ vagrant provision```, too.
