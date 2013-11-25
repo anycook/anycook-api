@@ -10,4 +10,4 @@ build/
 *.ipr
 *.iws
 .DS_Store
-test-environment/api-manifests/anycook-api.properties
+test-environment/api-manifests/anycook.properties

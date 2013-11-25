@@ -11,10 +11,10 @@ class anycook {
       ensure => directory,
   }
 
-  file { '/etc/anycook/anycook-api.properties' :
+  file { '/etc/anycook/anycook.properties' :
       ensure => present,
-      source => '/tmp/vagrant-puppet/manifests/anycook-api.properties',
-      #onlyif => 'test -f /etc/anycook/anycook-api.properties',
+      source => '/tmp/vagrant-puppet/manifests/anycook.properties',
+      #onlyif => 'test -f /etc/anycook/anycook.properties',
       require => File['/etc/anycook'],
       #before => Class['tomcat7'],
   }
