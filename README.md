@@ -24,7 +24,7 @@ If you want to set your own global conf in the test environment place it in the 
 
 ### Starting
 - Compile Java sources with ```$ gradle war``
-- Run ```$ vagrant up``` in project root directory. Sometimes, especially on OSX, vagrant does not run the provisioners after vm startup. If this happens you have to call ```$ vagrant provision```, too.
+- Run ```$ vagrant up --provision``` in project root directory.
 - The anycook API can be accessed on [http://localhost:8080](http://localhost:8080). The MySQL server via port 3333
 
 ### Adding database data
