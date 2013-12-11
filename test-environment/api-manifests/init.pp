@@ -2,6 +2,8 @@
 	path => "/usr/bin",
 } */
 
+$manifests = '/tmp/vagrant-puppet-1/manifests'
+
 class { 'apt':
   always_apt_update    => true,
 }
@@ -13,7 +15,7 @@ class anycook {
 
   file { '/etc/anycook/anycook.properties' :
       ensure => present,
-      source => '/tmp/vagrant-puppet/manifests/anycook.properties',
+      source => "${manifests}/anycook.properties",
       #onlyif => 'test -f /etc/anycook/anycook.properties',
       require => File['/etc/anycook'],
       #before => Class['tomcat7'],
@@ -33,14 +35,14 @@ class  apache2 {
 		ensure => file,
 		path => "/etc/apache2/conf.d/sendfile",
 		require => Package["apache2"],
-		source => "/tmp/vagrant-puppet/manifests/apache-conf/sendfile",
+		source => "${manifests}/apache-conf/sendfile",
 	}
 
 	file { "charset":
 		ensure => file,
 		path => "/etc/apache2/conf.d/charset",
 		require => Package["apache2"],
-		source => "/tmp/vagrant-puppet/manifests/apache-conf/charset",
+		source => "${manifests}/apache-conf/charset",
 	}
 
 
@@ -54,21 +56,21 @@ class  apache2 {
 		ensure => file,
 		path => "/etc/apache2/mods-enabled/jk.conf",
 		require => Package["libapache2-mod-jk"],
-		source => "/tmp/vagrant-puppet/manifests/apache-conf/jk.conf",
+		source => "${manifests}/apache-conf/jk.conf",
 	}
 
 	file { "worker.properties":
 		ensure => file,
 		path => "/etc/apache2/workers.properties",
 		require => Package["libapache2-mod-jk"],
-		source => "/tmp/vagrant-puppet/manifests/apache-conf/workers.properties",
+		source => "${manifests}/apache-conf/workers.properties",
 	}
 
 	file { "000-default":
 		ensure => file,
 		path => "/etc/apache2/sites-enabled/000-default",
 		require => Package["apache2"],
-		source => "/tmp/vagrant-puppet/manifests/apache-conf/000-default",
+		source => "${manifests}/apache-conf/000-default",
 
 	}
 
@@ -118,7 +120,7 @@ class tomcat7 {
 		force => true,
 		path => "/etc/tomcat7/server.xml",
 		require => Package["tomcat7"],
-		target => "/tmp/vagrant-puppet/manifests/tomcat-conf/server.xml",
+		target => "${manifests}/tomcat-conf/server.xml",
 	}
 
 	file { "setenv.sh":
@@ -126,7 +128,7 @@ class tomcat7 {
         force => true,
         path => "/usr/share/tomcat7/bin/setenv.sh",
         require => Package["tomcat7"],
-        target => "/tmp/vagrant-puppet/manifests/tomcat-conf/setenv.sh",
+        target => "${manifests}/tomcat-conf/setenv.sh",
     }
 
 	file { "/var/lib/tomcat7/webapps/ROOT":
@@ -155,22 +157,6 @@ class tomcat7 {
 	}
 }
 
-class glassfish {
-  file { "war":
-    ensure => link,
-    path => "/home/vagrant/glassfish4/glassfish/domains/domain1/autodeploy/anycook-api.war",
-    target => "/war/anycook-api-0.1.0.war",
-    force => true,
-    #require => [Package["tomcat7"], File["/var/lib/tomcat7/webapps/ROOT"]],
-  }
-
-  exec{ "glassfish":
-      command => "asadmin start-domain",
-      path => "/home/vagrant/glassfish4/glassfish/bin",
-
-  }
-
-}
 
 
 
