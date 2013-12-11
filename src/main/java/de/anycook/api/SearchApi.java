@@ -24,7 +24,7 @@ import de.anycook.search.SearchResult;
 
 
 @Path("search")
-public class SearchGraph {
+public class SearchApi {
 
     private final Logger logger = Logger.getLogger(getClass());
 	

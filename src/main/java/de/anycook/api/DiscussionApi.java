@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 
 @Path("discussion")
-public class DiscussionGraph {
+public class DiscussionApi {
 
     private final Logger logger = Logger.getLogger(getClass());
     @Context HttpHeaders hh;

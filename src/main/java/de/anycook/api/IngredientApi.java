@@ -22,7 +22,7 @@ import de.anycook.utils.JsonpBuilder;
 
 
 @Path("/ingredient")
-public class IngredientGraph {
+public class IngredientApi {
 
     private Logger logger = Logger.getLogger(getClass());
 	

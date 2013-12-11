@@ -25,7 +25,7 @@ import org.glassfish.jersey.server.ManagedAsync;
  *
  */
 @Path("/life")
-public class LifeGraph {
+public class LifeApi {
     private final Logger logger = Logger.getLogger(getClass());
 
 	@GET

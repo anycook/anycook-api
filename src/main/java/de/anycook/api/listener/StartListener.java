@@ -22,13 +22,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import de.anycook.api.DiscussionGraph;
-import de.anycook.conf.Configuration;
 import org.apache.log4j.Logger;
 
 import de.anycook.db.mysql.DBHandler;
-import de.anycook.api.DraftGraph;
-import de.anycook.api.MessageGraph;
 
 
 /**
@@ -50,7 +46,7 @@ public class StartListener implements ServletContextListener {
      */
     public void contextInitialized(ServletContextEvent arg0) {
         DBHandler.init();
-        //DraftGraph.init();
+        //DraftApi.init();
 
 
 
@@ -61,7 +57,7 @@ public class StartListener implements ServletContextListener {
      * @see ServletContextListener#contextDestroyed(ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent arg0) {
-    	//DraftGraph.destroyThreadPool();
+    	//DraftApi.destroyThreadPool();
     	DBHandler.closeSource();
     	logger.info("Server stopped");
     }

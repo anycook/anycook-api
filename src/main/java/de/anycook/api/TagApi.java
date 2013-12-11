@@ -18,7 +18,7 @@ import de.anycook.tag.Tag;
 
 
 @Path("tag")
-public class TagGraph {
+public class TagApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
 	@SuppressWarnings("unchecked")

@@ -14,10 +14,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 
 import de.anycook.autocomplete.Autocomplete;
-import de.anycook.api.SearchGraph.StringSet;
+import de.anycook.api.SearchApi.StringSet;
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.user.User;
 
@@ -28,7 +27,7 @@ import de.anycook.user.User;
  *
  */
 @Path("autocomplete")
-public class AutocompleteGraph {
+public class AutocompleteApi {
 
     private final Logger logger = Logger.getLogger(getClass());
 	

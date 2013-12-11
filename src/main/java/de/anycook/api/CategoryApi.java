@@ -22,7 +22,7 @@ import de.anycook.utils.JsonpBuilder;
 
 
 @Path("/category")
-public class CategoryGraph {
+public class CategoryApi {
 
     private final Logger logger = Logger.getLogger(getClass());
 

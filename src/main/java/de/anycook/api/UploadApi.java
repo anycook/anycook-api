@@ -23,10 +23,10 @@ import de.anycook.upload.UserUploader;
 
 
 @Path("upload")
-public class UploadGraph {
+public class UploadApi {
 	private final Logger logger;
 	
-	public UploadGraph() {
+	public UploadApi() {
 		logger = Logger.getLogger(getClass());
 	}
 	

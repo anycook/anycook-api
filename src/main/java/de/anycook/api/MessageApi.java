@@ -32,7 +32,7 @@ import de.anycook.messages.Message;
 import de.anycook.session.Session;
 
 @Path("/message")
-public class MessageGraph  {
+public class MessageApi {
 	
 	private final Logger logger;
     @Context private HttpServletRequest req;
@@ -41,7 +41,7 @@ public class MessageGraph  {
 	/**
 	 * 
 	 */
-	public MessageGraph() {
+	public MessageApi() {
 		logger = Logger.getLogger(getClass());
 	}
 

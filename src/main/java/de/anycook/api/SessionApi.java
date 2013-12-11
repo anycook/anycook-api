@@ -20,11 +20,11 @@ import java.util.Map;
 
 
 @Path("session")
-public class SessionGraph {
+public class SessionApi {
 	
 	private final Logger logger;
 	
-	public SessionGraph() {
+	public SessionApi() {
 		logger = Logger.getLogger(getClass());
 	}
 	

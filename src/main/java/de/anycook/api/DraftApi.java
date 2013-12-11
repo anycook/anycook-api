@@ -40,7 +40,7 @@ import de.anycook.utils.DaemonThreadFactory;
 import de.anycook.utils.JsonpBuilder;
 
 @Path("/drafts")
-public class DraftGraph {
+public class DraftApi {
 	private static ExecutorService exec;
     private static final int numThreads = 10;
 	
@@ -59,7 +59,7 @@ public class DraftGraph {
     @Context HttpHeaders hh;
     @Context HttpServletRequest request;
 
-    public DraftGraph(){
+    public DraftApi(){
 		logger = Logger.getLogger(getClass());
 	}
 	

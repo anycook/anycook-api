@@ -38,7 +38,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 
 @Path("/recipe")
 @Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-public class RecipeGraph {
+public class RecipeApi {
 	Logger logger = Logger.getLogger(getClass());
 
 	@GET

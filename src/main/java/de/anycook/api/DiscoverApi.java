@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 
 
 @Path("/discover")
-public class DiscoverGraph {
+public class DiscoverApi {
 
     private final Logger logger = Logger.getLogger(getClass());
 	
