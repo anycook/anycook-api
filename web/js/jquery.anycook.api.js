@@ -64,7 +64,7 @@
 		});
 	}
 	
-	$.anycook.graph._post = function(graph, data, callback){
+	$.anycook.graph._post = function(graph, data, callback, error){
 		if(!graph) graph = "";
 		if(!data) data = {};
 		var callback = callback || function(){};
@@ -89,7 +89,7 @@
 		});
 	}
 
-	$.anycook.graph._postJSON = function(graph, data, callback){
+	$.anycook.graph._postJSON = function(graph, data, callback, error){
 		if(!graph) graph = "";
 		if(!data) data = {};
 
@@ -113,7 +113,7 @@
 		});
 	}
 	
-	$.anycook.graph._put = function(graph,data, callback){
+	$.anycook.graph._put = function(graph,data, callback, error){
 		if(!graph) graph = "";
 		if(!data) data = {};
 		var callback = callback || function(){};
@@ -137,7 +137,7 @@
 		});
 	}
 	
-	$.anycook.graph._delete = function(graph,data, callback){
+	$.anycook.graph._delete = function(graph,data, callback, error){
 		if(!graph) graph = "";
 		if(!data) data = {};
 		var callback = callback || function(){};
