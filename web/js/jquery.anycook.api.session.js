@@ -10,20 +10,18 @@ $.anycook.graph.session = function(callback,error){
 }
 
 //login(username, password, stayloggedin [,callback])
-$.anycook.graph.session.login = function(username, password, stayloggedin, callback, error){
+$.anycook.graph.session.login = function(username, password, stayLoggedIn, callback, error){
 	var dfd = $.Deferred();
-	var graph = "/session/login";
-	var data = {username:username, password:password};
-	if(stayloggedin)
-		data.stayLoggedIn = true;
-	return $.anycook.graph._get(graph, data, callback, error);
+	var graph = "/session";
+	var data = {username:username, password:password, stayLoggedIn : stayLoggedIn ? true : false};
+	return $.anycook.graph._postJSON(graph, data, callback, error);
 };
 
 //logout([callback])
 $.anycook.graph.session.logout = function(callback){
 	var dfd = $.Deferred();
-	var graph = "/session/logout";
-	return $.anycook.graph._get(graph, {}, callback);
+	var graph = "/session";
+	return $.anycook.graph._delete(graph, {}, callback);
 }
 
 //settings

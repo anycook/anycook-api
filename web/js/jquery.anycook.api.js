@@ -28,7 +28,7 @@
 		var error = error || settings.error;
 		
 		//data[settings.callbackName] = "?";		
-		$.extend(data, {appid : settings.appid});
+		$.extend(data, {appId : settings.appId});
 		
 		return $.ajax({
 		  url: settings.baseUrl+graph+"?callback=?",
@@ -50,7 +50,7 @@
 		var settings = $.anycook.graph._settings();
 		var error = error || settings.error;
 		//data[settings.callbackName] = "?";		
-		$.extend(data, {appid : settings.appid});
+		$.extend(data, {appId : settings.appId});
 		return $.ajax({
 		    url: settings.baseUrl+graph,
 		    type: 'GET',
@@ -70,7 +70,7 @@
 		var callback = callback || function(){};
 		
 		var settings = $.anycook.graph._settings();
-		$.extend(data, {appid : settings.appid});
+		$.extend(data, {appId : settings.appId});
 
 		var error = error || settings.error;
 
@@ -94,7 +94,7 @@
 		if(!data) data = {};
 
 		var settings = $.anycook.graph._settings();
-		$.extend(data, {appid : settings.appid});
+		$.extend(data, {appId : settings.appId});
 
 		var callback = callback || function(){};
 		var error = error || settings.error;
@@ -122,7 +122,7 @@
 		var error = error || settings.error;
 
 		var url = settings.baseUrl+graph;
-		$.extend(data, {appid : settings.appid});
+		$.extend(data, {appId : settings.appId});
 		
 		return $.ajax({
 		    url: url,
@@ -146,7 +146,7 @@
 		var settings = $.anycook.graph._settings();
 		var error = error || settings.error;
 		//data[settings.callbackName] = "?";		
-		$.extend(data, {appid : settings.appid});
+		$.extend(data, {appId : settings.appId});
 		return $.ajax({
 		    url: settings.baseUrl+graph,
 		    type: 'DELETE',
@@ -162,7 +162,7 @@
 	$.anycook.graph.init = function(options){
 		var dfd = $.Deferred();
 		var settings = {
-			appid: -1,
+			appId: -1,
 			baseUrl: "http://api.anycook.de",
 			callbackName: "callback",
 			// frameId:"anycook-graph-frame"
