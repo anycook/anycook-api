@@ -42,21 +42,20 @@ public class SessionApi {
         }
 	}
 	
-	@GET
-	@Path("login")
+	@POST
+    @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response login(@Context HttpServletRequest request,
-			@QueryParam("username") String username,
-			@QueryParam("password") String password,
-			@QueryParam("stayLoggedIn") boolean stayLoggedIn){
+			Session.UserAuth auth){
 		
 		Session session = Session.init(request.getSession(true));
         try{
-            session.login(username, password);
+            session.login(auth);
             User user = session.getUser();
             ResponseBuilder response = Response.ok(user);
-            logger.info(String.format("stayLoggedIn is %s", stayLoggedIn));
-            if(stayLoggedIn){
+
+            if(auth.stayLoggedIn){
+                logger.debug(String.format("stayLoggedIn"));
                 NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, false);
                 response.cookie(cookie);
             }
@@ -70,8 +69,7 @@ public class SessionApi {
         }
     }
 	
-	@GET
-	@Path("logout")
+	@DELETE
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response logout(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
