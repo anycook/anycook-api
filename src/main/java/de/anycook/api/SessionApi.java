@@ -61,7 +61,7 @@ public class SessionApi {
             }
 
             return response.build();
-        }catch(DBUser.UserNotFoundException e){
+        }catch(User.LoginException|DBUser.UserNotFoundException e){
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         } catch (IOException | SQLException e) {
             logger.error(e);
@@ -102,16 +102,17 @@ public class SessionApi {
 	@POST
 	@Path("activate")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response activateAccount(@FormParam("activationkey") String activationKey){
-        boolean check;
+	public void activateAccount(@FormParam("activationkey") String activationKey){
         try {
-            check = User.activateById(activationKey);
+            User.activateById(activationKey);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBUser.ActivationFailedException e) {
+            logger.warn(e,e);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
-        return Response.ok(Boolean.toString(check)).build();
-	}
+    }
 	
 	
 	//settings
