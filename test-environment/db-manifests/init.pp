@@ -17,6 +17,8 @@ class install_mysql {
                 'bind_address'  => '0.0.0.0',
             },
         },
+        service_enabled => true,
+        service_manage => true,
         require => Exec["apt-get update"],
     }
 
