@@ -2,6 +2,7 @@ package de.anycook.api;
 
 import de.anycook.db.mysql.DBUser;
 import de.anycook.mailprovider.MailProvider;
+import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.settings.MailSettings;
@@ -49,8 +50,20 @@ public class SessionApi {
 			Session.UserAuth auth){
 		
 		Session session = Session.init(request.getSession(true));
+        LoginAttempt loginAttempt = null;
+
         try{
-            session.login(auth);
+            int userId = User.getUserId(auth.username);
+            if(!LoginAttempt.isLoginAllowed(userId)) {
+                logger.warn("too many login attempts for "+userId);
+                throw new WebApplicationException(Response.Status.FORBIDDEN);
+            }
+
+            loginAttempt = new LoginAttempt(userId, request.getRemoteAddr(), System.currentTimeMillis());
+
+
+            session.login(userId, auth.password);
+            loginAttempt.setSuccessful(true);
             User user = session.getUser();
             ResponseBuilder response = Response.ok(user);
 
@@ -66,6 +79,12 @@ public class SessionApi {
         } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } finally {
+            if(loginAttempt != null) try {
+                loginAttempt.save();
+            } catch (SQLException e) {
+                logger.error(e);
+            }
         }
     }
 	
