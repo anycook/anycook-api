@@ -2,16 +2,9 @@
  * @author Jan Graßegger <jan@anycook.de>
  */
 //search(querymap, [callback])
-$.anycook.graph.search = function(data, callback){	
-	var dfd = $.Deferred();
+$.anycook.graph.search = function(data, callback, error){	
 	var graph = "/search";
-	$.when($.anycook.graph._get(graph, data)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});
-	
-	return dfd.promise();
+	return $.anycook.graph._postJSON(graph, data, callback, error);
 };
 
 //validate(term [,callback])
