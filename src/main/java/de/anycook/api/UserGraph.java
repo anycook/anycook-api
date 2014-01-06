@@ -15,7 +15,6 @@ import javax.ws.rs.core.Response;
 
 import de.anycook.db.mysql.DBUser;
 import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
 
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.utils.enumerations.ImageType;
@@ -197,7 +196,7 @@ public class UserGraph {
 			@QueryParam("callback") String callback){
         List<String> schmeckt;
         try {
-            schmeckt = Recipe.getSchmecktRecipesfromUser(userid);
+            schmeckt = Recipe.getSchmecktRecipesFromUser(userid);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

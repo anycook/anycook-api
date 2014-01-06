@@ -16,7 +16,6 @@ import javax.ws.rs.core.Response;
 import org.apache.log4j.Logger;
 
 import de.anycook.autocomplete.Autocomplete;
-import de.anycook.api.SearchApi.StringSet;
 import de.anycook.utils.JsonpBuilder;
 import de.anycook.user.User;
 
@@ -125,4 +124,16 @@ public class AutocompleteApi {
 			}
 		}
 	}
+
+    public static class StringSet extends HashSet<String>{
+        private static final long serialVersionUID = 1L;
+
+        public StringSet(String in) {
+            super();
+            if(in != null){
+                for(String split : in.split(","))
+                    add(split);
+            }
+        }
+    }
 }
