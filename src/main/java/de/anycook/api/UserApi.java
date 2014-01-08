@@ -10,10 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBUser;
+import de.anycook.views.Views;
 import org.apache.log4j.Logger;
 
 import de.anycook.utils.JsonpBuilder;
@@ -26,7 +28,7 @@ import de.anycook.user.User;
 
 
 @Path("/user")
-public class UserGraph {
+public class UserApi {
 	private final Logger logger = Logger.getLogger(getClass());
 	
 	
@@ -115,6 +117,7 @@ public class UserGraph {
 	
 	@GET
 	@Path("{userId}")
+    @JsonView(Views.PublicUserView.class)
 	@Produces(MediaType.APPLICATION_JSON)
 	public User getUser(@PathParam("userId") int userId){
         try {
@@ -158,7 +161,7 @@ public class UserGraph {
             session.checkLogin(hh.getCookies());
             User user = session.getUser();
 
-            user.unfollow(userid);
+            user.unFollow(userid);
         } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
