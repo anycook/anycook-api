@@ -18,7 +18,6 @@ import de.anycook.db.mysql.DBUser;
 import de.anycook.views.Views;
 import org.apache.log4j.Logger;
 
-import de.anycook.utils.JsonpBuilder;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.discussion.Discussion;
 import de.anycook.recipe.Recipe;
@@ -59,10 +58,9 @@ public class UserApi {
 	@GET
 	@Path("mail")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response checkMail(@QueryParam("mail") String mail,
-			@QueryParam("callback") String callback){
+	public boolean checkMail(@QueryParam("mail") String mail){
         try {
-            return JsonpBuilder.buildResponse(callback, User.checkMail(mail));
+            return User.checkMail(mail);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -72,10 +70,9 @@ public class UserApi {
 	@GET
 	@Path("name")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response checkUsername(@QueryParam("username") String username,
-			@QueryParam("callback") String callback){
+	public boolean checkUsername(@QueryParam("username") String username){
         try {
-            return JsonpBuilder.buildResponse(callback, User.checkUsername(username));
+            return User.checkUsername(username);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -84,15 +81,14 @@ public class UserApi {
 	
 	/**
 	 * returns the number of users
-	 * @param callback
 	 * @return
 	 */
 	@GET
 	@Path("number")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getNum(@QueryParam("callback") String callback){
+	public int getNum(){
         try {
-            return JsonpBuilder.buildResponse(callback, User.getTotal());
+            return User.getTotal();
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -102,13 +98,12 @@ public class UserApi {
 	@GET
 	@Path("recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getRecommendations(@Context HttpServletRequest request, 
-			@QueryParam("callback") String callback){
+	public List<String> getRecommendations(@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
-		int userid = session.getUser().getId();
+		int userId = session.getUser().getId();
         try {
-            return JsonpBuilder.buildResponse(callback, Recommendation.recommend(userid));
+            return Recommendation.recommend(userId);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -195,30 +190,24 @@ public class UserApi {
 	@GET
 	@Path("{userId}/schmeckt")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response schmeckt(@PathParam("userId") int userid,
-			@QueryParam("callback") String callback){
-        List<String> schmeckt;
+	public List<String> schmeckt(@PathParam("userId") int userId){
         try {
-            schmeckt = Recipe.getSchmecktRecipesFromUser(userid);
+            return Recipe.getSchmecktRecipesFromUser(userId);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return JsonpBuilder.buildResponse(callback, schmeckt);
 	}
 	
 	@GET
 	@Path("{userId}/discussionnum")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getDiscussionNum(@PathParam("userId") int userid,
-			@QueryParam("callback") String callback){
-        int discNum;
+	public int getDiscussionNum(@PathParam("userId") int userId){
         try {
-            discNum = Discussion.getDiscussionNumforUser(userid);
+            return Discussion.getDiscussionNumforUser(userId);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return JsonpBuilder.buildResponse(callback, discNum);
 	}
 }

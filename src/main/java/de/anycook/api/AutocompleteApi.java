@@ -16,7 +16,6 @@ import de.anycook.api.util.MediaType;
 import org.apache.log4j.Logger;
 
 import de.anycook.autocomplete.Autocomplete;
-import de.anycook.utils.JsonpBuilder;
 import de.anycook.user.User;
 
 
@@ -58,20 +57,17 @@ public class AutocompleteApi {
 	@GET
 	@Path("ingredient")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response autocompleteIngredient(@QueryParam("q") String query,
+	public List<String> autocompleteIngredient(@QueryParam("q") String query,
 			@QueryParam("exclude") StringSet exclude,
-			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
-			@QueryParam("callback")String callback){
+			@QueryParam("maxresults") @DefaultValue("10") int maxResults){
 		if(query == null)
 			throw new WebApplicationException(401);
-        List<String> data = null;
         try {
-            data = Autocomplete.autocompleteZutat(query, maxresults, exclude);
+            return Autocomplete.autocompleteZutat(query, maxResults, exclude);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return JsonpBuilder.buildResponse(callback, data);
 	}
 	
 	@GET
@@ -94,20 +90,18 @@ public class AutocompleteApi {
 	@GET
 	@Path("tag")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response autocompleteTags(@QueryParam("q") String query,
+	public List<String> autocompleteTags(@QueryParam("q") String query,
 			@QueryParam("exclude") StringSet exclude,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
 			@QueryParam("callback")String callback){
 		if(query == null)
 			throw new WebApplicationException(401);
-        List<String> data;
         try {
-            data = Autocomplete.autocompleteTag(query, maxresults, exclude);
+            return Autocomplete.autocompleteTag(query, maxresults, exclude);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        return JsonpBuilder.buildResponse(callback, data);
 	}
 	
 	public static class IntSet extends HashSet<Integer>{

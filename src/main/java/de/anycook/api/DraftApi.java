@@ -37,7 +37,6 @@ import de.anycook.api.drafts.DraftChecker;
 import de.anycook.recipe.Recipe;
 import de.anycook.session.Session;
 import de.anycook.utils.DaemonThreadFactory;
-import de.anycook.utils.JsonpBuilder;
 
 @Path("/drafts")
 public class DraftApi {
@@ -65,15 +64,13 @@ public class DraftApi {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get(@QueryParam("callback") String callback,
-			@Context HttpHeaders hh,
+	public List<JSONObject> get(@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 
 		try(RecipeDrafts drafts = new RecipeDrafts()){
             session.checkLogin(hh.getCookies());
-            List<JSONObject> list = drafts.getAll(session.getUser().getId());
-            return JsonpBuilder.buildResponse(callback, list);
+            return drafts.getAll(session.getUser().getId());
         } catch (IOException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -145,7 +142,7 @@ public class DraftApi {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getDraft(@PathParam("id") String draft_id,
+	public JSONObject getDraft(@PathParam("id") String draft_id,
 			@QueryParam("callback") String callback,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
@@ -156,8 +153,7 @@ public class DraftApi {
             int userid = session.getUser().getId();
 		
 
-			JSONObject json = recipeDrafts.loadDraft(draft_id, userid);			
-			return JsonpBuilder.buildResponse(callback, json.toJSONString());
+			return recipeDrafts.loadDraft(draft_id, userid);
 		} catch (ParseException e) {
 			logger.error(e);
 			throw new WebApplicationException(400);

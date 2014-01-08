@@ -3,12 +3,11 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.mailprovider.MailProvider;
+import de.anycook.mailprovider.db.DBMailProvider;
 import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.settings.MailSettings;
-import de.anycook.user.settings.Settings;
-import de.anycook.utils.JsonpBuilder;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import javax.ws.rs.core.*;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -92,8 +90,7 @@ public class SessionApi {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public Response logout(@Context HttpHeaders hh,
-			@Context HttpServletRequest request,
-			@QueryParam("callback") String callback){
+			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		Map<String, Cookie> cookies = hh.getCookies();
         try {
@@ -116,7 +113,7 @@ public class SessionApi {
 			response.cookie(newCookie);
 		}
 		session.logout();
-		return response.entity(JsonpBuilder.build(callback, "true")).build();
+		return response.entity("true").build();
 	}
 	
 	@POST
@@ -140,39 +137,35 @@ public class SessionApi {
 	@GET
 	@Path("settings")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response getSettings(@Context HttpServletRequest request,
-			@QueryParam("callback") String callback){
+	public MailSettings getSettings(@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		User user = session.getUser();
         MailSettings mailsettings;
         try {
-            mailsettings = MailSettings.init(user.getId());
+            return MailSettings.init(user.getId());
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-        Map<String, Settings> settings = new HashMap<>();
-		settings.put("mail", mailsettings);
-		return JsonpBuilder.buildResponse(callback, settings);
 	}
 	
 	@GET
 	@Path("mailprovider")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public Response checkMailAnbieter(@QueryParam("domain") String domain){
+	public MailProvider checkMailAnbieter(@QueryParam("domain") String domain){
 		if(domain == null) 
 			throw new WebApplicationException(401);
-        MailProvider provider = null;
         try {
-            provider = MailProvider.getMailanbieterfromDomain(domain);
+            return MailProvider.getMailanbieterfromDomain(domain);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBMailProvider.ProviderNotFoundException e) {
+            logger.debug(e);
+            throw new WebApplicationException(Response.Status.NO_CONTENT);
         }
 
-        if(provider != null)
-			return JsonpBuilder.buildResponse(null, provider);
-		return JsonpBuilder.buildResponse(null, ""); 
+
 	}
 	
 	@POST
