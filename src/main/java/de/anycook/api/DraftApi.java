@@ -21,9 +21,9 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBRecipe;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
@@ -64,7 +64,7 @@ public class DraftApi {
 	}
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response get(@QueryParam("callback") String callback,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
@@ -142,23 +142,9 @@ public class DraftApi {
         }
     }
 	
-//	@GET
-//	@Path("num")
-//	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-//	public Response getDraftNumber(@QueryParam("callback") String callback,
-//			@Context HttpHeaders hh,
-//			@Context HttpServletRequest request){
-//		Session session = Session.init(request.getSession());
-//		session.checkLogin(hh.getCookies());
-//		RecipeDrafts drafts = new RecipeDrafts();
-//		int draftNum = drafts.count(session.getUser().getId());
-//		drafts.close();
-//		return JsonpBuilder.buildResponse(callback, draftNum);
-//	}
-	
 	@GET
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response getDraft(@PathParam("id") String draft_id,
 			@QueryParam("callback") String callback,
 			@Context HttpHeaders hh,

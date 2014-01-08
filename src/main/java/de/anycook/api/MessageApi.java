@@ -1,13 +1,16 @@
 package de.anycook.api;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import de.anycook.api.util.MediaType;
+import de.anycook.db.mysql.DBMessage;
+import de.anycook.messages.Message;
+import de.anycook.messages.MessageSession;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+import org.apache.log4j.Logger;
+import org.glassfish.jersey.server.ManagedAsync;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -16,20 +19,14 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import de.anycook.db.mysql.DBMessage;
-import de.anycook.messages.MessageSession;
-import de.anycook.user.User;
-import org.apache.log4j.Logger;
-import org.glassfish.jersey.server.ManagedAsync;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import de.anycook.messages.Message;
-import de.anycook.session.Session;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Path("/message")
 public class MessageApi {

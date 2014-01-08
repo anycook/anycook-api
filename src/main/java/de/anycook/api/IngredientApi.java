@@ -1,24 +1,14 @@
 package de.anycook.api;
 
+import de.anycook.api.util.MediaType;
+import de.anycook.ingredient.Ingredient;
+import org.apache.log4j.Logger;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.apache.log4j.Logger;
-import org.json.simple.JSONObject;
-
-import de.anycook.ingredient.Ingredient;
-import de.anycook.utils.JsonpBuilder;
 
 
 @Path("/ingredient")
@@ -28,7 +18,7 @@ public class IngredientApi {
 	
 	@SuppressWarnings("unchecked")
 	@GET
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<Ingredient> getAll(@QueryParam("parent") String parent){
 		 try {
              if(parent==null) return Ingredient.getAll();
@@ -45,7 +35,7 @@ public class IngredientApi {
 	 */
 	@GET
 	@Path("number")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Integer getNum(){
         try {
             return Ingredient.getTotal();
@@ -57,7 +47,7 @@ public class IngredientApi {
 	
 	@GET
 	@Path("extract")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Set<String> extractIngredients(@QueryParam("q") String query){
         try {
             return Ingredient.searchNGram(query, 3);
@@ -69,7 +59,7 @@ public class IngredientApi {
 	
 	@GET
 	@Path("{ingredientname}")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Ingredient getIngredient(@PathParam("ingredientname") String ingredientName){
         try {
             return Ingredient.init(ingredientName);

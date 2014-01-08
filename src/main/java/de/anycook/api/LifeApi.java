@@ -11,9 +11,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.anycook.api.util.MediaType;
 import de.anycook.news.life.Life;
 import de.anycook.news.life.LifeHandler;
 import org.apache.log4j.Logger;
@@ -30,7 +30,7 @@ public class LifeApi {
 
 	@GET
     @ManagedAsync
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public void getLives(@Suspended AsyncResponse asyncResponse, @QueryParam("newestid") Integer newestId,
                          @QueryParam("oldestid") Integer oldestId){
 

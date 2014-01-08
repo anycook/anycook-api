@@ -4,9 +4,9 @@ import java.sql.SQLException;
 import java.util.HashSet;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.anycook.api.util.MediaType;
 import de.anycook.search.Query;
 import org.apache.log4j.Logger;
 
@@ -23,7 +23,7 @@ public class SearchApi {
 	
 	@POST
     @Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public SearchResult search(Query query){
         try {
             return Search.search(query);
@@ -41,7 +41,7 @@ public class SearchApi {
 	 */
 	@GET
 	@Path("validate")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Multimap<String, String> validateSearch(@QueryParam("q") String query){
 		if(query==null)
 			throw new WebApplicationException(400);

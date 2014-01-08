@@ -1,6 +1,7 @@
 package de.anycook.api;
 
 import com.google.common.base.Preconditions;
+import de.anycook.api.util.MediaType;
 import de.anycook.discussion.Discussion;
 import de.anycook.discussion.db.DBDiscussion;
 import de.anycook.session.Session;
@@ -15,7 +16,6 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;

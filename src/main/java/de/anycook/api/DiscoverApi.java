@@ -1,27 +1,20 @@
 package de.anycook.api;
 
+import de.anycook.api.util.MediaType;
+import de.anycook.discover.DiscoverHandler;
+import de.anycook.session.Session;
+import de.anycook.user.User;
+import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import de.anycook.user.User;
-import de.anycook.utils.JsonpBuilder;
-import de.anycook.discover.DiscoverHandler;
-import de.anycook.session.Session;
-import org.apache.log4j.Logger;
 
 
 @Path("/discover")
@@ -30,7 +23,7 @@ public class DiscoverApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Map<String, List<String>> getDiscover(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@DefaultValue("30") @QueryParam("recipenum") int recipenum){
@@ -51,7 +44,7 @@ public class DiscoverApi {
 	
 	@GET
 	@Path("recommended")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverRecommended(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@DefaultValue("30") @QueryParam("recipenum") int recipenum){
@@ -72,7 +65,7 @@ public class DiscoverApi {
 	
 	@GET
 	@Path("tasty")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverTasty(
 			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
 			@QueryParam("callback") String callback){
@@ -86,7 +79,7 @@ public class DiscoverApi {
 	
 	@GET
 	@Path("new")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverNew(
 			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
 			@QueryParam("callback") String callback){

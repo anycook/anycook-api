@@ -10,9 +10,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import de.anycook.api.util.MediaType;
 import org.apache.log4j.Logger;
 
 import de.anycook.autocomplete.Autocomplete;
@@ -37,7 +37,7 @@ public class AutocompleteApi {
 	 * @return
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Map<String, Object> autocomplete(@QueryParam("q") String query,
 			@QueryParam("excludedusers") IntSet excludedUsers,
 			@QueryParam("excludedtags") StringSet excludedTags,
@@ -57,7 +57,7 @@ public class AutocompleteApi {
 	
 	@GET
 	@Path("ingredient")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response autocompleteIngredient(@QueryParam("q") String query,
 			@QueryParam("exclude") StringSet exclude,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
@@ -76,7 +76,7 @@ public class AutocompleteApi {
 	
 	@GET
 	@Path("user")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> autoCompleteUser(@QueryParam("q") String query,
                                      @QueryParam("exclude") IntSet exclude,
                                      @QueryParam("maxresults") @DefaultValue("10") int maxResults){
@@ -93,7 +93,7 @@ public class AutocompleteApi {
 	
 	@GET
 	@Path("tag")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response autocompleteTags(@QueryParam("q") String query,
 			@QueryParam("exclude") StringSet exclude,
 			@QueryParam("maxresults") @DefaultValue("10") int maxresults,

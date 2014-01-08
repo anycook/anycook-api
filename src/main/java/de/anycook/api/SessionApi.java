@@ -1,5 +1,6 @@
 package de.anycook.api;
 
+import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.mailprovider.MailProvider;
 import de.anycook.session.LoginAttempt;
