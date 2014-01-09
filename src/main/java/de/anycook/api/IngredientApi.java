@@ -1,6 +1,7 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
+import de.anycook.db.mysql.DBIngredient;
 import de.anycook.recipe.ingredient.Ingredient;
 import org.apache.log4j.Logger;
 
@@ -66,6 +67,9 @@ public class IngredientApi {
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBIngredient.IngredientNotFoundException e) {
+            logger.info(e,e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-	}
+    }
 }
