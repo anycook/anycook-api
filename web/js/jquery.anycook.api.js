@@ -112,6 +112,29 @@
 	     	error: error
 		});
 	}
+
+	$.anycook.graph._putJSON = function(graph, data, callback, error){
+		if(!graph) graph = "";
+		if(!data) data = {};
+
+		var settings = $.anycook.graph._settings();
+
+		var callback = callback || function(){};
+		var error = error || settings.error;
+
+		return $.ajax({
+		    url: settings.baseUrl+graph+"?appId="+settings.appId,
+		    type: 'PUT',
+		    data:JSON.stringify(data),
+		    dataType:"json",
+		    contentType: "application/json; charset=utf-8",
+		    xhrFields:{
+                withCredentials: true
+           },
+		    success: callback,
+		    error: error
+		});
+	}
 	
 	$.anycook.graph._delete = function(graph,data, callback, error){
 		if(!graph) graph = "";

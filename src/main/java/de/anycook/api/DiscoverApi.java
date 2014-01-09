@@ -26,7 +26,7 @@ public class DiscoverApi {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Map<String, List<String>> getDiscover(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipenum") int recipenum){
+			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum){
 		Session session = Session.init(request.getSession());
         try {
             try {
@@ -47,7 +47,7 @@ public class DiscoverApi {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverRecommended(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipenum") int recipenum){
+			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum){
 		Session session = Session.init(request.getSession());
         try {
             try {
@@ -67,7 +67,7 @@ public class DiscoverApi {
 	@Path("tasty")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverTasty(
-			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
+			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum,
 			@QueryParam("callback") String callback){
         try {
             return DiscoverHandler.getTastyRecipes(recipenum);
@@ -81,7 +81,7 @@ public class DiscoverApi {
 	@Path("new")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverNew(
-			@DefaultValue("30") @QueryParam("recipenum") int recipenum,
+			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum,
 			@QueryParam("callback") String callback){
         try {
             return DiscoverHandler.getNewestRecipes(recipenum);

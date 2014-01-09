@@ -79,15 +79,14 @@ $.anycook.graph.message.number = function(){
 //writeMessage(sessionid, text, [,callback])
 $.anycook.graph.message.answer = function(sessionid, text, callback){
 	var graph = "/message/"+sessionid;
-	var data = {message:text};
-	$.anycook.graph._put(graph, data);
+	$.anycook.graph._putJSON(graph, text);
 }
 
 //writeNewMessage(recipients, text [, callback])
 $.anycook.graph.message.writeNew = function(recipients, text, callback){
 	var graph = "/message";
-	var data = {message:text, recipients:JSON.stringify(recipients)};
-	$.anycook.graph._put(graph, data);
+	var data = {text:text, recipients:recipients};
+	$.anycook.graph._putJSON(graph, data);
 	// $.anycook.graph._put(graph);
 }
 

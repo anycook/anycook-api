@@ -3,33 +3,24 @@ package de.anycook.api;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.mongodb.DBObject;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBRecipe;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 
 import de.anycook.db.mongo.recipedrafts.RecipeDrafts;
@@ -64,7 +55,7 @@ public class DraftApi {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<JSONObject> get(@Context HttpHeaders hh,
+	public List<Map<String, Object>> get(@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 
@@ -142,46 +133,36 @@ public class DraftApi {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public JSONObject getDraft(@PathParam("id") String draft_id,
-			@QueryParam("callback") String callback,
+	public Map getDraft(@PathParam("id") String draft_id,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
         try (RecipeDrafts recipeDrafts = new RecipeDrafts()) {
 
             Session session = Session.init(request.getSession());
             session.checkLogin(hh.getCookies());
-            int userid = session.getUser().getId();
+            int userId = session.getUser().getId();
 		
 
-			return recipeDrafts.loadDraft(draft_id, userid);
-		} catch (ParseException e) {
-			logger.error(e);
-			throw new WebApplicationException(400);
+			return recipeDrafts.loadDraft(draft_id, userId).toMap();
 		} catch (IOException e){
             logger.error(e,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-		
 	}
 	
 	@POST
 	@Path("{id}")
-	public Response setData(@FormParam("data") String data, 
-			@PathParam("id") String draft_id,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){		
+    @Consumes(MediaType.APPLICATION_JSON)
+	public Response setData(Map<String, Object> draftData,@PathParam("id") String draft_id,
+			@Context HttpHeaders hh, @Context HttpServletRequest request){
 
 		try (RecipeDrafts drafts = new RecipeDrafts()) {
             Session session = Session.init(request.getSession());
             session.checkLogin(hh.getCookies());
-            JSONParser parser = new JSONParser();
-			JSONObject json = (JSONObject)parser.parse(data);
+
+			int userId = session.getUser().getId();
+			drafts.update(draftData, userId, draft_id);
 			
-			int userid = session.getUser().getId();
-			drafts.update(json, userid, draft_id);
-			
-		} catch (ParseException e) {
-			throw new WebApplicationException(400);
 		} catch (IOException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
