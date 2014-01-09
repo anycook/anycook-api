@@ -1,13 +1,29 @@
 /**
- * @author Jan Graßegger
+ * @license This file is part of anycook. The new internet cookbook
+ * Copyright (C) 2013 Jan Graßegger
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see [http://www.gnu.org/licenses/].
+ * 
+ * @author Jan Graßegger <jan@anycook.de>
  */
 
 
-if(!$.anycook.graph.recipe)
-	$.anycook.graph.recipe = {};
+if(!$.anycook.api.recipe)
+	$.anycook.api.recipe = {};
 		
 //recipe([recipename,[versionnum]],[data] [callback])
-$.anycook.graph.recipe = function(){
+$.anycook.api.recipe = function(){
 	
 	var recipe;
 	var callback;
@@ -47,22 +63,22 @@ $.anycook.graph.recipe = function(){
 	
 	
 	
-	var graph = "/recipe";
+	var path = "/recipe";
 	if(recipe)
-		graph+="/"+recipe;
+		path+="/"+recipe;
 	if(version)
-		graph+="/"+version;
-	return $.anycook.graph._get(graph, data, callback);
+		path+="/"+version;
+	return $.anycook.api._get(path, data, callback);
 };
 	
 //ofTheDay([callback])
-$.anycook.graph.recipe.ofTheDay = function(callback){
-	var graph = "/recipe/oftheday"
-	return $.anycook.graph._get(graph, {}, callback);
+$.anycook.api.recipe.ofTheDay = function(callback){
+	var path = "/recipe/oftheday"
+	return $.anycook.api._get(path, {}, callback);
 }
 
 //ingredients(recipename, [versionid], [callback])
-$.anycook.graph.recipe.ingredients = function(recipe){
+$.anycook.api.recipe.ingredients = function(recipe){
 	var versionid;
 	var callback;
 	
@@ -79,25 +95,25 @@ $.anycook.graph.recipe.ingredients = function(recipe){
 				versionid = arguments[1];
 	}
 	
-	var graph = "/recipe/"+recipe;
+	var path = "/recipe/"+recipe;
 	
 	if(versionid)
-		graph += "/"+versionid;
-	graph+="/ingredients"
+		path += "/"+versionid;
+	path+="/ingredients"
 	
-	return $.anycook.graph._get(graph, {}, callback);
+	return $.anycook.api._get(path, {}, callback);
 	
 }
 
 //tags(recipename, [callback])
-$.anycook.graph.recipe.tags = function(recipe, callback){	
-	var graph = "/recipe/"+recipe+"/tags";	
-	return $.anycook.graph._get(graph, {}, callback);
+$.anycook.api.recipe.tags = function(recipe, callback){	
+	var path = "/recipe/"+recipe+"/tags";	
+	return $.anycook.api._get(path, {}, callback);
 	
 }
 
 //steps(recipename, [versionid], [callback])
-$.anycook.graph.recipe.steps = function(recipe){
+$.anycook.api.recipe.steps = function(recipe){
 	var versionid;
 	var callback;
 	
@@ -114,58 +130,49 @@ $.anycook.graph.recipe.steps = function(recipe){
 				versionid = arguments[1];
 	}
 	
-	var graph = "/recipe/"+recipe;
+	var path = "/recipe/"+recipe;
 	
 	if(versionid)
-		graph += "/"+versionid;
-	graph+="/steps"
+		path += "/"+versionid;
+	path+="/steps"
 	
-	return $.anycook.graph._get(graph, {}, callback);
+	return $.anycook.api._get(path, {}, callback);
 	
 }
 
 //number([callback])
-$.anycook.graph.recipe.number = function(callback){
-	var graph = "/recipe/number"
-	return $.anycook.graph._get(graph, {}, callback);
+$.anycook.api.recipe.number = function(callback){
+	var path = "/recipe/number"
+	return $.anycook.api._get(path, {}, callback);
 }
 
 //save(recipename, dataJSON [, callback])
-$.anycook.graph.recipe.save = function(data, callback){
-	var graph = "/recipe/";
-	// var data = {};
-	// data.ingredients = JSON.stringify(data.ingredient);
-	// data.tags = JSON.stringify(tags);
-	return $.anycook.graph._postJSON(graph, data, callback);
+$.anycook.api.recipe.save = function(data, callback){
+	var path = "/recipe/";
+	return $.anycook.api._postJSON(path, data, callback);
 }
 
-$.anycook.graph.recipe.image = function(recipe, type){
-	var settings = $.anycook.graph._settings();
+$.anycook.api.recipe.image = function(recipe, type){
+	var settings = $.anycook.api._settings();
 	if(!type)
 		type = "small";
 	return settings.baseUrl+"/recipe/"+encodeURIComponent(recipe)+"/image?type="+type+"&appid="+settings.appid;
 };
 
 //schmeckt(recipename, [callback])
-$.anycook.graph.recipe.schmeckt = function(recipename, callback){
-	var graph = "/recipe/"+recipename+"/schmeckt";
-	var dfd = $.Deferred();
-	$.when($.anycook.graph._get(graph)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});		
-	return dfd.promise();
+$.anycook.api.recipe.schmeckt = function(recipename, callback){
+	var path = "/recipe/"+recipename+"/schmeckt";
+	return $.anycook.api._get(path, callback);
 }
 
 //makeSchmeckt(recipename, [callback])
-$.anycook.graph.recipe.makeSchmeckt = function(recipename, callback){
-	var graph = "/recipe/"+recipename+"/schmeckt";
-	$.anycook.graph._put(graph,{},callback);
+$.anycook.api.recipe.makeSchmeckt = function(recipename, callback){
+	var path = "/recipe/"+recipename+"/schmeckt";
+	$.anycook.api._put(path,{},callback);
 }
 
 //unmakeSchmeckt(recipename,[callback])
-$.anycook.graph.recipe.unmakeSchmeckt = function(recipename,callback){
-	var graph = "/recipe/"+recipename+"/schmeckt";
-	$.anycook.graph._delete(graph,{},callback);
+$.anycook.api.recipe.unmakeSchmeckt = function(recipename,callback){
+	var path = "/recipe/"+recipename+"/schmeckt";
+	$.anycook.api._delete(path,{},callback);
 }

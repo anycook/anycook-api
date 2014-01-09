@@ -2,15 +2,15 @@
  * @author Jan Graßegger <jan@anycook.de>
  */
 
-if(!$.anycook.graph.ingredient) 
-	$.anycook.graph.ingredient = {}
+if(!$.anycook.api.ingredient) 
+	$.anycook.api.ingredient = {}
 
-$.anycook.graph.ingredient.number = function(callback){
-	var graph = "/ingredient/number";
-	return $.anycook.graph._get(graph, {}, callback);
+$.anycook.api.ingredient.number = function(callback){
+	var path = "/ingredient/number";
+	return $.anycook.api._get(path, {}, callback);
 }
 
-$.anycook.graph.ingredient.extract = function(query, callback){
-	var graph = "/ingredient/extract";
-	return $.anycook.graph._get(graph,{q:query}, callback);
+$.anycook.api.ingredient.extract = function(query, callback){
+	var path = "/ingredient/extract";
+	return $.anycook.api._get(path,{q:query}, callback);
 }

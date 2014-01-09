@@ -1,10 +1,26 @@
 /**
+ * @license This file is part of anycook. The new internet cookbook
+ * Copyright (C) 2013 Jan Graßegger
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see [http://www.gnu.org/licenses/].
+ * 
  * @author Jan Graßegger <jan@anycook.de>
  */
 
 //autocomplete(term, [excludedCategorie, excludedIngredients, excludedTags, excludedUsers], [callback])
-$.anycook.graph.autocomplete = function(term){
-	var graph = "/autocomplete"
+$.anycook.api.autocomplete = function(term){
+	var path = "/autocomplete"
 	var data = {q:term};
 	var callback;
 	
@@ -33,11 +49,11 @@ $.anycook.graph.autocomplete = function(term){
 				callback = arguments[1];
 			break;
 	}
-	return $.anycook.graph._get(graph, data, callback);
+	return $.anycook.api._get(path, data, callback);
 }
 
 //user(term [, exclude][, callback])
-$.anycook.graph.autocomplete.user = function(term){
+$.anycook.api.autocomplete.user = function(term){
 	var exclude;
 	var callback;
 	var data = {q:term};
@@ -57,12 +73,12 @@ $.anycook.graph.autocomplete.user = function(term){
 	}
 	
 	var dfd = $.Deferred();
-	var graph = "/autocomplete/user"
-	return 	$.anycook.graph._get(graph, data, callback);
+	var path = "/autocomplete/user"
+	return 	$.anycook.api._get(path, data, callback);
 }
 
 //ingredient(term [, exclude][, callback])
-$.anycook.graph.autocomplete.ingredient = function(term){
+$.anycook.api.autocomplete.ingredient = function(term){
 	var exclude;
 	var callback;
 	var data = {q:term};
@@ -83,12 +99,12 @@ $.anycook.graph.autocomplete.ingredient = function(term){
 	
 	
 	var dfd = $.Deferred();
-	var graph = "/autocomplete/ingredient"
-	return 	$.anycook.graph._get(graph, data, callback);
+	var path = "/autocomplete/ingredient"
+	return 	$.anycook.api._get(path, data, callback);
 }
 
 //tag(term [, exclude][, callback])
-$.anycook.graph.autocomplete.tag = function(term){
+$.anycook.api.autocomplete.tag = function(term){
 	var exclude;
 	var callback;
 	var data = {q:term};
@@ -108,6 +124,6 @@ $.anycook.graph.autocomplete.tag = function(term){
 	}
 
 	var dfd = $.Deferred();
-	var graph = "/autocomplete/tag"
-	return 	$.anycook.graph._get(graph, data, callback);
+	var path = "/autocomplete/tag"
+	return 	$.anycook.api._get(path, data, callback);
 }

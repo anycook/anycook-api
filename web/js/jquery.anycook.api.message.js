@@ -1,9 +1,25 @@
 /**
+ * @license This file is part of anycook. The new internet cookbook
+ * Copyright (C) 2013 Jan Graßegger
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see [http://www.gnu.org/licenses/].
+ * 
  * @author Jan Graßegger <jan@anycook.de>
  */
 
 //message([lastdate [, callback]])
-$.anycook.graph.message = function(){
+$.anycook.api.message = function(){
 	var lastdate;
 	var callback;
 	switch(arguments.length){
@@ -20,13 +36,13 @@ $.anycook.graph.message = function(){
 			callback = arguments[0];	
 	}
 
-	var graph = "/message";
+	var path = "/message";
 	var data = {lastChange:lastdate};
-	return $.anycook.graph._get(graph, data, callback);
+	return $.anycook.api._get(path, data, callback);
 }
 
 //session(sessionid [,lastid] [,callback])
-$.anycook.graph.message.session = function(sessionid){
+$.anycook.api.message.session = function(sessionid){
 	var callback;
 	var lastid = -1;
 	
@@ -43,13 +59,13 @@ $.anycook.graph.message.session = function(sessionid){
 			callback = arguments[1];
 	}
 	
-	var graph = "/message/"+sessionid;
+	var path = "/message/"+sessionid;
 	var data = {lastId : lastid};
-	return $.anycook.graph._get(graph, data, callback);
+	return $.anycook.api._get(path, data, callback);
 }
 
 //number([lastnum] [,callback])
-$.anycook.graph.message.number = function(){
+$.anycook.api.message.number = function(){
 	var lastnum = -1;
 	var callback = function(){};
 	
@@ -66,32 +82,30 @@ $.anycook.graph.message.number = function(){
 			callback = arguments[1];
 	}
 
-	var graph = "/message/number";
+	var path = "/message/number";
 	var data = {lastnum : lastnum};
 
-	var settings = $.anycook.graph._settings();
-	//data[settings.callbackName] = "?";		
+	var settings = $.anycook.api._settings();
 	$.extend(data, {appid : settings.appid});
 	
-	return $.anycook.graph._get(graph, data, callback);
+	return $.anycook.api._get(path, data, callback);
 };
 
 //writeMessage(sessionid, text, [,callback])
-$.anycook.graph.message.answer = function(sessionid, text, callback){
-	var graph = "/message/"+sessionid;
-	$.anycook.graph._putJSON(graph, text);
+$.anycook.api.message.answer = function(sessionid, text, callback){
+	var path = "/message/"+sessionid;
+	$.anycook.api._putJSON(path, text);
 }
 
 //writeNewMessage(recipients, text [, callback])
-$.anycook.graph.message.writeNew = function(recipients, text, callback){
-	var graph = "/message";
+$.anycook.api.message.writeNew = function(recipients, text, callback){
+	var path = "/message";
 	var data = {text:text, recipients:recipients};
-	$.anycook.graph._putJSON(graph, data);
-	// $.anycook.graph._put(graph);
+	$.anycook.api._putJSON(path, data);
 }
 
 //readMessage(sessionid, messageid [,callback])
-$.anycook.graph.message.read = function(sessionid, messageid, callback){
-	var graph = "/message/"+sessionid+"/"+messageid;
-	$.anycook.graph._put(graph);
+$.anycook.api.message.read = function(sessionid, messageid, callback){
+	var path = "/message/"+sessionid+"/"+messageid;
+	$.anycook.api._put(path);
 }
