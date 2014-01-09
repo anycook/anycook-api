@@ -2,8 +2,10 @@
  * @author Jan Graßegger <jan@anycook.de>
  */
 
-if(!$.anycook.api.ingredient) 
-	$.anycook.api.ingredient = {}
+$.anycook.api.ingredient = function(callback){
+	var path = "/ingredient";
+	return $.anycook.api._get(path, {}, callback);
+}
 
 $.anycook.api.ingredient.number = function(callback){
 	var path = "/ingredient/number";

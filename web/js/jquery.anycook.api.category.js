@@ -36,40 +36,23 @@ $.anycook.api.category = function(){
 			callback = arguments[0];	
 	}
 	
-	
-	
-	var dfd = $.Deferred();
-	
 	var path = "/category";
-	if(userid)
+	if(category)
 		path+="/"+category;
-	$.when($.anycook.api._get(path)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});			
 	
-	return dfd.promise();
+	return $.anycook.api._get(path, callback);
 };
 
 //sorted([callback])
 $.anycook.api.category.sorted = function(callback){
 	var dfd = $.Deferred();
 	var path = "/category/sorted"
-	$.when($.anycook.api._get(path)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});
+	return $.anycook.api._get(path, callback);
 }
 
 //number([callback])
 $.anycook.api.category.number = function(callback){
 	var dfd = $.Deferred();
 	var path = "/category/number"
-	$.when($.anycook.api._get(path)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});
+	return $.anycook.api._get(path, callback);
 }
