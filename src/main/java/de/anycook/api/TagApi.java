@@ -3,7 +3,7 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBTag;
 import de.anycook.recipe.Recipe;
-import de.anycook.tag.Tag;
+import de.anycook.recipe.tag.Tag;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;

@@ -1,7 +1,7 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
-import de.anycook.ingredient.Ingredient;
+import de.anycook.recipe.ingredient.Ingredient;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;

@@ -1,7 +1,7 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
-import de.anycook.category.Category;
+import de.anycook.recipe.category.Category;
 import de.anycook.db.mysql.DBCategory;
 import org.apache.log4j.Logger;
 
