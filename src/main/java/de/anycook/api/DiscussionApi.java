@@ -3,7 +3,7 @@ package de.anycook.api;
 import com.google.common.base.Preconditions;
 import de.anycook.api.util.MediaType;
 import de.anycook.discussion.Discussion;
-import de.anycook.discussion.db.DBDiscussion;
+import de.anycook.db.mysql.DBDiscussion;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;

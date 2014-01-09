@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBUser;
-import de.anycook.views.Views;
+import de.anycook.user.views.Views;
 import org.apache.log4j.Logger;
 
 import de.anycook.utils.enumerations.ImageType;
