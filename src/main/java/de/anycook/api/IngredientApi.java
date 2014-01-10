@@ -38,9 +38,9 @@ public class IngredientApi {
 	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Ingredient> getAll(@QueryParam("parent") String parent){
+	public List<Ingredient> getAll(@QueryParam("parent") boolean parent){
 		 try {
-             if(parent==null) return Ingredient.getAll();
+             if(!parent) return Ingredient.getAll();
             return Ingredient.loadParents();
         } catch (SQLException e) {
             logger.error(e);
@@ -77,13 +77,13 @@ public class IngredientApi {
     }
 	
 	@GET
-	@Path("{ingredientname}")
+	@Path("{ingredientName}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Ingredient getIngredient(@PathParam("ingredientname") String ingredientName){
+	public Ingredient getIngredient(@PathParam("ingredientName") String ingredientName){
         try {
             return Ingredient.init(ingredientName);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBIngredient.IngredientNotFoundException e) {
             logger.info(e,e);
