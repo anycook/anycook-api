@@ -18,6 +18,7 @@
 
 package de.anycook.api;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashSet;
 
@@ -45,8 +46,8 @@ public class SearchApi {
 	public SearchResult search(Query query){
         try {
             return Search.search(query);
-        } catch (SQLException e) {
-            logger.error(e);
+        } catch (SQLException | IOException e) {
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
