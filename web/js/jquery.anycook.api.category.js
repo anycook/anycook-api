@@ -40,19 +40,17 @@ $.anycook.api.category = function(){
 	if(category)
 		path+="/"+category;
 	
-	return $.anycook.api._get(path, callback);
+	return $.anycook.api._get(path, {}, callback);
 };
 
 //sorted([callback])
 $.anycook.api.category.sorted = function(callback){
-	var dfd = $.Deferred();
 	var path = "/category/sorted"
-	return $.anycook.api._get(path, callback);
+	return $.anycook.api._get(path, {}, callback);
 }
 
 //number([callback])
 $.anycook.api.category.number = function(callback){
-	var dfd = $.Deferred();
 	var path = "/category/number"
-	return $.anycook.api._get(path, callback);
+	return $.anycook.api._get(path, {}, callback);
 }
