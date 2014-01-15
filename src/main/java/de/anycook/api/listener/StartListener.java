@@ -22,9 +22,13 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import de.anycook.db.lucene.FulltextIndex;
 import org.apache.log4j.Logger;
 
 import de.anycook.db.mysql.DBHandler;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 
 /**
@@ -44,18 +48,21 @@ public class StartListener implements ServletContextListener {
 	/**
      * @see ServletContextListener#contextInitialized(ServletContextEvent)
      */
+    @Override
     public void contextInitialized(ServletContextEvent arg0) {
         DBHandler.init();
-        //DraftApi.init();
-
-
-
+        try {
+            FulltextIndex.init().addAllRecipes();
+        } catch (SQLException | IOException e) {
+            logger.error(e, e);
+        }
         logger.info("Server started");
     }
 
 	/**
      * @see ServletContextListener#contextDestroyed(ServletContextEvent)
      */
+    @Override
     public void contextDestroyed(ServletContextEvent arg0) {
     	//DraftApi.destroyThreadPool();
     	DBHandler.closeSource();
