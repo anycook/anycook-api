@@ -18,6 +18,7 @@
 
 package de.anycook.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.mailprovider.MailProvider;
@@ -26,6 +27,7 @@ import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.settings.MailSettings;
+import de.anycook.user.views.Views;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +50,7 @@ public class SessionApi {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+    @JsonView(Views.PrivateUserView.class)
 	public User getSession(@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession(true));
