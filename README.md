@@ -13,11 +13,11 @@ More soon!
 - Install [Gradle](http://www.gradle.org/)
 - Install [Virtual Box](https://www.virtualbox.org/)
 - Install [Vagrant](http://www.vagrantup.com/) (Having problems with vagrant in OSX Mavericks? Execute ```sudo /Library/StartupItems/VirtualBox/VirtualBox restart``` and try again ([source](http://www.asquera.de/development/2013/06/20/vagrant-on-mavericks/)))
-- Execute ```$ git submodule init``` to download required puppet modules. These are:
+- Execute ```$ git submodule init && git submodule update``` to download required puppet modules. These are:
+  - [anycook-core](https://github.com/anycook/anycook-core)
   - [puppetlabs/mysql](https://forge.puppetlabs.com/puppetlabs/mysql)
   - [puppetlabs/apt](https://forge.puppetlabs.com/puppetlabs/apt)
   - and their dependency [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
-- Clone [anycook-core](https://github.com/anycook/anycook-core) into the same parent directory
 
 ### Configuration
 Available properties can be found [here](https://github.com/anycook/anycook-core/wiki/Configuration-File).
