@@ -1,1 +1,1 @@
-includeFlat 'anycook-core'
+include 'anycook-core'
