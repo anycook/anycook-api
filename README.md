@@ -1,7 +1,9 @@
 anycook-api
 ===========
 
-REST Api for anycook 
+REST Api for anycook
+
+[![Build Status](https://travis-ci.org/anycook/anycook-api.png?branch=master)](https://travis-ci.org/anycook/anycook-api)
 
 More soon!
 
