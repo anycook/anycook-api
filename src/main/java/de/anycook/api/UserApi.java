@@ -56,7 +56,7 @@ public class UserApi {
         try {
             return User.getAll();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -68,7 +68,7 @@ public class UserApi {
         try {
             User.newUser(mail, password, username);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
@@ -80,7 +80,7 @@ public class UserApi {
         try {
             return User.checkMail(mail);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -92,7 +92,7 @@ public class UserApi {
         try {
             return User.checkUsername(username);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -108,7 +108,7 @@ public class UserApi {
         try {
             return User.getTotal();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -123,7 +123,7 @@ public class UserApi {
         try {
             return Recommendation.recommend(userId);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -136,7 +136,7 @@ public class UserApi {
         try {
             return User.init(userId);
         } catch (IOException | SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBUser.UserNotFoundException e) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -145,7 +145,7 @@ public class UserApi {
 	
 	@PUT
 	@Path("{userId}/follow")
-	public Response follow(@PathParam("userId") int userid,
+	public Response follow(@PathParam("userId") int userId,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
@@ -154,9 +154,9 @@ public class UserApi {
             session.checkLogin(hh.getCookies());
             User user = session.getUser();
 
-            user.follow(userid);
+            user.follow(userId);
         } catch (IOException | SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
@@ -165,7 +165,7 @@ public class UserApi {
 	
 	@DELETE
 	@Path("{userId}/follow")
-	public Response unfollow(@PathParam("userId") int userid,
+	public Response unfollow(@PathParam("userId") int userId,
 			@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
@@ -174,9 +174,9 @@ public class UserApi {
             session.checkLogin(hh.getCookies());
             User user = session.getUser();
 
-            user.unFollow(userid);
+            user.unFollow(userId);
         } catch (IOException | SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
@@ -186,12 +186,12 @@ public class UserApi {
 	@GET
 	@Path("{userId}/image")
 	@Produces("image/png")
-	public Response getImage(@PathParam("userId") int userid,
+	public Response getImage(@PathParam("userId") int userId,
 			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
 		
 		try {
-			URI uri = new URI(User.getUserImage(userid, type));
+			URI uri = new URI(User.getUserImage(userId, type));
 			return Response.temporaryRedirect(uri).build();
 		} catch (URISyntaxException e) {
 			logger.warn(e);

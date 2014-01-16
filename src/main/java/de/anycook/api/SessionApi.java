@@ -26,7 +26,7 @@ import de.anycook.db.mysql.DBMailProvider;
 import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
 import de.anycook.user.User;
-import de.anycook.user.settings.MailSettings;
+import de.anycook.user.settings.NotificationSettings;
 import de.anycook.user.views.Views;
 import org.apache.log4j.Logger;
 
@@ -43,6 +43,7 @@ import java.util.Map;
 public class SessionApi {
 	
 	private final Logger logger;
+
 	
 	public SessionApi() {
 		logger = Logger.getLogger(getClass());
@@ -65,7 +66,7 @@ public class SessionApi {
 	
 	@POST
     @Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(@Context HttpServletRequest request,
 			Session.UserAuth auth){
 		
@@ -109,7 +110,7 @@ public class SessionApi {
     }
 	
 	@DELETE
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response logout(@Context HttpHeaders hh,
 			@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
@@ -139,7 +140,7 @@ public class SessionApi {
 	
 	@POST
 	@Path("activate")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public void activateAccount(@FormParam("activationkey") String activationKey){
         try {
             User.activateById(activationKey);
@@ -152,27 +153,10 @@ public class SessionApi {
         }
     }
 	
-	
-	//settings
-	
-	@GET
-	@Path("settings")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
-	public MailSettings getSettings(@Context HttpServletRequest request){
-		Session session = Session.init(request.getSession());
-		User user = session.getUser();
-        MailSettings mailsettings;
-        try {
-            return MailSettings.init(user.getId());
-        } catch (SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-	}
-	
+    //mail provider
 	@GET
 	@Path("mailprovider")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public MailProvider checkMailAnbieter(@QueryParam("domain") String domain){
 		if(domain == null) 
 			throw new WebApplicationException(401);
@@ -187,145 +171,5 @@ public class SessionApi {
         }
 
 
-	}
-	
-	@POST
-	@Path("settings/account/{type}")
-	public Response changeAccountSettings(@Context HttpServletRequest request,
-			@Context HttpHeaders hh,
-			@PathParam("type") String type,
-			@FormParam("value") String value){
-		Session session = Session.init(request.getSession());
-
-        try {
-            session.checkLogin(hh.getCookies());
-            User user = session.getUser();
-            boolean check;
-
-            switch (type) {
-                case "text":
-                    check = user.setText(value);
-                    break;
-                case "place":
-                    check = user.setPlace(value);
-                    break;
-                case "name":
-                    check = user.setName(value);
-                    break;
-
-                default:
-                    throw new WebApplicationException(404);
-            }
-
-            if(!check){
-                logger.warn("check failed");
-                throw new WebApplicationException(400);
-            }
-
-            return Response.ok("true").build();
-        } catch (IOException | SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-
-
-
-		
-	}
-	
-	@PUT
-	@Path("settings/mail/{type}")
-	public Response addMailSettings(@Context HttpServletRequest request,
-			@Context HttpHeaders hh, 
-			@PathParam("type") String type){
-		Session session = Session.init(request.getSession());
-
-
-        try{
-            session.checkLogin(hh.getCookies());
-            MailSettings settings = MailSettings.init(session.getUser().getId());
-            logger.debug("add mailtype:"+type);
-
-            if(type.equals("all")){
-                settings.changeAll(true);
-            }else{
-                switch (type.toLowerCase()) {
-                    case "recipeactivation":
-                        settings.setRecipeactivation(true);
-                        break;
-                    case "recipediscussion":
-                        settings.setRecipediscussion(true);
-                        break;
-                    case "tagaccepted":
-                        settings.setTagaccepted(true);
-                        break;
-                    case "tagdenied":
-                        settings.setTagdenied(true);
-                        break;
-                    case "discussionanswer":
-                        settings.setDiscussionanswer(true);
-                        break;
-                    case "schmeckt":
-                        settings.setSchmeckt(true);
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        } catch (IOException | SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-
-
-        return Response.ok().build();
-	}
-	
-	@DELETE
-	@Path("settings/mail/{type}")
-	public Response removeMailSettings(@Context HttpServletRequest request,
-			@Context HttpHeaders hh, 
-			@PathParam("type") String type){
-		Session session = Session.init(request.getSession());
-
-        try{
-            session.checkLogin(hh.getCookies());
-            MailSettings settings = MailSettings.init(session.getUser().getId());
-            logger.debug("remove mailtype:"+type);
-
-            if(type.equals("all")){
-                settings.changeAll(false);
-            }else{
-                switch (type.toLowerCase()) {
-                case "recipeactivation":
-                    settings.setRecipeactivation(false);
-                    break;
-                case "recipediscussion":
-                    settings.setRecipediscussion(false);
-                    break;
-                case "tagaccepted":
-                    settings.setTagaccepted(false);
-                    break;
-                case "tagdenied":
-                    settings.setTagdenied(false);
-                    break;
-                case "discussionanswer":
-                    settings.setDiscussionanswer(false);
-                    break;
-                case "schmeckt":
-                    settings.setSchmeckt(false);
-                    break;
-
-                default:
-                    break;
-                }
-            }
-        } catch (IOException | SQLException e){
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-		
-		return Response.ok().build();
 	}
 }
