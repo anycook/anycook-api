@@ -180,7 +180,7 @@
 			baseUrl: "http://api.anycook.de",
 			callbackName: "callback",
 			// frameId:"anycook-api-frame"
-			scripts: ["autocomplete","category","discover","discussion", "ingredient", "life","message", "recipe", "search", "session", "tag", "user"],
+			scripts: ["autocomplete","category","discover","discussion", "ingredient", "life","message", "recipe", "search", "setting", "session", "tag", "user"],
 			error : function(xhr){console.error(xhr)}
 		};
 		
