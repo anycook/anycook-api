@@ -40,32 +40,6 @@ $.anycook.api.session.logout = function(callback){
 	return $.anycook.api._delete(path, {}, callback);
 }
 
-//settings
-$.anycook.api.session.settings = function(callback){
-	var path = "/session/settings";
-	var dfd = $.Deferred();
-	return $.anycook.api._get(path, {}, callback);
-}
-
-
-$.anycook.api.session.addMailSettings = function(type){
-	var path = "/session/settings/mail/"+type;		
-	return $.anycook.api._put(path);
-}
-
-$.anycook.api.session.removeMailSettings = function(type){
-	var path = "/session/settings/mail/"+type;		
-	return $.anycook.api._delete(path);
-}
-
-
-//changeAccountSettings(data)
-$.anycook.api.session.setAccount = function(type, value,callback){
-	var path = "/session/settings/account/"+type;
-	var data = {value:value};		
-	return $.anycook.api._post(path, data, callback);
-}
-
 // getMailProvider(domain, [callback])
 $.anycook.api.session.getMailProvider = function(domain, callback){
 	var path = "/session/mailprovider";
