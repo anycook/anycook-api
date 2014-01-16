@@ -17,7 +17,7 @@ More soon!
   - [anycook-core](https://github.com/anycook/anycook-core)
   - [puppetlabs/mysql](https://forge.puppetlabs.com/puppetlabs/mysql)
   - [puppetlabs/apt](https://forge.puppetlabs.com/puppetlabs/apt)
-  - and their dependency [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
+  - [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
 
 ### Configuration
 Available properties can be found [here](https://github.com/anycook/anycook-core/wiki/Configuration-File).
