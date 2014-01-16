@@ -14,7 +14,7 @@ class install_mysql {
         
         override_options => { 
             'mysqld' => { 
-                'bind_address'  => '0.0.0.0',
+                'bind-address'  => '0.0.0.0',
             },
         },
         service_enabled => true,
