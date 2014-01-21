@@ -24,6 +24,7 @@ import de.anycook.messages.Message;
 import de.anycook.messages.MessageSession;
 import de.anycook.session.Session;
 import de.anycook.user.User;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
 
@@ -74,8 +75,8 @@ public class MessageApi {
         if(lastChange == null){
             try {
                 asyncResponse.resume(MessageSession.getSessionsFromUser(user.getId()));
-            } catch (SQLException e) {
-                logger.error(e,e);
+            } catch (SQLException|DBMessage.SessionNotFoundException e) {
+                logger.error(e, e);
                 asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
             }
             return;
@@ -88,7 +89,7 @@ public class MessageApi {
                 if(!sessions.isEmpty() && asyncResponse.isSuspended()) asyncResponse.resume(sessions);
                 else Thread.sleep(1000);
             }
-        } catch (SQLException | InterruptedException e){
+        } catch (SQLException | InterruptedException | DBMessage.SessionNotFoundException e){
             logger.error(e,e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
@@ -98,14 +99,19 @@ public class MessageApi {
 	@PUT
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void newMessage(NewMessage message, @Context HttpHeaders hh, @Context HttpServletRequest request){
+        if(message == null)
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+
+        logger.debug(message);
+
 		try {
 			Session session = Session.init(request.getSession());
 			session.checkLogin(hh.getCookies());
 			int userId = session.getUser().getId();
             message.recipients.add(userId);
 			MessageSession.getSession(message.recipients).newMessage(userId, message.text);
-		} catch (IOException | SQLException e ) {
-			logger.error(e);
+		} catch (IOException | SQLException | DBMessage.SessionNotFoundException e ) {
+			logger.error(e, e);
 			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -120,7 +126,6 @@ public class MessageApi {
             session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
 
-            int newNumber = -1;
             while(!asyncResponse.isCancelled() && !asyncResponse.isDone()){
                 int newMessageNum = dbmessage.getNewMessageNum(userId);
                 if(newMessageNum == lastNumber){
@@ -160,7 +165,7 @@ public class MessageApi {
                     else
                         Thread.sleep(1000);
             }
-        } catch (InterruptedException | SQLException e) {
+        } catch (InterruptedException | SQLException | DBMessage.SessionNotFoundException e) {
             logger.error(e, e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
@@ -183,7 +188,7 @@ public class MessageApi {
             session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
             MessageSession.getSession(sessionId, userId).newMessage(userId, message);
-        } catch (IOException | SQLException e) {
+        } catch (IOException | SQLException | DBMessage.SessionNotFoundException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -209,7 +214,10 @@ public class MessageApi {
         public List<Integer> recipients;
         public String text;
 
-        public NewMessage(){}
+        @Override
+        public String toString() {
+            return String.format("{recipients : %s, text : %s}", StringUtils.join(recipients, ","), text);
+        }
     }
 
 }
