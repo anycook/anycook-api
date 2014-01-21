@@ -94,14 +94,15 @@ $.anycook.api.message.number = function(){
 //writeMessage(sessionid, text, [,callback])
 $.anycook.api.message.answer = function(sessionid, text, callback){
 	var path = "/message/"+sessionid;
-	$.anycook.api._putJSON(path, text);
+	var data = {text : text}
+	$.anycook.api._postJSON(path, data);
 }
 
 //writeNewMessage(recipients, text [, callback])
 $.anycook.api.message.writeNew = function(recipients, text, callback){
 	var path = "/message";
 	var data = {text:text, recipients:recipients};
-	$.anycook.api._putJSON(path, data);
+	$.anycook.api._postJSON(path, data);
 }
 
 //readMessage(sessionid, messageid [,callback])

@@ -85,13 +85,11 @@
 		if(!data) data = {};
 
 		var settings = $.anycook.api._settings();
-		$.extend(data, {appId : settings.appId});
-
 		var callback = callback || function(){};
 		var error = error || settings.error;
 
 		return $.ajax({
-		    url: settings.baseUrl+api,
+		    url: settings.baseUrl+api+"?appId="+settings.appId,
 		    type: 'POST',
 		    data:JSON.stringify(data),
 		    dataType:"json",
