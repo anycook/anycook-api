@@ -128,3 +128,48 @@ Returns a category with a list of its recipes.
             "recipes":["Yakitori","Hühnerfrikassee","Wiener Schnitzel mit Pommes","Sandwich mit Minutensteak","Hühnerbrust mit Erdnusssoße","Kebab im Teigmantel","gefüllte Hackbuletten","Schweinekotelett mit Sauerkraut","Hack-Gemüsetaschen","Putenpfanne mit Spinat und Kichererbsen","Hamburger","Gebratene Ente","Schinken-Käse-Brötchen","Gefüllte Paprika mit Hackfleisch","Pute mit Parmesan und Schinken","Hähnchenbrust mit Mandelkruste","Cordon bleu"],
             "recipeNumber":17
         }
+        
+
+# Group Discover
+Ressources that return list of recipes by different kind of recommendation types
+
+## New [/discover/new?recipeNumber={recipeNumber}]
+Returns the newest recipes
+
+### Get new [GET]
+
++ Parameters
+    + recipeNumber = `30` (number, optional) ... Maximum number of returned recipes
+    
++ Response 200 (application/json)
+    
+        ["Schokoladen-Beeren-Gugelhupf","Nasi Goreng Ikan","Russischer Zupfkuchen","Apfel-Zwiebel-Balsamico Gemüse","Apfel-Tiramisu","Steckrüben-Lauchsuppe mit Feta","Kartoffel-Kürbis Suppe","Blätterteigsnäk","feine Plätzchen","Nougat-Karos","Cranberry-Zimt-Schnecken","Florentiner Plätzchen","gefüllte Kringel","Windbeuteltorte","selbstgemachte Nudeln","Oliven-Pesto","Omas gedeckter Apfelkuchen","Pute mit Parmesan und Schinken","Paprika-Garnelen mit Nudeln und Avocado","Pizzateig","Kebab im Teigmantel","Tomaten-Feta-Taschen","Spinat-Walnuss-Pesto","Bananenbrot","Schoko-Walnuss-Muffins","Süddeutscher Zwiebelkuchen","Kräuter-Kartoffelbrei","Sonnen-Brot","Schokibakuchen","Käse-Kirschkuchen"]
+
+## Recommended [/discover/recommended?recipeNumber={recipeNumber}]
+If logged-in it returns the recipes that are similar to the recipes you like. Otherwise it returns the most viewed recipes.
+
+### Get recommended [GET]
+
++ Parameters
+    + recipeNumber = `30` (number, optional) ... Maximum number of returned recipes
+    
++ Response 200 (application/json)
+
+        ["Gratinierte Putenfilets mit Äpfeln","Zitronenrisotto","Dal","Spinat-Quiche","Gemüsewähe","Kartoffelsuppe","Kartoffelpuffer","Schinken-Käse-Gnocchi","Quiche mit Lauch und Speck","Brotauflauf","Zucchini-Champignon-Lasagne","Sandwich mit Minutensteak","Käse-Lauch-Suppe","Wiener Schnitzel mit Pommes","Nudelauflauf","Lasagne","Kürbiskuchen","Yakitori","Johannisbeer-Blechkuchen","Spinattaschen","Panna Cotta","Canelloni mit Gemüsefüllung","Mousakas","Tortellini mit Pilz-Sahnesoße","Nudeln in Brokkoli-Schinken-Sauce","Beeren-Schmand-Kuchen","Marmorkuchen","Provence-Risotto","Hühnerbrust mit Erdnusssoße","Gefüllter Kürbis"]
+        
+
+## Tasty [/discover/tasty?recipeNumber={recipeNumber}]
+Returns the recipes that the users like most.
+
+### Get tasty [GET]
+
++ Parameters
+    + recipeNumber = `30` (number, optional) ... Maximum number of returned recipes
+    
++ Response 200 (application/json)
+
+        ["Zucchini-Champignon-Lasagne","Gratinierte Putenfilets mit Äpfeln","Pizzateig","Zitronenkuchen","Kartoffelsuppe","Dal","Spinat-Quiche","Zitronenrisotto","Yakitori","Wiener Schnitzel mit Pommes","Hühnerfrikassee","Beeren-Muffins","Gemüsewähe","Schokibakuchen","Macadamia-Cookies","Käse-Lauch-Suppe","Panna Cotta","Marmorkuchen","Brotauflauf","Gemüsebratlinge","Kartoffelpuffer","Italienischer Nudelsalat","Schinken-Käse-Gnocchi","Russischer Rotebeetesalat","Tiramisu ohne Ei","Haferbrei","Beeren-Schmand-Kuchen","Fusilli mit Ricotta","Grießbrei mit Himbeeren","Kürbiskuchen"]
+        
+
+
+
