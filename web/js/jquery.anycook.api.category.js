@@ -45,8 +45,8 @@ $.anycook.api.category = function(){
 
 //sorted([callback])
 $.anycook.api.category.sorted = function(callback){
-	var path = "/category/sorted"
-	return $.anycook.api._get(path, {}, callback);
+	var path = "/category"
+	return $.anycook.api._get(path, {sorted : true}, callback);
 }
 
 //number([callback])

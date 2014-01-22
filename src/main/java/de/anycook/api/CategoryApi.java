@@ -35,40 +35,23 @@ public class CategoryApi {
 
     private final Logger logger = Logger.getLogger(getClass());
 
-	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> getAll(){
+	public Map<String, Integer> getAll(@QueryParam("sorted") boolean sorted){
         try {
-            return Category.getAll();
+            return sorted ? Category.getAllSorted() : Category.getAll();
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 	
-	/**
-	 * All categories ordered by order attribute in DB
-	 * @return
-	 */
-	@Path("sorted")
+	@Path("{categoryName}")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Integer> getAllSorted(){
+	public Category getCategory(@PathParam("categoryName") String categoryName){
         try {
-            return Category.getAllSorted();
-        } catch (SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-	
-	@Path("{categoryname}")
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Category getCategory(@PathParam("categoryname") String categoryname){
-        try {
-            return Category.init(categoryname);
+            return Category.init(categoryName);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
