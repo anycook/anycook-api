@@ -1,0 +1,82 @@
+FORMAT: 1A
+HOST: http://api.anycook.de
+
+# anycook
+anycook is the online cookbook.
+
+# Group Autocomplete
+Notes related resources of the **Notes API**
+
+## General [/autocomplete?query={query}&excludedCategory={excludedCategory}&excludedIngredients={excludedIngredients}&excludedTags={excludedTags}&excludedUsers={excludedUsers}&maxResults={maxResults}]
+Autocompletes a query for all types
+
+### Autocomplete query [GET] 
+
++ Parameters
+    + query (string, `t`) ... String that should be completed
+    + excludedCategory (optional, string, `Fleisch`) ... Excludes a category from autocomplete results
+    + excludedIngredients (optional, string, `Kaffee,Saft`) ... Excludes one or more ingredients from autocomplete results (comma seperated)
+    + excludedTags (optional, string, `matschepampe,weihnachten`) ... Excludes on or more tags from autocomplete (comma seperated)
+    + excludedUsers (optional, string, `1,2`) ... List of user ids to exclude (only numbers, comma seperated)
+    + maxResults = `10` (optional, number, `100`) ... Maximum number of the returned results 
+
++ Response 200 (application/json)
+
+        { 
+            "tags":["japanisch","joghurt"],
+            "kategorien":[],
+            "zutaten":["Joghurt"],
+            "user":[
+                {"id":24,"name":"jaminka"},
+                {"id":83,"name":"jasmin"},
+                {"id":60,"name":"Johänni"}],
+            "gerichte":["Johannisbeer-Blechkuchen"]
+        }
+
+## Ingredient [/autocomplete/ingredient?query={query}&exclude={exclude}&maxResults={maxResults}]
+Autocompletes only ingredient names
+
+### Autocomplete query [GET]
+
++ Parameters
+   + query (string, `l`) ... String that should be completed
+   + exclude (optional, string, `Kaffee,Saft`) ... Excludes one or more ingredients from autocomplete results (comma seperated)
+   + maxResults = `10` (optional, number, `100`) ... Maximum number of the returned results
+
++ Response 200 (application/json)
+        
+        ["Lasagneplatten","Lauch","Lauchzwiebel","Lauchzwiebeln","lauwarmes Wasser","Linsen","Loffelbiscuits"]
+
+## Tag [/autocomplete/tag?query={query}&exclude={exclude}&maxResults={maxResults}]
+Autcompletes only tag names
+
+### Autocomplete query [GET]
+
++ Parameters
+   + query (string, `m`) ... String that should be completed
+   + exclude (optional, string, `mexikanisch,weihnachten`) ... Excludes one or more tags from autocomplete results (comma seperated)
+   + maxResults = `10` (optional, number, `100`) ... Maximum number of the returned results
+
++ Response 200 (application/json)
+        
+        ["matschepampe","mediteran","mexikanisch","minze"]
+
+## User [/autocomplete/user?query={query}&exclude={exclude}&maxResults={maxResults}]
+Autcompletes only user names
+
+### Autocomplete query [GET]
+
++ Parameters
+   + query (string, `j`) ... String that should be completed
+   + exclude (optional, string, `1,2`) ... List of user ids to exclude (only numbers, comma seperated)
+   + maxResults = `10` (optional, number, `100`) ... Maximum number of the returned results
+
++ Response 200 (application/json)
+        
+            [
+                {"id":24,"name":"jaminka"},
+                {"id":83,"name":"jasmin"},
+                {"id":60,"name":"Johänni"}
+            ]
+
+
