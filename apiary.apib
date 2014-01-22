@@ -5,7 +5,7 @@ HOST: http://api.anycook.de
 anycook is the online cookbook.
 
 # Group Autocomplete
-Notes related resources of the **Notes API**
+Ressources that autocomplete query strings.
 
 ## General [/autocomplete?query={query}&excludedCategory={excludedCategory}&excludedIngredients={excludedIngredients}&excludedTags={excludedTags}&excludedUsers={excludedUsers}&maxResults={maxResults}]
 Autocompletes a query for all types
@@ -48,7 +48,7 @@ Autocompletes only ingredient names
         ["Lasagneplatten","Lauch","Lauchzwiebel","Lauchzwiebeln","lauwarmes Wasser","Linsen","Loffelbiscuits"]
 
 ## Tag [/autocomplete/tag?query={query}&exclude={exclude}&maxResults={maxResults}]
-Autcompletes only tag names
+Autocompletes only tag names
 
 ### Autocomplete query [GET]
 
@@ -62,7 +62,7 @@ Autcompletes only tag names
         ["matschepampe","mediteran","mexikanisch","minze"]
 
 ## User [/autocomplete/user?query={query}&exclude={exclude}&maxResults={maxResults}]
-Autcompletes only user names
+Autocompletes only user names
 
 ### Autocomplete query [GET]
 
@@ -80,3 +80,51 @@ Autcompletes only user names
             ]
 
 
+# Group Category
+Ressources that represent the recipe categories
+
+## Categories [/category?sorted={sorted}]
+Returns all category names with number of recipes. Sorted by name or in the anycook prefered order.
+
+### Get all categories [GET]
+
++ Parameters
+    + sorted (boolean, optional, `true`)
+        If set to true categories get sorted in the anycook prefered order.
+
++ Response 200 (application/json)
+
+        {
+            "Grundrezepte":0,
+            "Vorspeisen und Häppchen":0,
+            "Gemüse und Salate":18,
+            "Suppen und Eintöpfe":15,
+            "Fleisch":17,
+            "Fisch":3,
+            "Nudeln und Reis":24,
+            "Kartoffelgerichte":4,
+            "Ofengerichte":22,
+            "Eierspeisen":4,
+            "Soßen und Dips":5,
+            "Kuchen und Torten":0,
+            "Backwaren":6,
+            "Desserts":46,
+            "Sonstiges":0
+        }
+
+
+## Category [/category/{name}]
+Returns a category with a list of its recipes.
+
+### Get category [GET]
+
++ Parameters
+    + name (string, required, `Fleisch`) ... Name of a category.
+    
++ Response 200 (application/json)
+
+        {
+            "name":"Fleisch",
+            "recipes":["Yakitori","Hühnerfrikassee","Wiener Schnitzel mit Pommes","Sandwich mit Minutensteak","Hühnerbrust mit Erdnusssoße","Kebab im Teigmantel","gefüllte Hackbuletten","Schweinekotelett mit Sauerkraut","Hack-Gemüsetaschen","Putenpfanne mit Spinat und Kichererbsen","Hamburger","Gebratene Ente","Schinken-Käse-Brötchen","Gefüllte Paprika mit Hackfleisch","Pute mit Parmesan und Schinken","Hähnchenbrust mit Mandelkruste","Cordon bleu"],
+            "recipeNumber":17
+        }
