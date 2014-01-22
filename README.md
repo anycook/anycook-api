@@ -18,7 +18,7 @@ To use the full test stack you will also need to clone and start the [anycook-pa
   - [puppetlabs/mysql](https://forge.puppetlabs.com/puppetlabs/mysql)
   - [puppetlabs/apt](https://forge.puppetlabs.com/puppetlabs/apt)
   - [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
-- If you are an anycook internal and want to commit changes to anycook-core change your git remotes (Execute the following command inside the anycook-core folder!!): ```git remote set-url --push origin git@github.com:anycook/anycook-core.git``
+- If you are an anycook internal and want to commit changes to anycook-core change your git remotes (Execute the following command inside the __anycook-core__ folder): ```git remote set-url --push origin git@github.com:anycook/anycook-core.git``
 
 ### Configuration
 Available properties can be found [here](https://github.com/anycook/anycook-core/wiki/Configuration-File).
