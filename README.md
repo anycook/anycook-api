@@ -5,6 +5,9 @@ REST Api for anycook
 
 [![Build Status](https://travis-ci.org/anycook/anycook-api.png?branch=master)](https://travis-ci.org/anycook/anycook-api)
 
+## Documentation
+A detailed API documentation can be found [here](http://docs.anycook.apiary.io/) (still in progress).
+
 ## Test environment
 To use the full test stack you will also need to clone and start the [anycook-page](https://github.com/anycook/anycook-page) project.
 
