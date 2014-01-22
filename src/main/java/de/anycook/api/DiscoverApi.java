@@ -19,7 +19,7 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
-import de.anycook.discover.DiscoverHandler;
+import de.anycook.discover.Discover;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import org.apache.log4j.Logger;
@@ -32,7 +32,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 
 @Path("/discover")
@@ -41,42 +40,22 @@ public class DiscoverApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, List<String>> getDiscover(@Context HttpHeaders hh,
-			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum){
-		Session session = Session.init(request.getSession());
-        try {
-            try {
-                session.checkLogin(hh.getCookies());
-                User user = session.getUser();
-                return DiscoverHandler.getDiscoverRecipes(recipenum, user.getId());
-            } catch (WebApplicationException e) {
-                return DiscoverHandler.getDiscoverRecipes(recipenum);
-            }
-        } catch (IOException | SQLException e){
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-	}
-	
-	@GET
 	@Path("recommended")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverRecommended(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum){
+			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
 		Session session = Session.init(request.getSession());
         try {
             try {
                 session.checkLogin(hh.getCookies());
                 User user = session.getUser();
-                return DiscoverHandler.getRecommendedRecipes(recipenum, user.getId());
+                return Discover.getRecommendedRecipes(recipeNumber, user.getId());
             } catch (WebApplicationException e) {
-                return DiscoverHandler.getPopularRecipes(recipenum);
+                return Discover.getPopularRecipes(recipeNumber);
             }
         } catch (IOException | SQLException e){
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
@@ -85,12 +64,11 @@ public class DiscoverApi {
 	@Path("tasty")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverTasty(
-			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum,
-			@QueryParam("callback") String callback){
+			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
-            return DiscoverHandler.getTastyRecipes(recipenum);
+            return Discover.getTastyRecipes(recipeNumber);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e ,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -99,12 +77,11 @@ public class DiscoverApi {
 	@Path("new")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getDiscoverNew(
-			@DefaultValue("30") @QueryParam("recipeNumber") int recipenum,
-			@QueryParam("callback") String callback){
+			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
-            return DiscoverHandler.getNewestRecipes(recipenum);
+            return Discover.getNewestRecipes(recipeNumber);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
