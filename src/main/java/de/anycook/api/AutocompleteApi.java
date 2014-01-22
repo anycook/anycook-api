@@ -22,12 +22,7 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
 import de.anycook.api.util.MediaType;
@@ -48,24 +43,22 @@ public class AutocompleteApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
 	/**
-	 * autocompletes for all categories
-	 * @param query 
-	 * @param maxResults
-	 * @return
+	 * Completion for all categories
 	 */
-	@GET
+	@POST
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> autocomplete(@QueryParam("q") String query,
-			@QueryParam("excludedusers") IntSet excludedUsers,
-			@QueryParam("excludedtags") StringSet excludedTags,
-			@QueryParam("excludedingredients") StringSet excludedIngredients,
-			@QueryParam("excludedcategorie") String excludedCategory,
-			@QueryParam("maxresults") @DefaultValue("10") int maxResults){
-		if(query == null)
-			throw new WebApplicationException(401);
+    @Consumes(MediaType.APPLICATION_JSON)
+	public Map<String, Object> autocomplete(@QueryParam("query") String query,
+                                            @QueryParam("excludedCategory") String excludedCategory,
+                                            @QueryParam("excludedIngredients") StringSet excludedIngredients,
+                                            @QueryParam("excludedTags") StringSet excludedTags,
+                                            @QueryParam("excludedUsers") IntSet excludedUsers,
+                                            @QueryParam("maxResults") @DefaultValue("10") int maxResults){
+
+        if(query == null) throw new WebApplicationException(Response.Status.BAD_REQUEST);
         try {
-            return Autocomplete.autoCompleteAll(query, maxResults,
-                    excludedIngredients, excludedTags, excludedUsers, excludedCategory);
+            return Autocomplete.autoCompleteAll(query, excludedCategory, excludedIngredients, excludedTags,
+                    excludedUsers, maxResults);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -75,13 +68,13 @@ public class AutocompleteApi {
 	@GET
 	@Path("ingredient")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> autocompleteIngredient(@QueryParam("q") String query,
-			@QueryParam("exclude") StringSet exclude,
-			@QueryParam("maxresults") @DefaultValue("10") int maxResults){
+	public List<String> autocompleteIngredient(@QueryParam("query") String query,
+			                                   @QueryParam("exclude") StringSet exclude,
+			                                   @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)
 			throw new WebApplicationException(401);
         try {
-            return Autocomplete.autocompleteZutat(query, maxResults, exclude);
+            return Autocomplete.autocompleteIngredient(query, maxResults, exclude);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -92,13 +85,13 @@ public class AutocompleteApi {
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> autoCompleteUser(@QueryParam("q") String query,
-                                     @QueryParam("exclude") IntSet exclude,
-                                     @QueryParam("maxresults") @DefaultValue("10") int maxResults){
+                                       @QueryParam("exclude") IntSet exclude,
+                                       @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)
 			throw new WebApplicationException(401);
 
         try {
-            return Autocomplete.autocompleteUsernames(query, maxResults, exclude);
+            return Autocomplete.autocompleteUsers(query, maxResults, exclude);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -109,13 +102,12 @@ public class AutocompleteApi {
 	@Path("tag")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> autocompleteTags(@QueryParam("q") String query,
-			@QueryParam("exclude") StringSet exclude,
-			@QueryParam("maxresults") @DefaultValue("10") int maxresults,
-			@QueryParam("callback")String callback){
+			                             @QueryParam("exclude") StringSet exclude,
+			                             @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)
 			throw new WebApplicationException(401);
         try {
-            return Autocomplete.autocompleteTag(query, maxresults, exclude);
+            return Autocomplete.autocompleteTag(query, maxResults, exclude);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -123,9 +115,6 @@ public class AutocompleteApi {
 	}
 	
 	public static class IntSet extends HashSet<Integer>{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 
 		public IntSet(String in) {
@@ -148,4 +137,6 @@ public class AutocompleteApi {
             }
         }
     }
+
+
 }

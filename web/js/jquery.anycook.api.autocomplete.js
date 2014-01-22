@@ -31,16 +31,16 @@ $.anycook.api.autocomplete = function(term){
 				callback = arguments[5];
 				
 		case 5:
-			data.excludedcategorie = arguments[1];
+			data.excludedCategory = arguments[1];
 			
 			if(arguments[2])
-				data.excludedingredients = arguments[2].toString();
+				data.excludedIngredients = arguments[2].toString();
 			
 			if(arguments[3])
-				data.excludedtags = arguments[3].toString();
+				data.excludedTags = arguments[3].toString();
 				
 			if(arguments[4])
-				data.excludedusers = arguments[4].toString();
+				data.excludedUsers = arguments[4].toString();
 			break;
 		
 		case 2:
