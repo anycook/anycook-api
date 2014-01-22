@@ -5,19 +5,20 @@ REST Api for anycook
 
 [![Build Status](https://travis-ci.org/anycook/anycook-api.png?branch=master)](https://travis-ci.org/anycook/anycook-api)
 
-More soon!
-
 ## Test environment
+To use the full test stack you will also need to clone and start the [anycook-page](https://github.com/anycook/anycook-page) project.
+
 ### Required dependencies
 - Install [Java7 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
 - Install [Gradle](http://www.gradle.org/)
 - Install [Virtual Box](https://www.virtualbox.org/)
 - Install [Vagrant](http://www.vagrantup.com/) (Having problems with vagrant in OSX Mavericks? Execute ```sudo /Library/StartupItems/VirtualBox/VirtualBox restart``` and try again ([source](http://www.asquera.de/development/2013/06/20/vagrant-on-mavericks/)))
-- Execute ```$ git submodule init && git submodule update``` to download required submodules. These are:
+- Execute ```git submodule init && git submodule update``` in project root to download required submodules. These are:
   - [anycook-core](https://github.com/anycook/anycook-core)
   - [puppetlabs/mysql](https://forge.puppetlabs.com/puppetlabs/mysql)
   - [puppetlabs/apt](https://forge.puppetlabs.com/puppetlabs/apt)
   - [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
+- If you are an anycook internal and want to commit changes to anycook-core change your git remotes (Execute the following command inside the anycook-core folder!!): ```git remote set-url --push origin git@github.com:anycook/anycook-core.git``
 
 ### Configuration
 Available properties can be found [here](https://github.com/anycook/anycook-core/wiki/Configuration-File).
