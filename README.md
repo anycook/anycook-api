@@ -26,7 +26,7 @@ Available properties can be found [here](https://github.com/anycook/anycook-core
 If you want to set your own global conf in the test environment place it in the project as ```test-environment/api-manifests/anycook.properties```
 
 ### Starting
-- Compile Java sources with ```$ gradle war``
+- Compile Java sources with ```$ gradle war```
 - Run ```$ vagrant up --provision``` in project root directory.
 - The anycook API can be accessed on [http://localhost:8080](http://localhost:8080). The MySQL server via port 3333
 
