@@ -63,7 +63,6 @@ public class RecipeApi {
 	
 	/**
 	 * Number of recipes
-	 * @return
 	 */
 	@GET
 	@Path("number")
