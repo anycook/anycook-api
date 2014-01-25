@@ -18,6 +18,9 @@
  * @author Jan Graßegger <jan@anycook.de>
  */
 
+ if(!$.anycook.api.discover)
+	$.anycook.api.discover = {};
+
 //recommended([callback])
 $.anycook.api.discover.recommended = function(callback){
 	var path = "/discover/recommended";
