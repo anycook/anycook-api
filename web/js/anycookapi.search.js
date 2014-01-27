@@ -17,15 +17,16 @@
  * 
  * @author Jan Graßegger <jan@anycook.de>
  */
+'use strict';
+//search(querymap, [callback])
+AnycookAPI.search = function(data, callback, error){
+	var path = '/search';
+	return AnycookAPI._postJSON(path, data, callback, error);
+};
 
-//life(data, [callback])
-$.anycook.api.life = function(data, callback){
-	var path = "/life";
-	var dfd = $.Deferred();
-	$.when($.anycook.api._get(path, data)).then(function(json){
-		dfd.resolve(json);
-		if(callback)
-			callback(json);
-	});		
-	return dfd.promise();
-}
+//validate(term [,callback])
+AnycookAPI.search.validate = function(term, callback){
+	var path = '/search/validate';
+	var data = {q:term};
+	return AnycookAPI._get(path, data, callback);
+};

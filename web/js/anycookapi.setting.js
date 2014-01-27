@@ -16,27 +16,12 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  * 
  * @author Jan Graßegger <jan@anycook.de>
- */	
-$.anycook.api.registration = function(mail, username, password,callback){
-	var graph = "/user";
-	var data = {username:username, mail:mail, password:password};
-	return $.anycook.api._post(graph,data,callback);
-}
-	
-$.anycook.api.registration.checkMail =function(mail, callback){
-	var graph = "/user/mail";
-	var data = {mail:mail};
-	return $.anycook.api._get(graph, data, callback);		
-}
-
-$.anycook.api.registration.checkUsername =function(username, callback){
-	var graph = "/user/name";
-	var data = {username:username};
-	return $.anycook.api._get(graph, data, callback);		
-}
-
-$.anycook.api.registration.activate = function(activationKey, callback){
-	var graph = "/session/activate";
-	var data = {activationkey:activationKey};
-	return $.anycook.api._post(graph, data, callback);
-}
+ */
+'use strict';
+ //life(data, [callback])
+AnycookAPI.setting = {
+	notification : function(callback){
+		var path = '/setting/notification';
+		return AnycookAPI._get(path, {}, callback);
+	}
+};

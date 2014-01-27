@@ -17,35 +17,26 @@
  * 
  * @author Jan Graßegger <jan@anycook.de>
  */
+'use strict';
+AnycookAPI.discover = {
+	//recommended([callback])
+	recommended : function(callback){
+		var path = '/discover/recommended';
+		return AnycookAPI._get(path, {}, callback);
+	},
 
-if(!$.anycook.api.tag) $.anycook.api.tag ={}
+	//tasty([callback])
+	tasty : function(callback){
+		var path = '/discover/tasty';
+		return AnycookAPI._get(path, {}, callback);
+	},
 
-$.anycook.api.tag.number = function(callback){
-	var path  = "/tag/number"
-	return $.anycook.api._get(path,  {}, callback);
-}
-
-$.anycook.api.tag.suggest = function(recipename, tags, callback){
-	var path  = "/recipe/"+recipename+"/tags";
-	return $.anycook.api._postJSON(path,  tags, callback);
-}
-
-//popularTags([recipe], [callback])
-$.anycook.api.tag.popular = function(){
-	var callback;
-	var data ={};
-	switch(arguments.length){
-	case 2:
-		var type2 = typeof arguments[1];
-		if(type2 == "function")
-			callback = arguments[1];
-	case 1:
-		var type1 = typeof arguments[0];
-		if(type1 == "string")
-			data.recipe = arguments[0];
-		else if(type1 == "function")
-			callback = arguments[1];
+	//new([callback])
+	new : function(callback){
+		var path = '/discover/new';
+		return AnycookAPI._get(path, {}, callback);
 	}
-	var path  = "/tag/popular";
-	return $.anycook.api._get(path, data, callback);		
-}
+};
+
+
+

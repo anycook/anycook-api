@@ -17,40 +17,44 @@
  * 
  * @author Jan Graßegger <jan@anycook.de>
  */
-	
+'use strict';
 //category([category], [callback])
-$.anycook.api.category = function(){
+AnycookAPI.category = function(){
 	var category;
 	var callback;
 	switch(arguments.length){
 	case 2:
 		var type2 = typeof arguments[1];
-		if(type2 == "function")
+		if(type2 === 'function'){
 			callback = arguments[1];
-	
+		}
+		/* falls through */
 	case 1:
 		var type1 = typeof arguments[0];
-		if(type1 == "string")
+		if(type1 === 'string'){
 			category = arguments[0];
-		else if(type1 == "function")
-			callback = arguments[0];	
+		}
+		else if(type1 === 'function') {
+			callback = arguments[0];
+		}
 	}
 	
-	var path = "/category";
-	if(category)
-		path+="/"+category;
+	var path = '/category';
+	if(category) {
+		path += '/'+category;
+	}
 	
-	return $.anycook.api._get(path, {}, callback);
+	return AnycookAPI._get(path, {}, callback);
 };
 
 //sorted([callback])
-$.anycook.api.category.sorted = function(callback){
-	var path = "/category"
-	return $.anycook.api._get(path, {sorted : true}, callback);
-}
+AnycookAPI.category.sorted = function(callback){
+	var path = '/category';
+	return AnycookAPI._get(path, {sorted : true}, callback);
+};
 
 //number([callback])
-$.anycook.api.category.number = function(callback){
-	var path = "/category/number"
-	return $.anycook.api._get(path, {}, callback);
-}
+AnycookAPI.category.number = function(callback){
+	var path = '/category/number';
+	return AnycookAPI._get(path, {}, callback);
+};

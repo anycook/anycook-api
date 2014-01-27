@@ -17,25 +17,37 @@
  * 
  * @author Jan Graßegger <jan@anycook.de>
  */
-
- if(!$.anycook.api.discover)
-	$.anycook.api.discover = {};
-
-//recommended([callback])
-$.anycook.api.discover.recommended = function(callback){
-	var path = "/discover/recommended";
-	return $.anycook.api._get(path, {}, callback);	
-}
-
-//tasty([callback])
-$.anycook.api.discover.tasty = function(callback){
-	var path = "/discover/tasty";
-	return $.anycook.api._get(path, {}, callback);	
-}
-
-//new([callback])
-$.anycook.api.discover.new = function(callback){
-	var path = "/discover/new";
-	return $.anycook.api._get(path, {}, callback);	
-}
-
+'use strict';
+AnycookAPI.tag = {
+	number : function(callback){
+		var path  = '/tag/number';
+		return AnycookAPI._get(path, {}, callback);
+	},
+	suggest : function(recipename, tags, callback){
+		var path  = '/recipe/'+recipename+'/tags';
+		return AnycookAPI._postJSON(path,  tags, callback);
+	},
+	//popular([recipe], [callback])
+	popular : function(){
+		var callback;
+		var data = {};
+		switch(arguments.length){
+		case 2:
+			var type2 = typeof arguments[1];
+			if(type2 === 'function'){
+				callback = arguments[1];
+			}
+			/* falls through */
+		case 1:
+			var type1 = typeof arguments[0];
+			if(type1 === 'string'){
+				data.recipe = arguments[0];
+			}
+			else if(type1 === 'function'){
+				callback = arguments[1];
+			}
+		}
+		var path  = '/tag/popular';
+		return AnycookAPI._get(path, data, callback);
+	}
+};

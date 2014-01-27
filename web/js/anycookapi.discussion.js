@@ -17,41 +17,44 @@
  * 
  * @author Jan Graßegger <jan@anycook.de>
  */
-
+'use strict';
 //discussion(recipename [, callback])
-$.anycook.api.discussion = function(recipename, lastid, callback){
-	var path = "/discussion/"+recipename;
+AnycookAPI.discussion = function(recipename, lastid, callback){
+	var path = '/discussion/'+recipename;
 	var data = {lastid:lastid};
-	return $.anycook.api._get(path, data, callback);
-}
+	return AnycookAPI._get(path, data, callback);
+};
 
-//answer(recipename, text, [, parentid] [, callback])
-$.anycook.api.discussion.answer = function(recipename, text){
-	var path = "/discussion/"+recipename;
+//answer(recipename, text [, parentid] [, callback])
+AnycookAPI.discussion.answer = function(recipename, text){
+	var path = '/discussion/'+recipename;
 	var data = {comment:text};
 	var callback;
 	switch(arguments.length){
 	case 4:
 		callback = arguments[3];
+		/* falls through */
 	case 3:
 		var type = typeof arguments[2];
-		if(type == "function")
+		if(type === 'function'){
 			callback = arguments[2];
-		else
+		}else{
 			data.pid = Number(arguments[2]);
+		}
 	}
 	
-	return $.anycook.api._post(path, data, callback);
-}
+	return AnycookAPI._post(path, data, callback);
+};
 
-$.anycook.api.discussion.like = function(recipename, id, callback){
+//like(recipeName, id [, callback])
+AnycookAPI.discussion.like = function(recipename, id, callback){
 	recipename = encodeURIComponent(recipename);
-	var path = "/discussion/like/"+recipename+"/"+id;
-	return $.anycook.api._put(path, {}, callback);
-}
+	var path = '/discussion/like/'+recipename+'/'+id;
+	return AnycookAPI._put(path, {}, callback);
+};
 
-$.anycook.api.discussion.unlike = function(recipename, id, callback){
+AnycookAPI.discussion.unlike = function(recipename, id, callback){
 	recipename = encodeURIComponent(recipename);
-	var path = "/discussion/like/"+recipename+"/"+id;
-	return $.anycook.api._delete(path, {}, callback);
-}
+	var path = '/discussion/like/'+recipename+'/'+id;
+	return AnycookAPI._delete(path, {}, callback);
+};
