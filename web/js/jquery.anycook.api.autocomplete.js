@@ -21,7 +21,7 @@
 //autocomplete(term, [excludedCategorie, excludedIngredients, excludedTags, excludedUsers], [callback])
 $.anycook.api.autocomplete = function(term){
 	var path = "/autocomplete"
-	var data = {q:term};
+	var data = {query : term};
 	var callback;
 	
 	switch(arguments.length){
@@ -56,7 +56,7 @@ $.anycook.api.autocomplete = function(term){
 $.anycook.api.autocomplete.user = function(term){
 	var exclude;
 	var callback;
-	var data = {q:term};
+	var data = {query : term};
 	
 	switch(arguments.length){
 		case 3:
@@ -81,7 +81,7 @@ $.anycook.api.autocomplete.user = function(term){
 $.anycook.api.autocomplete.ingredient = function(term){
 	var exclude;
 	var callback;
-	var data = {q:term};
+	var data = {query : term};
 	
 	switch(arguments.length){
 		case 3:
@@ -107,7 +107,7 @@ $.anycook.api.autocomplete.ingredient = function(term){
 $.anycook.api.autocomplete.tag = function(term){
 	var exclude;
 	var callback;
-	var data = {q:term};
+	var data = {query : term};
 	
 	switch(arguments.length){
 		case 3:
