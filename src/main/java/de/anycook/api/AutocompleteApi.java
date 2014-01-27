@@ -72,7 +72,7 @@ public class AutocompleteApi {
 			                                   @QueryParam("exclude") StringSet exclude,
 			                                   @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)
-			throw new WebApplicationException(401);
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
         try {
             return Autocomplete.autocompleteIngredient(query, maxResults, exclude);
         } catch (SQLException e) {
@@ -88,7 +88,7 @@ public class AutocompleteApi {
                                        @QueryParam("exclude") IntSet exclude,
                                        @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)
-			throw new WebApplicationException(401);
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
 
         try {
             return Autocomplete.autocompleteUsers(query, maxResults, exclude);
