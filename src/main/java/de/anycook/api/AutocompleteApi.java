@@ -45,7 +45,7 @@ public class AutocompleteApi {
 	/**
 	 * Completion for all categories
 	 */
-	@POST
+	@GET
 	@Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
 	public Map<String, Object> autocomplete(@QueryParam("query") String query,
