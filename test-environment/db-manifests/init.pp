@@ -19,6 +19,7 @@ class install_mysql {
         },
         service_enabled => true,
         service_manage => true,
+        restart => true,
         require => Exec["apt-get update"],
     }
 
