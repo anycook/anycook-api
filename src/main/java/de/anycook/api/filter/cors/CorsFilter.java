@@ -101,6 +101,8 @@ public class CorsFilter implements ContainerResponseFilter {
         MultivaluedMap<String, Object> headers = responseContext.getHeaders();
         headers.putSingle("Access-Control-Allow-Origin", origin);
         headers.putSingle("Access-Control-Allow-Credentials", "true");
+        if(responseContext.getStatus() == 201)
+            headers.putSingle("Access-Control-Expose-Headers", "Location");
 	}
 
 

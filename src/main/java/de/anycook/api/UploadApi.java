@@ -20,15 +20,16 @@ package de.anycook.api;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.fileupload.FileUploadException;
@@ -38,6 +39,8 @@ import de.anycook.session.Session;
 import de.anycook.upload.RecipeUploader;
 import de.anycook.upload.UploadHandler;
 import de.anycook.upload.UserUploader;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 
 @Path("upload")
@@ -51,8 +54,11 @@ public class UploadApi {
 	
 	@POST
 	@Path("image/{type}")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response uploadRecipeImage(@Context HttpServletRequest request,
 			@Context HttpHeaders hh,
+            @FormDataParam("file") InputStream uploadedInputStream,
+            @FormDataParam("file") FormDataContentDisposition fileDetail,
 			@PathParam("type") String type){
 		
 		UploadHandler upload;
@@ -76,32 +82,32 @@ public class UploadApi {
 		}
         File tempFile;
         try {
-            tempFile = upload.uploadFile(request);
+            tempFile = upload.uploadFile(uploadedInputStream);
         } catch (IOException | FileUploadException e) {
             logger.error(e,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-
-        if(tempFile!=null){
-            try{
-                String newFilename = upload.saveFile(tempFile);
-                if(type.equals("user"))
-                    session.getUser().setImage(newFilename);
-
-                return  Response.ok("{success:\""+newFilename+"\"}").build();
-            } catch (SQLException | IOException e) {
+        } finally {
+            try {
+                uploadedInputStream.close();
+            } catch (IOException e) {
                 logger.error(e, e);
-                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
             }
-
         }
-		else{
-			logger.warn("upload failed");
-			return Response.status(400).entity("{error:\"upload failed\"}").build();
-		}
-			
-		
-	}
+
+        if(tempFile == null)
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+
+        try{
+            String newFilename = upload.saveFile(tempFile);
+            if(type.equals("user"))
+                session.getUser().setImage(newFilename);
+            String path = String.format("/images/%s/big/%s", type, newFilename);
+            return  Response.created(new URI(path)).build();
+        } catch (SQLException | IOException | URISyntaxException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	
 }
