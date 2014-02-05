@@ -94,6 +94,49 @@
 			    error: error
 			});
 		},
+		_postFile : function(api, data, progress, complete, uploaded){
+			// Uploading - for Firefox, Google Chrome and Safari
+			var xhr = new XMLHttpRequest();
+			xhr.withCredentials = true;
+
+			xhr.onreadystatechange=function()
+			{	
+				//if document has been created
+				if(xhr.readyState==4 && xhr.status == 201){
+					var location = this.getResponseHeader('Location');
+					complete(location, xhr);
+				}
+				
+			}
+			var settings = AnycookAPI._settings();
+			xhr.open("post", settings.baseUrl+api, true);
+
+			// Update progress bar
+			xhr.upload.addEventListener('progress', progress, false);
+
+			// File uploaded
+			if(uploaded){
+				xhr.addEventListener('load', uploaded, false);	
+			}
+			
+
+			// Set appropriate headers
+			//xhr.setRequestHeader("Content-Type", "multipart/form-data");
+			//xhr.setRequestHeader("X-File-Name", file.name);
+			//xhr.setRequestHeader("X-File-Size", file.size);
+			//xhr.setRequestHeader("X-File-Type", file.type);
+
+			//Create FormData object
+			var formData = new FormData();
+
+			for(var key in data){
+				formData.append(key, data[key]);
+			}
+			
+
+			// Send the file (doh)
+			xhr.send(formData);
+		},
 		_put : function(api,data, callback, error){
 			api = api || '';
 			data = data || {};
@@ -177,6 +220,7 @@
 					'setting',
 					'session',
 					'tag',
+					'upload',
 					'user'
 				],
 				error : function(xhr){
