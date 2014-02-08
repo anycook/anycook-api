@@ -13,7 +13,7 @@ To use the full test stack you will also need to clone and start the [anycook-pa
 
 ### Required dependencies
 - Install [Java7 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
-- Install [Gradle](http://www.gradle.org/)
+- Install [Gradle](http://www.gradle.org/). To install it via brew execute ```brew install gradle```.
 - Install [Virtual Box](https://www.virtualbox.org/)
 - Install [Vagrant](http://www.vagrantup.com/) (Having problems with vagrant in OSX Mavericks? Execute ```sudo /Library/StartupItems/VirtualBox/VirtualBox restart``` and try again ([source](http://www.asquera.de/development/2013/06/20/vagrant-on-mavericks/)))
 - Execute ```git submodule init && git submodule update``` in project root to download required submodules. These are:
