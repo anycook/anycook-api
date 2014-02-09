@@ -81,10 +81,14 @@
 			var settings = AnycookAPI._settings();
 			error = error || settings.error;
 
+			if(!(typeof data === 'string')){
+				data = JSON.stringify(data);
+			}
+
 			return $.ajax({
 			    url: settings.baseUrl+api+'?appId='+settings.appId,
 			    type: 'POST',
-			    data:JSON.stringify(data),
+			    data: data,
 			    dataType:'json',
 			    contentType: 'application/json; charset=utf-8',
 			    xhrFields:{
@@ -168,10 +172,14 @@
 			var settings = AnycookAPI._settings();
 			error = error || settings.error;
 
+			if(!(typeof data === 'string')){
+				data = JSON.stringify(data);
+			}
+
 			return $.ajax({
 			    url: settings.baseUrl+api+'?appId='+settings.appId,
 			    type: 'PUT',
-			    data:JSON.stringify(data),
+			    data : data,
 			    dataType : 'json',
 			    contentType: 'application/json; charset=utf-8',
 			    xhrFields:{

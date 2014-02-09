@@ -18,8 +18,23 @@
  * @author Jan Graßegger <jan@anycook.de>
  */
 'use strict';
- //life(data, [callback])
+ 
 AnycookAPI.setting = {
+	setName : function(newName, callback){
+		var path = '/setting/name';
+		return AnycookAPI._putJSON(path, newName, callback);
+	},
+	//setPlace(newPlace [, callback])
+	setPlace : function(newPlace, callback){
+		var path = '/setting/place';
+		return AnycookAPI._putJSON(path, newPlace, callback);
+	},
+	//setText(newText [, callback])
+	setText : function(newText, callback){
+		var path = '/setting/text';
+		return AnycookAPI._putJSON(path, newText, callback);
+	},
+	//notification([callback])
 	notification : function(callback){
 		var path = '/setting/notification';
 		return AnycookAPI._get(path, {}, callback);

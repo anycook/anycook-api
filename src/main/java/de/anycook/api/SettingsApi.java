@@ -21,6 +21,7 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.session.Session;
+import de.anycook.user.User;
 import de.anycook.user.settings.NotificationSettings;
 import org.apache.log4j.Logger;
 
@@ -43,6 +44,55 @@ public class SettingsApi {
     public HttpServletRequest request;
     @Context
     public HttpHeaders hh;
+
+
+    @PUT
+    @Path("name")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateUsername(String newUsername){
+        Session session = Session.init(request.getSession());
+        try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+            user.setName(newUsername);
+
+        } catch (IOException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PUT
+    @Path("place")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updatePlace(String newPlace){
+        Session session = Session.init(request.getSession());
+        try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+            user.setPlace(newPlace);
+
+        } catch (IOException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PUT
+    @Path("text")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateText(String newText){
+        Session session = Session.init(request.getSession());
+        try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+            user.setText(newText);
+
+        } catch (IOException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GET
     @Path("notification")
