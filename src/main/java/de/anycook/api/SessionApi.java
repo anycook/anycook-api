@@ -172,4 +172,39 @@ public class SessionApi {
 
 
 	}
+
+    @POST
+    @Path("resetPassword")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void resetPasswordRequest(String mail){
+        try {
+            User.createResetPasswordID(mail);
+        } catch (SQLException | IOException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBUser.UserNotFoundException e) {
+            logger.info(e);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+    }
+
+    @PUT
+    @Path("resetPassword")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void resetPassword(PasswordReset passwordReset){
+        try {
+            User.resetPassword(passwordReset.id, passwordReset.newPassword);
+        } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (User.ResetPasswordException e) {
+            logger.warn(e);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+    }
+
+    public static class PasswordReset{
+        public String id;
+        public String newPassword;
+    }
 }

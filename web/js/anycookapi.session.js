@@ -44,6 +44,17 @@ $.extend(AnycookAPI.session, {
 	getMailProvider : function(domain, callback){
 		var path = '/session/mailprovider';
 		return AnycookAPI._get(path, {domain:domain}, callback);
+	},
+	// resetPassword(mail, callback)
+	resetPasswordRequest : function(mail, callback, error){
+		AnycookAPI._postJSON('/session/resetPassword', mail, callback, error);
+	},
+	resetPassword : function(id, newPassword, callback, error){
+		var data = {
+			id : id,
+			newPassword : newPassword
+		}
+		AnycookAPI._putJSON('/session/resetPassword', data, callback, error);
 	}
 });
 
