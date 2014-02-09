@@ -84,7 +84,7 @@ public class AutocompleteApi {
 	@GET
 	@Path("user")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<User> autoCompleteUser(@QueryParam("q") String query,
+	public List<User> autoCompleteUser(@QueryParam("query") String query,
                                        @QueryParam("exclude") IntSet exclude,
                                        @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)
@@ -101,11 +101,11 @@ public class AutocompleteApi {
 	@GET
 	@Path("tag")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> autocompleteTags(@QueryParam("q") String query,
+	public List<String> autocompleteTags(@QueryParam("query") String query,
 			                             @QueryParam("exclude") StringSet exclude,
 			                             @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)
-			throw new WebApplicationException(401);
+			throw new WebApplicationException(Response.Status.BAD_REQUEST);
         try {
             return Autocomplete.autocompleteTag(query, maxResults, exclude);
         } catch (SQLException e) {
