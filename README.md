@@ -42,3 +42,6 @@ If you want to set your own global conf in the test environment place it in the 
     2. Change the port to 3333 and click OK
     3. Load the latest testdump. (For anycook internals: Latest dump is located in the root of the BTSync folder)
     4. Click on the lighning symbol
+
+### Adding user and recipe images
+- Copy image folders from btSync into ```./images``` in project root.
