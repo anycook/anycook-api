@@ -87,7 +87,21 @@ public class SettingsApi {
             session.checkLogin(hh.getCookies());
             User user = session.getUser();
             user.setText(newText);
+        } catch (IOException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 
+    @PUT
+    @Path("email")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateMail(String newMail){
+        Session session = Session.init(request.getSession());
+        try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+            user.setMailCandidate(newMail);
         } catch (IOException | SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

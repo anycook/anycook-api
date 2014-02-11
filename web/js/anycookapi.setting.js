@@ -20,6 +20,11 @@
 'use strict';
  
 AnycookAPI.setting = {
+	//setMail(newMail [, callback])
+	setMail : function(newMail, callback){
+		var path = '/setting/email';
+		return AnycookAPI._putJSON(path, newMail, callback);
+	},
 	setName : function(newName, callback){
 		var path = '/setting/name';
 		return AnycookAPI._putJSON(path, newName, callback);
