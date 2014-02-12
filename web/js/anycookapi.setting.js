@@ -20,6 +20,11 @@
 'use strict';
  
 AnycookAPI.setting = {
+	//confirmMail(code, callback)
+	confirmMail : function(code, callback, error){
+		var path = '/setting/email';
+		return AnycookAPI._postJSON(path, code, callback, error);
+	},
 	//setMail(newMail [, callback])
 	setMail : function(newMail, callback){
 		var path = '/setting/email';

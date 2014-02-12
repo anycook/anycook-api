@@ -108,6 +108,25 @@ public class SettingsApi {
         }
     }
 
+    @POST
+    @Path("email")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String confirmMailUpdate(String code){
+        Session session = Session.init(request.getSession());
+        try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+            return user.confirmMailCandidate(code);
+        } catch (IOException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBUser.WrongCodeException e) {
+            logger.warn(e, e);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+    }
+
     @GET
     @Path("notification")
     @Produces(MediaType.APPLICATION_JSON)
