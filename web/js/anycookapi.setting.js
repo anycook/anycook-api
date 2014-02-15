@@ -48,5 +48,9 @@ AnycookAPI.setting = {
 	notification : function(callback){
 		var path = '/setting/notification';
 		return AnycookAPI._get(path, {}, callback);
+	},
+	saveNotifications : function(settings, callback, error){
+		var path = '/setting/notification';
+		return AnycookAPI._putJSON(path, settings, callback, error);
 	}
 };
