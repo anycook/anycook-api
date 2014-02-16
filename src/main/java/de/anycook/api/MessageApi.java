@@ -127,7 +127,6 @@ public class MessageApi {
             int userId = session.getUser().getId();
 
             int newMessageNum = MessageSession.getNewMessageNum(userId);
-            logger.info(newMessageNum+ ", "+lastNumber);
             if(newMessageNum == lastNumber){
                 MessageNumberProvider.INSTANCE.suspend(userId, asyncResponse);
             } else{
