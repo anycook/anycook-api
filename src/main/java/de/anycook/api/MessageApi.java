@@ -20,10 +20,7 @@ package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBMessage;
-import de.anycook.messages.Message;
-import de.anycook.messages.MessageNumberProvider;
-import de.anycook.messages.MessageSessionProvider;
-import de.anycook.messages.MessageSession;
+import de.anycook.messages.*;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import org.apache.commons.lang3.StringUtils;
@@ -156,16 +153,15 @@ public class MessageApi {
                 return;
             }
 
-            while (!asyncResponse.isDone() && !asyncResponse.isCancelled()){
-                    MessageSession messageSession = MessageSession.getSession(sessionId, userId, lastId);
-                    if(!messageSession.isEmpty() && asyncResponse.isSuspended())
-                        asyncResponse.resume(messageSession);
-                    else
-                        Thread.sleep(1000);
-            }
-        } catch (InterruptedException | SQLException | DBMessage.SessionNotFoundException e) {
+            MessageSession messageSession = MessageSession.getSession(sessionId, userId, lastId);
+            if(!messageSession.isEmpty()) asyncResponse.resume(messageSession);
+            else MessageProvider.INSTANCE.suspend(sessionId, userId, asyncResponse);
+        } catch (SQLException e) {
             logger.error(e, e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+        } catch (DBMessage.SessionNotFoundException e) {
+            logger.warn(e, e);
+            asyncResponse.resume(new WebApplicationException(Response.Status.BAD_REQUEST));
         }
 
 
