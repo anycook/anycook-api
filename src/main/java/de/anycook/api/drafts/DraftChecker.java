@@ -18,7 +18,7 @@
 
 package de.anycook.api.drafts;
 
-import de.anycook.db.mongo.recipedrafts.RecipeDrafts;
+import de.anycook.db.mongo.RecipeDrafts;
 import de.anycook.messages.Checker;
 import org.apache.log4j.Logger;
 

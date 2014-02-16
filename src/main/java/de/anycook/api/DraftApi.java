@@ -18,12 +18,16 @@
 
 package de.anycook.api;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import de.anycook.api.drafts.DraftChecker;
+import de.anycook.api.util.MediaType;
+import de.anycook.db.mongo.RecipeDrafts;
+import de.anycook.db.mysql.DBRecipe;
+import de.anycook.newrecipe.DraftNumberProvider;
+import de.anycook.recipe.Recipe;
+import de.anycook.session.Session;
+import de.anycook.utils.DaemonThreadFactory;
+import org.apache.log4j.Logger;
+import org.glassfish.jersey.server.ManagedAsync;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -32,20 +36,12 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.mongodb.DBObject;
-import de.anycook.api.util.MediaType;
-import de.anycook.db.mysql.DBRecipe;
-import org.apache.log4j.Logger;
-import org.glassfish.jersey.server.ManagedAsync;
-
-
-import de.anycook.db.mongo.recipedrafts.RecipeDrafts;
-import de.anycook.api.drafts.DraftChecker;
-import de.anycook.recipe.Recipe;
-import de.anycook.session.Session;
-import de.anycook.utils.DaemonThreadFactory;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Path("/drafts")
 public class DraftApi {
@@ -110,19 +106,9 @@ public class DraftApi {
         int userId = session.getUser().getId();
         RecipeDrafts drafts = new RecipeDrafts();
 
-        try {
-            while (!asyncResponse.isCancelled() && !asyncResponse.isDone()){
-                int newNum = drafts.count(userId);
-                if(lastNum == null || newNum != lastNum){
-                    asyncResponse.resume(newNum);
-                } else {
-                    Thread.sleep(1500);
-                }
-            }
-        } catch (InterruptedException e) {
-            logger.error(e, e);
-            asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
-        }
+        int newNum = drafts.count(userId);
+        if(lastNum == null || newNum != lastNum) asyncResponse.resume(newNum);
+        else DraftNumberProvider.INSTANCE.suspend(userId, asyncResponse);
     }
 	
 	@PUT
