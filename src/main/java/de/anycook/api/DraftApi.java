@@ -89,7 +89,7 @@ public class DraftApi {
             Session session = Session.init(request.getSession());
             session.checkLogin(hh.getCookies());
             return recipeDrafts.newDraft(session.getUser().getId());
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -186,7 +186,7 @@ public class DraftApi {
 
             int user_id = session.getUser().getId();
             recipeDrafts.remove(user_id, draft_id);
-        } catch (IOException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
