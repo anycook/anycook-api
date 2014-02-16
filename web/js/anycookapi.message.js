@@ -94,7 +94,7 @@ $.extend(AnycookAPI.message, {
 		}
 
 		var path = '/message/number';
-		var data = {lastnum : lastnum};
+		var data = {lastNum : lastnum};
 
 		var settings = AnycookAPI._settings();
 		$.extend(data, {appid : settings.appid});

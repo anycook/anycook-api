@@ -21,7 +21,8 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.Message;
-import de.anycook.messages.MessageProvider;
+import de.anycook.messages.MessageNumberProvider;
+import de.anycook.messages.MessageSessionProvider;
 import de.anycook.messages.MessageSession;
 import de.anycook.session.Session;
 import de.anycook.user.User;
@@ -87,7 +88,7 @@ public class MessageApi {
         try{
             List<MessageSession> sessions = MessageSession.getSessionsFromUser(user.getId(), changeDate);
             if(!sessions.isEmpty()) asyncResponse.resume(sessions);
-            else MessageProvider.INSTANCE.suspend(user.getId(), asyncResponse);
+            else MessageSessionProvider.INSTANCE.suspend(user.getId(), asyncResponse);
         } catch (SQLException | DBMessage.SessionNotFoundException e){
             logger.error(e,e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
@@ -116,26 +117,24 @@ public class MessageApi {
 	}
 
     @GET
+    @ManagedAsync
     @Path("number")
     @Produces(MediaType.APPLICATION_JSON)
     public void getMessageNumber(@Suspended AsyncResponse asyncResponse, @QueryParam("lastNum") int lastNumber){
         Session session = Session.init(req.getSession());
-
-        try(DBMessage dbmessage = new DBMessage()){
+        try{
             session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
 
-            while(!asyncResponse.isCancelled() && !asyncResponse.isDone()){
-                int newMessageNum = dbmessage.getNewMessageNum(userId);
-                if(newMessageNum == lastNumber){
-                    Thread.sleep(2500);
-                    continue;
-                }
-
-                if(asyncResponse.isSuspended())
-                    asyncResponse.resume(newMessageNum);
+            int newMessageNum = MessageSession.getNewMessageNum(userId);
+            logger.info(newMessageNum+ ", "+lastNumber);
+            if(newMessageNum == lastNumber){
+                MessageNumberProvider.INSTANCE.suspend(userId, asyncResponse);
+            } else{
+                logger.info("return message num");
+                asyncResponse.resume(newMessageNum);
             }
-        } catch (IOException | InterruptedException | SQLException e) {
+        } catch (IOException | SQLException e) {
             logger.error(e, e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
@@ -203,6 +202,7 @@ public class MessageApi {
             session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
             Message.read(sessionId, messageId, userId);
+            MessageNumberProvider.INSTANCE.wakeUpSuspended(userId);
         } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
