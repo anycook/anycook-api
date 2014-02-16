@@ -20,13 +20,12 @@ package de.anycook.api;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
+import de.anycook.db.mysql.DBMailProvider;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.mailprovider.MailProvider;
-import de.anycook.db.mysql.DBMailProvider;
 import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
 import de.anycook.user.User;
-import de.anycook.user.settings.NotificationSettings;
 import de.anycook.user.views.Views;
 import org.apache.log4j.Logger;
 
@@ -201,6 +200,13 @@ public class SessionApi {
             logger.warn(e);
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
+    }
+
+    @GET
+    @Path("id")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getSessionId(@Context HttpServletRequest request) {
+        return request.getSession(true).getId();
     }
 
     public static class PasswordReset{
