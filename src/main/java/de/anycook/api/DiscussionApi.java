@@ -20,13 +20,13 @@ package de.anycook.api;
 
 import com.google.common.base.Preconditions;
 import de.anycook.api.util.MediaType;
-import de.anycook.discussion.Discussion;
 import de.anycook.db.mysql.DBDiscussion;
+import de.anycook.discussion.Discussion;
+import de.anycook.discussion.DiscussionProvider;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
 
-import javax.ejb.Asynchronous;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
@@ -49,13 +49,12 @@ public class DiscussionApi {
 
     @GET
     @ManagedAsync
-    @Asynchronous
     @Path("{recipeName}")
     @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse, @PathParam("recipeName") final String recipeName,
                     @QueryParam("lastid") final Integer lastId, @Context HttpServletRequest request){
         Session session = Session.init(request.getSession());
-        int userId = -1;
+        int userId;
         try{
             session.checkLogin(request.getCookies());
             userId = session.getUser().getId();
@@ -74,30 +73,23 @@ public class DiscussionApi {
                 asyncResponse.resume(Response.ok().build());
             }
         });
-
         asyncResponse.setTimeout(5, TimeUnit.MINUTES);
 
-        while (!asyncResponse.isDone() && !asyncResponse.isCancelled()){
-            Discussion newDiscussion;
-            try(DBDiscussion dbDiscussion = new DBDiscussion()) {
-
-                newDiscussion = dbDiscussion.getDiscussion(recipeName, lastId, userId);
-                if(newDiscussion.size() > 0){
-                    logger.debug("found new disscussion elements for " + recipeName);
-                    if(asyncResponse.isSuspended())
-                        asyncResponse.resume(Response.ok(newDiscussion, MediaType.APPLICATION_JSON_TYPE).build());
-                    break;
-                } else
-                    Thread.sleep(2000);
-            } catch (SQLException e) {
-                logger.error(e);
-                if(asyncResponse.isSuspended())
-                    asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
-                break;
-            } catch (InterruptedException e) {
-                break;
-            }
+        Discussion newDiscussion;
+        try(DBDiscussion dbDiscussion = new DBDiscussion()) {
+            newDiscussion = dbDiscussion.getDiscussion(recipeName, lastId, userId);
+        } catch (SQLException e) {
+            logger.error(e, e);
+            if(asyncResponse.isSuspended())
+                asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+            return;
         }
+
+        if(newDiscussion.size() > 0){
+                logger.debug("found new disscussion elements for " + recipeName);
+                asyncResponse.resume(Response.ok(newDiscussion, MediaType.APPLICATION_JSON_TYPE).build());
+        }
+        else DiscussionProvider.INSTANCE.suspend(recipeName, userId, lastId, asyncResponse);
     }
 
 	@POST
@@ -116,10 +108,11 @@ public class DiscussionApi {
             if(pid == null) Discussion.discuss(comment, userid, recipe);
             else Discussion.answer(comment, pid, userid, recipe);
         } catch (IOException | SQLException e){
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
+        DiscussionProvider.INSTANCE.wakeUpSuspended(recipe);
 		return Response.ok("true").build();
 	}
 	
