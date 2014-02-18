@@ -204,7 +204,7 @@ public class SessionApi {
 
     @GET
     @Path("id")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     public String getSessionId(@Context HttpServletRequest request) {
         return request.getSession(true).getId();
     }

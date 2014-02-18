@@ -1,20 +1,20 @@
 /**
  * @license This file is part of anycook. The new internet cookbook
  * Copyright (C) 2013 Jan Graßegger
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see [http://www.gnu.org/licenses/].
- * 
+ *
  * @author Jan Graßegger <jan@anycook.de>
  */
 'use strict';
@@ -32,15 +32,17 @@
 			api = api || '';
 			data = data || {};
 			callback = callback || function(){};
-			
+
 			var settings = AnycookAPI._settings();
 			error = error || settings.error;
+            var sessionId = settings.sessionId;
+            var url = settings.baseUrl + api + (sessionId ? ';jsessionid='+sessionId : '');
 
 			$.extend(data, {appId : settings.appId});
 			return $.ajax({
-			    url : settings.baseUrl+api,
+			    url : url,
 			    type : 'GET',
-			    dataType : 'json',
+			    //dataType : 'json',
 			    data : data,
 			    xhrFields : {
 					withCredentials: true
@@ -53,15 +55,16 @@
 			api = api || '';
 			data = data || {};
 			callback = callback || function(){};
-			
+
 			var settings = AnycookAPI._settings();
 			$.extend(data, {appId : settings.appId});
 
 			error = error || settings.error;
-
+            var sessionId = settings.sessionId;
+            var url = settings.baseUrl + api + (sessionId ? ';jsessionid='+sessionId : '');
 
 			return $.ajax({
-			    url: settings.baseUrl+api,
+			    url: url,
 			    type: 'POST',
 			    data:data,
 			    dataType:'json',
@@ -85,8 +88,11 @@
 				data = JSON.stringify(data);
 			}
 
+            var sessionId = settings.sessionId;
+            var url = settings.baseUrl + api + (sessionId ? ';jsessionid='+sessionId : '');
+
 			return $.ajax({
-			    url: settings.baseUrl+api+'?appId='+settings.appId,
+			    url: url+'?appId='+settings.appId,
 			    type: 'POST',
 			    data: data,
 			    dataType:'json',
@@ -104,25 +110,27 @@
 			xhr.withCredentials = true;
 
 			xhr.onreadystatechange=function()
-			{	
+			{
 				//if document has been created
 				if(xhr.readyState==4 && xhr.status == 201){
 					var location = this.getResponseHeader('Location');
 					complete(location, xhr);
 				}
-				
+
 			}
 			var settings = AnycookAPI._settings();
-			xhr.open("post", settings.baseUrl+api, true);
+            var sessionId = settings.sessionId;
+            var url = settings.baseUrl + api + (sessionId ? ';jsessionid='+sessionId : '');
+			xhr.open("post", url, true);
 
 			// Update progress bar
 			xhr.upload.addEventListener('progress', progress, false);
 
 			// File uploaded
 			if(uploaded){
-				xhr.addEventListener('load', uploaded, false);	
+				xhr.addEventListener('load', uploaded, false);
 			}
-			
+
 
 			// Set appropriate headers
 			//xhr.setRequestHeader("Content-Type", "multipart/form-data");
@@ -136,7 +144,7 @@
 			for(var key in data){
 				formData.append(key, data[key]);
 			}
-			
+
 
 			// Send the file (doh)
 			xhr.send(formData);
@@ -149,9 +157,10 @@
 			var settings = AnycookAPI._settings();
 			error = error || settings.error;
 
-			var url = settings.baseUrl+api;
+			var sessionId = settings.sessionId;
+            var url = settings.baseUrl + api + (sessionId ? ';jsessionid='+sessionId : '');
 			$.extend(data, {appId : settings.appId});
-			
+
 			return $.ajax({
 			    url: url,
 			    type: 'PUT',
@@ -171,13 +180,15 @@
 
 			var settings = AnycookAPI._settings();
 			error = error || settings.error;
+            var sessionId = settings.sessionId;
+            var url = settings.baseUrl + api + (sessionId ? ';jsessionid='+sessionId : '');
 
 			if(!(typeof data === 'string')){
 				data = JSON.stringify(data);
 			}
 
 			return $.ajax({
-			    url: settings.baseUrl+api+'?appId='+settings.appId,
+			    url: url+'?appId='+settings.appId,
 			    type: 'PUT',
 			    data : data,
 			    dataType : 'json',
@@ -193,13 +204,15 @@
 			api = api || '';
 			data = data || {};
 			callback = callback || function(){};
-			
+
 			var settings = AnycookAPI._settings();
 			error = error || settings.error;
+            var sessionId = settings.sessionId;
+            var url = settings.baseUrl + api + (sessionId ? ';jsessionid='+sessionId : '');
 
 			$.extend(data, {appId : settings.appId});
 			return $.ajax({
-			    url: settings.baseUrl+api,
+			    url: url,
 			    type: 'DELETE',
 			    data:data,
 			    xhrFields:{
@@ -235,13 +248,13 @@
 					console.error(xhr);
 				}
 			};
-			
+
 			if(options){
 				$.extend(settings, options);
 			}
-			
-			AnycookAPI._settings(settings);
-			
+
+            AnycookAPI._settings(settings);
+
 			var numScripts = settings.scripts.length;
 			var numLoaded = 0;
 
@@ -256,8 +269,20 @@
 				var script = settings.scripts[i];
 				$.getScript(settings.baseUrl+'/js/anycookapi.'+script+'.js', checkLoaded);
 			}
-				
-			return dfd.promise();
+
+            var dfd2 = $.Deferred();
+
+            //get session id
+            $.when(dfd.promise()).then(function(){
+                AnycookAPI.session.id(function(sessionId){
+                    settings.sessionId = sessionId;
+                    console.log(sessionId);
+                    AnycookAPI._settings(settings);
+                    dfd2.resolve();
+                });
+            });
+
+			return dfd2.promise();
 		}
 	};
 })( jQuery, this);
