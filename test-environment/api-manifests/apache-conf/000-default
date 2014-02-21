@@ -2,8 +2,7 @@
 	ServerAdmin webmaster@localhost
 	AddDefaultCharset utf-8
 
-	DocumentRoot /web
-    SetEnvIf Request_URI "/js/*" no-jk
+	DocumentRoot /var/www
     SetEnvIf Request_URI "/images/*" no-jk
 	JkMount /* worker1
 
@@ -13,7 +12,7 @@
 		Options FollowSymLinks
 		AllowOverride None
 	</Directory>
-	<Directory /web>
+	<Directory /var/www>
 		Options Indexes FollowSymLinks MultiViews
 		AllowOverride All
 		Order allow,deny
