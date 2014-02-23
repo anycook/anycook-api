@@ -157,29 +157,6 @@ class tomcat7 {
 	}
 }
 
-
-
-
-
-# Class: sass
-#
-#
-class sass {
-	package { "sass":
-		ensure => installed,
-		provider => 'gem',
-		
-	}
-
-	exec { "sass --watch scss:css &":
-		require => Package["sass"],
-		path => "/opt/vagrant_ruby/bin/",
-		cwd => "/var/www"
-		#hasrestart => true,
-		#hasstatus => true,
-	}
-}
-
 class mongodb {
   apt::source { 'mongodb':
     location   => 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart/',
