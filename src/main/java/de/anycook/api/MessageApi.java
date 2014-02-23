@@ -172,7 +172,7 @@ public class MessageApi {
 	@POST
 	@Path("{sessionId}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void answerSession(@PathParam("sessionId") int sessionId, AnswerMessage message){
+	public void answerSession(@PathParam("sessionId") int sessionId, String message){
 		if(message == null){
 			logger.info("text was null");
 			throw new WebApplicationException(400);
@@ -183,7 +183,7 @@ public class MessageApi {
         try {
             session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
-            MessageSession.getSession(sessionId, userId).newMessage(userId, message.text);
+            MessageSession.getSession(sessionId, userId).newMessage(userId, message);
         } catch (IOException | SQLException | DBMessage.SessionNotFoundException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -215,10 +215,6 @@ public class MessageApi {
         public String toString() {
             return String.format("{recipients : %s, text : %s}", StringUtils.join(recipients, ","), text);
         }
-    }
-
-    public static class AnswerMessage {
-        public String text;
     }
 
 }
