@@ -20,7 +20,8 @@ package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBMessage;
-import de.anycook.messages.*;
+import de.anycook.messages.Message;
+import de.anycook.messages.MessageSession;
 import de.anycook.messages.providers.MessageNumberProvider;
 import de.anycook.messages.providers.MessageProvider;
 import de.anycook.messages.providers.MessageSessionProvider;
@@ -28,7 +29,6 @@ import de.anycook.session.Session;
 import de.anycook.user.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.glassfish.jersey.server.ManagedAsync;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -59,7 +59,6 @@ public class MessageApi {
 	}
 
     @GET
-    @ManagedAsync
     @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse, @QueryParam("lastChange") Long lastChange){
         asyncResponse.setTimeoutHandler(new TimeoutHandler() {
@@ -117,7 +116,6 @@ public class MessageApi {
 	}
 
     @GET
-    @ManagedAsync
     @Path("number")
     @Produces(MediaType.APPLICATION_JSON)
     public void getMessageNumber(@Suspended AsyncResponse asyncResponse, @QueryParam("lastNum") int lastNumber){
@@ -142,7 +140,6 @@ public class MessageApi {
 
     @GET
     @Path("{sessionId}")
-    @ManagedAsync
     @Produces(MediaType.APPLICATION_JSON)
     public void getMessagesFromSession(@Suspended AsyncResponse asyncResponse, @PathParam("sessionId") int sessionId,
                                        @QueryParam("lastId") Integer lastId){

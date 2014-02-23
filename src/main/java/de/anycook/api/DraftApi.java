@@ -27,7 +27,6 @@ import de.anycook.recipe.Recipe;
 import de.anycook.session.Session;
 import de.anycook.utils.DaemonThreadFactory;
 import org.apache.log4j.Logger;
-import org.glassfish.jersey.server.ManagedAsync;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -98,7 +97,6 @@ public class DraftApi {
 
     @GET
     @Path("num")
-    @ManagedAsync
     @Produces(MediaType.APPLICATION_JSON)
     public void getDraftNum(@QueryParam("lastNum") Integer lastNum,
                             @Suspended AsyncResponse asyncResponse){

@@ -48,7 +48,6 @@ public class DiscussionApi {
     @Context HttpServletRequest request;
 
     @GET
-    @ManagedAsync
     @Path("{recipeName}")
     @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse, @PathParam("recipeName") final String recipeName,
