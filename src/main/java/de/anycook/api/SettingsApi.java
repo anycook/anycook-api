@@ -97,6 +97,8 @@ public class SettingsApi {
     @Path("email")
     @Consumes(MediaType.APPLICATION_JSON)
     public void updateMail(String newMail){
+        if(newMail == null) throw new WebApplicationException(Response.Status.BAD_REQUEST);
+
         Session session = Session.init(request.getSession());
         try {
             session.checkLogin(hh.getCookies());
