@@ -25,7 +25,6 @@ import de.anycook.discussion.Discussion;
 import de.anycook.discussion.DiscussionProvider;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
-import org.glassfish.jersey.server.ManagedAsync;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
