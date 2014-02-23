@@ -129,6 +129,22 @@ public class SettingsApi {
         }
     }
 
+    @PUT
+    @Path("password")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void changePassword(NewPassword password){
+        Session session = Session.init(request.getSession());
+        try {
+            session.checkLogin(hh.getCookies());
+            User user = session.getUser();
+            if(!User.checkPassword(password.newPassword) || !user.setNewPassword(password.oldPassword, password.newPassword))
+                throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        } catch (IOException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GET
     @Path("notification")
     @Produces(MediaType.APPLICATION_JSON)
@@ -161,6 +177,11 @@ public class SettingsApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
+    }
+
+    public static class NewPassword{
+        public String oldPassword;
+        public String newPassword;
     }
 
 }
