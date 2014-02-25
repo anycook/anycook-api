@@ -18,12 +18,15 @@
 
 package de.anycook.api;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
+import de.anycook.conf.Configuration;
+import de.anycook.session.Session;
+import de.anycook.upload.RecipeUploader;
+import de.anycook.upload.UploadHandler;
+import de.anycook.upload.UserUploader;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.log4j.Logger;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -31,16 +34,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.log4j.Logger;
-
-import de.anycook.session.Session;
-import de.anycook.upload.RecipeUploader;
-import de.anycook.upload.UploadHandler;
-import de.anycook.upload.UserUploader;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 
 
 @Path("upload")
@@ -101,7 +100,9 @@ public class UploadApi {
             String newFilename = upload.saveFile(tempFile);
             if(type.equals("user"))
                 session.getUser().setImage(newFilename);
-            String path = String.format("/images/%s/big/%s", type, newFilename);
+
+            String basePath = Configuration.getPropertyImageBasePath();
+            String path = String.format("%s%s/big/%s", basePath, type, newFilename);
             return  Response.created(new URI(path)).build();
         } catch (SQLException | IOException | URISyntaxException e) {
             logger.error(e, e);
