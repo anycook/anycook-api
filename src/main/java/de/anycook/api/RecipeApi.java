@@ -18,9 +18,11 @@
 
 package de.anycook.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSaveRecipe;
+import de.anycook.recipe.Views;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.newrecipe.NewRecipe;
 import de.anycook.recipe.Recipe;
@@ -95,6 +97,7 @@ public class RecipeApi {
 	
 	@GET
 	@Path("{recipeName}")
+    @JsonView(Views.RecipeView.class)
 	public Recipe getRecipe(@PathParam("recipeName") String recipeName){
         try {
             return Recipe.init(recipeName);
@@ -162,6 +165,7 @@ public class RecipeApi {
     //version
 	@GET
 	@Path("{recipeName}/{versionid}")
+    @JsonView(Views.RecipeView.class)
 	public Recipe getVersion(@PathParam("recipeName") String recipeName,
 			@PathParam("versionid") int versionid){
         try {

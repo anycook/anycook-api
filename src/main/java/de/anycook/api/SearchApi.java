@@ -18,21 +18,19 @@
 
 package de.anycook.api;
 
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.HashSet;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.google.common.collect.Multimap;
+import de.anycook.api.util.MediaType;
+import de.anycook.recipe.Views;
+import de.anycook.search.Query;
+import de.anycook.search.Search;
+import de.anycook.search.SearchResult;
+import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-
-import de.anycook.api.util.MediaType;
-import de.anycook.search.Query;
-import org.apache.log4j.Logger;
-
-import com.google.common.collect.Multimap;
-
-import de.anycook.search.Search;
-import de.anycook.search.SearchResult;
+import java.io.IOException;
+import java.sql.SQLException;
 
 
 @Path("search")
@@ -41,6 +39,7 @@ public class SearchApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
 	@POST
+    @JsonView(Views.ResultRecipeView.class)
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public SearchResult search(Query query){
