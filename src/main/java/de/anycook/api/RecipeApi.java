@@ -51,10 +51,11 @@ public class RecipeApi {
 	Logger logger = Logger.getLogger(getClass());
 
 	@GET
-	public List<String> getAll(@QueryParam("userId") Integer userId){
+    @JsonView(Views.ResultRecipeView.class)
+	public List<Recipe> getAll(@QueryParam("userId") Integer userId){
         try{
             if(userId != null)
-                return Recipe.getRecipeNamesFromUser(userId);
+                return Recipe.getRecipesFromUser(userId);
             else
                 return Recipe.getAll();
         } catch (Exception e){

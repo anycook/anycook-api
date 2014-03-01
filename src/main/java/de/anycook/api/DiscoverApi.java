@@ -18,8 +18,11 @@
 
 package de.anycook.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
 import de.anycook.discover.Discover;
+import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Views;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import org.apache.log4j.Logger;
@@ -42,7 +45,8 @@ public class DiscoverApi {
 	@GET
 	@Path("recommended")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> getDiscoverRecommended(@Context HttpHeaders hh,
+    @JsonView(Views.ResultRecipeView.class)
+	public List<Recipe> getDiscoverRecommended(@Context HttpHeaders hh,
 			@Context HttpServletRequest request,
 			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
 		Session session = Session.init(request.getSession());
@@ -63,7 +67,8 @@ public class DiscoverApi {
 	@GET
 	@Path("tasty")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> getDiscoverTasty(
+    @JsonView(Views.ResultRecipeView.class)
+    public List<Recipe> getDiscoverTasty(
 			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
             return Discover.getTastyRecipes(recipeNumber);
@@ -76,7 +81,8 @@ public class DiscoverApi {
 	@GET
 	@Path("new")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> getDiscoverNew(
+    @JsonView(Views.ResultRecipeView.class)
+    public List<Recipe> getDiscoverNew(
 			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
             return Discover.getNewestRecipes(recipeNumber);
