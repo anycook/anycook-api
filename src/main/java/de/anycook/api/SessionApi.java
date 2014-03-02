@@ -107,6 +107,23 @@ public class SessionApi {
             }
         }
     }
+
+    @POST
+    @Path("facebook")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void facebookLogin(@Context HttpServletRequest request, String signedRequest){
+        Session session = Session.init(request.getSession(true));
+        try {
+            session.facebookLogin(signedRequest);
+        } catch (IOException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (User.LoginException|DBUser.UserNotFoundException e) {
+            logger.warn(e);
+            throw new WebApplicationException(Response.Status.FORBIDDEN);
+        }
+    }
 	
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
