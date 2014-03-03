@@ -39,7 +39,7 @@ public class SearchApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
 	@POST
-    @JsonView(Views.ResultRecipeView.class)
+    @JsonView(Views.TasteNumView.class)
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public SearchResult search(Query query){

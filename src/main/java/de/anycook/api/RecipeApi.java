@@ -56,8 +56,7 @@ public class RecipeApi {
         try{
             if(userId != null)
                 return Recipe.getRecipesFromUser(userId);
-            else
-                return Recipe.getAll();
+            return Recipe.getAll();
         } catch (Exception e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -164,8 +163,19 @@ public class RecipeApi {
 	
 
     //version
+    @GET
+    @Path("{recipeName}/version")
+    public List<Recipe> getAllVersion(@PathParam("recipeName") String recipeName){
+        try {
+            return Recipe.getAllVersions(recipeName);
+        } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 	@GET
-	@Path("{recipeName}/{versionid}")
+	@Path("{recipeName}/version/{versionid}")
     @JsonView(Views.RecipeView.class)
 	public Recipe getVersion(@PathParam("recipeName") String recipeName,
 			@PathParam("versionid") int versionid){
@@ -181,7 +191,7 @@ public class RecipeApi {
     }
 
     @GET
-    @Path("{recipeName}/{versionId}/ingredients")
+    @Path("{recipeName}/version/{versionId}/ingredients")
     public List<Ingredient> getVersionIngredients(@PathParam("recipeName") String recipeName,
                                @PathParam("versionId") int versionId){
         try {
@@ -193,7 +203,7 @@ public class RecipeApi {
     }
 
     @GET
-    @Path("{recipeName}/{versionId}/steps")
+    @Path("{recipeName}/version/{versionId}/steps")
     public List<Step> getVersionSteps(@PathParam("recipeName") String recipeName,
                                     @PathParam("versionId") int versionId){
         try {
