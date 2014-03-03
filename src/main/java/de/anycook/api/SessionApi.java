@@ -42,10 +42,12 @@ import java.util.Map;
 public class SessionApi {
 	
 	private final Logger logger;
+    private final String cookieDomain;
 
 	
 	public SessionApi() {
 		logger = Logger.getLogger(getClass());
+        cookieDomain = "."+de.anycook.conf.Configuration.getPropertyCookieDomain();
 	}
 	
 	@GET
@@ -89,7 +91,8 @@ public class SessionApi {
 
             if(auth.stayLoggedIn){
                 logger.debug(String.format("stayLoggedIn"));
-                NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", ".anycook.de", "", 7 * 24 * 60 *60, false);
+                NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", cookieDomain,
+                        "", 7 * 24 * 60 * 60, false);
                 response.cookie(cookie);
             }
 
