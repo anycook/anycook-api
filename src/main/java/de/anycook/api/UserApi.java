@@ -51,8 +51,9 @@ public class UserApi {
 	
 	@SuppressWarnings("unchecked")
 	@GET
+    @JsonView(Views.PublicUserView.class)
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Integer> getUsers(){
+	public List<User> getUsers(){
         try {
             return User.getAll();
         } catch (SQLException e) {
