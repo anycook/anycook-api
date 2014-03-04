@@ -43,11 +43,13 @@ public class SessionApi {
 	
 	private final Logger logger;
     private final String cookieDomain;
+    private final boolean cookieSecure;
 
 	
 	public SessionApi() {
 		logger = Logger.getLogger(getClass());
         cookieDomain = de.anycook.conf.Configuration.getPropertyCookieDomain();
+        cookieSecure = !de.anycook.conf.Configuration.isInDeveloperMode();
 	}
 	
 	@GET
@@ -92,7 +94,7 @@ public class SessionApi {
             if(auth.stayLoggedIn){
                 logger.debug(String.format("stayLoggedIn"));
                 NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", cookieDomain,
-                        "", 7 * 24 * 60 * 60, false);
+                        "", 7 * 24 * 60 * 60, cookieSecure, true);
                 response.cookie(cookie);
             }
 
