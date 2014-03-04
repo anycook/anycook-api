@@ -117,12 +117,13 @@ public class UserApi {
 	@GET
 	@Path("recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
+    @JsonView(de.anycook.recipe.Views.ResultRecipeView.class)
 	public List<Recipe> getRecommendations(@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
 		int userId = session.getUser().getId();
         try {
-            return Recommendation.recommend(userId);
+            return Recommendation.recommend(userId, 20);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
