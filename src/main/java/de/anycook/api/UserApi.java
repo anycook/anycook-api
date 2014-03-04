@@ -24,6 +24,7 @@ import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.discussion.Discussion;
 import de.anycook.recipe.Recipe;
+import de.anycook.recommendation.Recommendation;
 import de.anycook.session.Session;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
@@ -112,7 +113,7 @@ public class UserApi {
         }
     }
 
-	/*@GET
+	@GET
 	@Path("recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Recipe> getRecommendations(@Context HttpServletRequest request){
@@ -125,7 +126,7 @@ public class UserApi {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-    }*/
+    }
 	
 	@GET
 	@Path("{userId}")
