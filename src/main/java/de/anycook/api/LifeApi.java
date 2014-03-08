@@ -21,9 +21,11 @@
  */
 package de.anycook.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
 import de.anycook.news.life.Life;
 import de.anycook.news.life.LifeHandler;
+import de.anycook.user.views.Views;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
 
@@ -47,6 +49,7 @@ public class LifeApi {
 
 	@GET
     @ManagedAsync
+    @JsonView(Views.ResultView.class)
 	@Produces(MediaType.APPLICATION_JSON)
 	public void getLives(@Suspended AsyncResponse asyncResponse, @QueryParam("newestid") Integer newestId,
                          @QueryParam("oldestid") Integer oldestId){

@@ -18,6 +18,7 @@
 
 package de.anycook.api;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.Message;
@@ -27,6 +28,7 @@ import de.anycook.messages.providers.MessageProvider;
 import de.anycook.messages.providers.MessageSessionProvider;
 import de.anycook.session.Session;
 import de.anycook.user.User;
+import de.anycook.user.views.Views;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -60,6 +62,7 @@ public class MessageApi {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @JsonView(Views.ResultView.class)
     public void get(@Suspended final AsyncResponse asyncResponse, @QueryParam("lastChange") Long lastChange){
         asyncResponse.setTimeoutHandler(new TimeoutHandler() {
             @Override
@@ -97,7 +100,7 @@ public class MessageApi {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void newMessage(NewMessage message, @Context HttpHeaders hh, @Context HttpServletRequest request){
+    public void newMessage(NewMessage message, @Context HttpHeaders hh, @Context HttpServletRequest request){
         if(message == null)
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
 
@@ -141,6 +144,7 @@ public class MessageApi {
     @GET
     @Path("{sessionId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @JsonView(Views.ResultView.class)
     public void getMessagesFromSession(@Suspended AsyncResponse asyncResponse, @PathParam("sessionId") int sessionId,
                                        @QueryParam("lastId") Integer lastId){
         Session session = Session.init(req.getSession());
