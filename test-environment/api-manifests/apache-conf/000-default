@@ -8,6 +8,8 @@
 
     Alias /images /localImages
 
+    AddOutputFilterByType DEFLATE application/json
+
 	<Directory />
 		Options FollowSymLinks
 		AllowOverride None

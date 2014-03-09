@@ -67,10 +67,11 @@ class  apache2 {
 	}
 
 	file { "000-default":
-		ensure => file,
+        ensure => link,
+        force => true,
 		path => "/etc/apache2/sites-enabled/000-default",
 		require => Package["apache2"],
-		source => "${manifests}/apache-conf/000-default",
+		target => "${manifests}/apache-conf/000-default",
 
 	}
 
