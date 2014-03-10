@@ -18,14 +18,12 @@
 
 package de.anycook.api;
 
-import de.anycook.api.drafts.DraftChecker;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mongo.RecipeDrafts;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.newrecipe.DraftNumberProvider;
 import de.anycook.recipe.Recipe;
 import de.anycook.session.Session;
-import de.anycook.utils.DaemonThreadFactory;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,24 +37,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Path("/drafts")
 public class DraftApi {
-	private static ExecutorService exec;
-    private static final int numThreads = 10;
-	
-	public static void init() {
-		exec = Executors.newCachedThreadPool(DaemonThreadFactory.singleton());
-        for(int i = 0; i<numThreads; i++){
-        	exec.execute(new DraftChecker());
-        }
-	}
-	
-	public static void destroyThreadPool() {
-		exec.shutdownNow();
-	}
 
     private Logger logger;
     @Context HttpHeaders hh;
