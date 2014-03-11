@@ -22,8 +22,10 @@ import java.util.Date;
 
 
 public abstract class News implements Comparable<News> {
-    private final int id;
-    private final Date datetime;
+    private int id;
+    private Date datetime;
+
+    public News(){}
 
     public News(int id, Date datetime) {
         this.id = id;
@@ -36,6 +38,14 @@ public abstract class News implements Comparable<News> {
 
     public Date getDatetime() {
         return datetime;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setDatetime(Date datetime) {
+        this.datetime = datetime;
     }
 
     @Override

@@ -39,7 +39,7 @@ public enum DraftNumberProvider {
             Logger.getLogger(MessageSession.class).debug("reading response");
             try {
                 AsyncResponse response = queue.take();
-                if(response.isSuspended()) response.resume(newNumber);
+                if(response.isSuspended()) response.resume(String.valueOf(newNumber));
             } catch (InterruptedException e) {
                 logger.warn(e, e);
             }

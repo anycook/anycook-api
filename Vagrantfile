@@ -6,7 +6,7 @@ Vagrant.configure("2") do |config|
 
     api.vm.provider :virtualbox do |vb|
     #   vb.gui = true
-        vb.customize ["modifyvm", :id, "--memory", "1024"]
+        vb.customize ["modifyvm", :id, "--memory", "2048"]
     end
 
     api.vm.network :private_network, ip: "10.1.0.200"
@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
      db.vm.network :private_network, ip: "10.1.0.201"
      db.vm.network "forwarded_port", guest: 3306, host: 3333
 
-     db.vm.synced_folder "anycook-core/doc/mysql", "/mysql"
+     db.vm.synced_folder "doc/mysql", "/mysql"
 
      db.vm.provision :puppet do |puppet|
         puppet.manifests_path = "test-environment/db-manifests"

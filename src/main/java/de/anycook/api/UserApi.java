@@ -43,16 +43,15 @@ import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
 
-
 @Path("/user")
 public class UserApi {
 	private final Logger logger = Logger.getLogger(getClass());
 	
 	
-	@SuppressWarnings("unchecked")
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public List<User> getUsers(){
+        logger.info("test");
         try {
             return User.getAll();
         } catch (SQLException e) {
@@ -132,7 +131,7 @@ public class UserApi {
 	@GET
 	@Path("{userId}")
     @JsonView(Views.PublicUserView.class)
-	@Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public User getUser(@PathParam("userId") int userId){
         try {
             return User.init(userId);

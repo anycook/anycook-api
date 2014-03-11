@@ -88,7 +88,7 @@ public class DraftApi {
         RecipeDrafts drafts = new RecipeDrafts();
 
         int newNum = drafts.count(userId);
-        if(lastNum == null || newNum != lastNum) asyncResponse.resume(newNum);
+        if(lastNum == null || newNum != lastNum) asyncResponse.resume(String.valueOf(newNum));
         else DraftNumberProvider.INSTANCE.suspend(userId, asyncResponse);
     }
 	

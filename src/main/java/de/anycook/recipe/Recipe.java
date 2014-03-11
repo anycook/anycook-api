@@ -18,7 +18,6 @@
 
 package de.anycook.recipe;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -111,88 +110,43 @@ public class Recipe implements Comparable<Recipe> {
         this.views = views;
     }
 
-    @JsonView(Views.ResultRecipeView.class)
+    //getter
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @JsonView(Views.ResultRecipeView.class)
     public int getActiveId() {
         return activeId;
     }
 
-    public void setActiveId(int activeId) {
-        this.activeId = activeId;
-    }
-
-    @JsonView(Views.RecipeView.class)
     public String getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    @JsonView(Views.ResultRecipeView.class)
     public String getDescription() {
         return description;
     }
 
-    @JsonView(Views.ResultRecipeView.class)
     public Image getImage() {
         return image;
     }
 
-    public void setImage(String image) {
-        this.image = new RecipeImage(image);
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @JsonView(Views.ResultRecipeView.class)
     public Time getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
-        this.time = time;
-    }
-
-    @JsonView(Views.RecipeView.class)
     public int getSkill() {
         return skill;
     }
 
-    public void setSkill(int skill) {
-        this.skill = skill;
-    }
-
-    @JsonView(Views.RecipeView.class)
     public int getCalorie() {
         return calorie;
     }
 
-    public void setCalorie(int calorie) {
-        this.calorie = calorie;
-    }
-
-    @JsonView(Views.RecipeView.class)
     public int getPersons() {
         return persons;
     }
 
-    public void setPersons(int persons) {
-        this.persons = persons;
-    }
-
-    @JsonView(Views.TasteNumView.class)
     public int getTasteNum() {
         try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
             return dbGetRecipe.getTasteNum(name);
@@ -203,36 +157,69 @@ public class Recipe implements Comparable<Recipe> {
 
     }
 
-    @JsonView(Views.RecipeView.class)
     public int getId() {
         return id;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    //setter
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setId(int id) {
         this.id = id;
     }
 
-    @JsonView(Views.RecipeView.class)
-    public User getAuthor() {
-        return author;
+    public void setActiveId(int activeId) {
+        this.activeId = activeId;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setTime(Time time) {
+        this.time = time;
+    }
+
+    public void setSkill(int skill) {
+        this.skill = skill;
+    }
+
+    public void setCalorie(int calorie) {
+        this.calorie = calorie;
+    }
+
+    public void setPersons(int persons) {
+        this.persons = persons;
     }
 
     public void setAuthor(User author) {
         this.author = author;
     }
 
-    @JsonView(Views.ResultRecipeView.class)
-    public Date getCreated() {
-        return created;
-    }
-
     public void setCreated(Date created) {
         this.created = created;
-    }
-
-    @JsonView(Views.ResultRecipeView.class)
-    public int getViews() {
-        return views;
     }
 
     public void setViews(int views) {
