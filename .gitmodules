@@ -1,6 +1,3 @@
-[submodule "anycook-core"]
-	path = anycook-core
-	url = https://github.com/anycook/anycook-core.git
 [submodule "test-environment/puppet-modules/mysql"]
 	path = test-environment/puppet-modules/mysql
 	url = https://github.com/puppetlabs/puppetlabs-mysql.git

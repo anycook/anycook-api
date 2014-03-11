@@ -51,7 +51,6 @@ public class UserApi {
 	
 	@SuppressWarnings("unchecked")
 	@GET
-    @JsonView(Views.PublicUserView.class)
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> getUsers(){
         try {

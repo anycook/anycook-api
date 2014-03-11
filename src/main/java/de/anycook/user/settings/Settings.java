@@ -16,25 +16,18 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.user.settings;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import org.apache.log4j.Logger;
 
-import javax.ws.rs.ApplicationPath;
+public abstract class Settings {
+    protected final Logger logger;
+    protected final int userId;
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
 
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
-
+    public Settings(int userId) {
+        logger = Logger.getLogger(getClass());
+        this.userId = userId;
     }
 
 

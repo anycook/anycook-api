@@ -1,0 +1,138 @@
+{namespace de.anycook.notification.message}
+
+/**
+ * Message body when resetting password
+ * @param recipientName name of the recipient.
+ * @param baseUrl Website domain
+ * @param resetKey unique key needed to reset password
+ */
+{template .resetPassword}
+    Hallo {$recipientName},{\r}{\n}{\n}
+    Um dein Passwort zurückzusetzen gehe bitte zu folgendem Link:{\r}{\n}
+    http://{$baseUrl}#/resetpassword/{$resetKey}{\r}{\n}{\n}
+    Solltest du dein Passwort nicht zurücksetzen wollen, kannst du diese Mail ignorieren.{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Deine anycook-Team!
+{/template}
+
+/**
+ * Message body to activate account
+ * @param recipientName name of the recipient.
+ * @param baseUrl Website domain
+ * @param activationKey unique key needed to activate a new account
+ */
+{template .accountActivation}
+    Hallo {$recipientName},{\r}{\n}{\n}
+    Gehe bitte zu diesem Link um deinen anycook-Account zu aktivieren:{\r}{\n}
+    http://{$baseUrl}#/activate/{$activationKey}{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team.
+{/template}
+
+/**
+ * Message body when a user want to change email
+ * @param recipientName name of the user
+ * @param baseUrl Website domain
+ * @param activationKey unique key needed to activate a new mail address
+ */
+{template .newMail}
+    Hallo {$recipientName},{\r}{\n}{\n}
+    Um diese EMailaddresse zu aktivieren folge bitte diesem Link:{\r}{\n}
+    http://{$baseUrl}#/confirmMail/{$activationKey}{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team
+{/template}
+
+/**
+ * Message body when receiving a new message
+ * @param recipientName name of the user
+ * @param sender name of the user sent the message
+ * @param content content of the message
+ */
+{template .newMessage}
+    Hallo {$recipientName},{\r}{\n}{\n}
+    {$sender} hat dir eine neue Nachricht geschrieben:{\r}{\n}{\n}
+    {$content}
+    {\r}{\n}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team.
+{/template}
+
+/**
+ * Message body when a tag has been accepted
+ * @param tagName name of the accepted tag
+ * @param recipeName name of the recipe the tag has been submitted for
+ */
+{template .tagAccepted}
+    Dein Tag "{$tagName}" für "{$recipeName}" wurde angenommen!{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team.
+{/template}
+
+/**
+ * Message body when a tag has been denied
+ * @param tagName name of the denied tag
+ * @param recipeName name of the recipe the tag has been submitted for
+ */
+{template .tagDenied}
+    Dein Tag "{$tagName}" für "{$recipeName}" wurde leider abgelehnt. Wir sind nicht der Meinung, dass dieser Tag zu diesem Gericht passt.{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team
+{/template}
+
+/**
+ * Message body when discusses in an observed recipe
+  * @param userName name of the user discussed
+  * @param recipeName name of the recipe the discussion belongs to
+  * @param content content of the contribution
+ */
+{template .discussion}
+    {$userName} schrieb einen neuen Diskussionsbeitrag zu {$recipeName}:{\r}{\n}
+    {$content}{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team
+{/template}
+
+/**
+ * Message body when someone has answered to a discussion
+ * @param userName name of the user replied to your contribution
+ * @param recipeName name of the recipe the discussion belongs to
+ * @param content content of the contribution
+ */
+{template .discussionAnswer}
+    {$userName} antwortete auf deinen Diskussionsbeitrag zu {$recipeName}:{\r}{\n}
+    {$content}{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team
+{/template}
+
+/**
+ * Message body if someone likes your recipe
+ * @param userName name of the user who likes your recipe
+ * @param recipeName name your recipe the user likes
+ */
+{template .tastes}
+    {$userName} schmeckt dein Rezept {$recipeName}.{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team
+{/template}
+
+/**
+ * Message body when one of my recipes has been activated
+ * @param recipeName name of the activated recipe
+ */
+{template .recipeActivation}
+    Deine Version von {$recipeName} wurde aktiviert!{\r}{\n}
+    {\r}{\n}
+    Viele Grüße,{\r}{\n}
+    Dein anycook-Team
+{/template}
+

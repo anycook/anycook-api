@@ -16,26 +16,33 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.social;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import org.scribe.model.Token;
+import org.scribe.oauth.OAuthService;
 
-import javax.ws.rs.ApplicationPath;
+import java.sql.SQLException;
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
+public abstract class Social {
+    protected static OAuthService service;
+    protected static String consumer_key = null;
+    protected static String secret_key = null;
+    protected static String callback = null;
 
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
-
+    protected Social() {
     }
 
 
+    public void addService(OAuthService s) {
+        service = s;
+    }
+
+    public OAuthService getService() {
+        return service;
+    }
+
+    public abstract Token exchangeRequestForAccess(String veri_token, Integer users_id) throws SQLException;
+
+
+    public abstract String getAuthUrl();
 }

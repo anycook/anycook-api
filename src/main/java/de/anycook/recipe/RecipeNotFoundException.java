@@ -16,26 +16,21 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.recipe;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+public class RecipeNotFoundException extends Exception {
 
-import javax.ws.rs.ApplicationPath;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 4150748849111849590L;
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
-
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
-
+    public RecipeNotFoundException() {
+        super();
     }
 
+    public RecipeNotFoundException(String s) {
+        super(s);
+    }
 
 }

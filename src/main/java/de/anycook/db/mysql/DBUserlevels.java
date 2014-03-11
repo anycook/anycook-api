@@ -16,26 +16,24 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.db.mysql;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-import javax.ws.rs.ApplicationPath;
+public class DBUserlevels extends DBHandler {
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
-
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
-
+    public DBUserlevels() throws SQLException {
+        super();
     }
 
-
+    public void newUserlevel(int id, String shortName, String fullName) throws SQLException {
+        PreparedStatement pStatement = connection.prepareStatement("INSERT INTO userlevels (id, shortname, fullname) " +
+                "VALUES (?, ?, ?)");
+        pStatement.setInt(1, id);
+        pStatement.setString(2, shortName);
+        pStatement.setString(3, fullName);
+        pStatement.executeUpdate();
+        logger.info("new userlevel " + fullName + " with id = " + id + " created");
+    }
 }

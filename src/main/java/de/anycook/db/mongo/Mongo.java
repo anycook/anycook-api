@@ -16,26 +16,38 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.db.mongo;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+import org.apache.log4j.Logger;
 
-import javax.ws.rs.ApplicationPath;
+import java.net.UnknownHostException;
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
+public class Mongo {
+    private MongoClient client = null;
+    protected final Logger logger;
 
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
+    protected Mongo() {
+        logger = Logger.getLogger(getClass());
+        try {
+            client = new MongoClient();
+        } catch (UnknownHostException e) {
+            logger.error(e);
+        }
 
     }
 
+    protected DBCollection getCollection(String collectionName) {
+        return client.getDB("anycook").getCollection(collectionName);
+    }
+
+    public void close() {
+        client.close();
+    }
+
+    protected void finalize() throws Throwable {
+        close();
+    }
 
 }

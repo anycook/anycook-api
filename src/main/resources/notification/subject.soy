@@ -1,0 +1,79 @@
+{namespace de.anycook.notification.subject}
+
+/**
+ * Mail subject if you want to reset your password
+ */
+{template .resetPassword}
+    Passwort zurücksetzen
+{/template}
+
+/**
+ * Mail subject to the account activation mail
+ */
+{template .accountActivation}
+    Herzlich willkommen bei anycook
+{/template}
+
+/**
+ * Mail subject if your tag has been accepted
+ * @param tagName name of the accepted tag
+ */
+{template .tagAccepted}
+    Dein Tag-Vorschlag "{$tagName}" wurde angenommen
+{/template}
+
+/**
+ * Mail subject if your tag has been denied
+ * @param tagName name of the denied tag
+ */
+{template .tagDenied}
+    Dein Tag-Vorschlag "{$tagName}" wurde abgelehnt
+{/template}
+
+/**
+ * Mail subject if someone discusses in one of your recipes
+ * @param recipeName name of the recipe the discussion belongs to
+ */
+{template .discussion}
+    Neuer Diskussionbeitrag für "{$recipeName}"
+{/template}
+
+/**
+ * Mail subject if your discussion article has been answered
+ * @param recipeName name of the recipe the discussion belongs to
+ */
+{template .discussionAnswer}
+    Neue Antwort auf einen deiner Diskussionbeiträge in {$recipeName}
+{/template}
+
+/**
+ * Subject if you want a new mail
+ */
+{template .newMail}
+    Neue Emailaddresse
+{/template}
+
+/**
+ * Subject when you receive a new message
+ * @param sender Name of the user who sends you a new Message
+ */
+{template .newMessage}
+    {$sender} hat dir eine neue Nachricht geschrieben
+{/template}
+
+/**
+ * Mail subject if someone likes your recipe
+ * @param userName name of the user who likes your recipe
+ * @param recipeName name your recipe the user likes
+ */
+{template .tastes}
+    "{$userName}" schmeckt dein Rezept {$recipeName}
+{/template}
+
+/**
+ * Mail subject when your recipe was activated
+ * @param recipeName name of the activated recipe
+ */
+{template .recipeActivation}
+    Deine Version von {$recipeName} wurde aktiviert
+{/template}

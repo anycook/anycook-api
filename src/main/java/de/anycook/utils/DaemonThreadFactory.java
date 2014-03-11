@@ -16,26 +16,24 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.utils;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import java.util.concurrent.ThreadFactory;
 
-import javax.ws.rs.ApplicationPath;
+public class DaemonThreadFactory implements ThreadFactory {
+    private static DaemonThreadFactory singleton = null;
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
-
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
-
+    public static DaemonThreadFactory singleton() {
+        if (singleton == null)
+            singleton = new DaemonThreadFactory();
+        return singleton;
     }
 
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread thread = new Thread(r);
+        thread.setDaemon(true);
+        return thread;
+    }
 
 }

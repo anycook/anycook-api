@@ -16,26 +16,26 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.db.lucene;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
+import org.apache.lucene.analysis.core.LowerCaseTokenizer;
+import org.apache.lucene.analysis.ngram.NGramTokenFilter;
+import org.apache.lucene.util.Version;
 
-import javax.ws.rs.ApplicationPath;
+import java.io.Reader;
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
 
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
+public class NGramAnalyzer extends Analyzer {
+
+    @Override
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        Tokenizer tokenizer = new LowerCaseTokenizer(Version.LUCENE_45, reader);
+        TokenStream filter = new NGramTokenFilter(Version.LUCENE_45, tokenizer, 1, 5);
+
+        return new TokenStreamComponents(tokenizer, filter);
 
     }
-
-
 }

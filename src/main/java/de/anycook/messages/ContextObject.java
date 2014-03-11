@@ -16,26 +16,14 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.api;
+package de.anycook.messages;
 
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
-import org.glassfish.jersey.server.ResourceConfig;
+import javax.servlet.AsyncContext;
 
-import javax.ws.rs.ApplicationPath;
+public class ContextObject {
+    public final AsyncContext context;
 
-/**
- * @author Jan Graßegger<jan@anycook.de>
- */
-@ApplicationPath("/*")
-public class Api extends ResourceConfig{
-    public Api(){
-        packages("de.anycook.api");
-
-        register(EntityFilteringFeature.class);
-        register(MultiPartFeature.class);
-
+    public ContextObject(AsyncContext context) {
+        this.context = context;
     }
-
-
 }
