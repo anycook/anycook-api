@@ -20,9 +20,11 @@ package de.anycook.discussion;
 
 import de.anycook.user.User;
 
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class DiscussionElement {
-    private final int id;
+    private int id;
     private int parentId;
     private User user;
     private String text;
@@ -32,6 +34,8 @@ public class DiscussionElement {
     private String datetime;
     private boolean active;
     private boolean likedByUser;
+
+    public DiscussionElement(){}
 
     public DiscussionElement(int id) {
         this.id = id;
@@ -132,6 +136,10 @@ public class DiscussionElement {
 
     public int getId() {
         return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

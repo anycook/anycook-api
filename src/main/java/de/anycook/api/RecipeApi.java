@@ -123,7 +123,7 @@ public class RecipeApi {
 	
 	@GET
 	@Path("{recipeName}/tags")
-	public List<String> getRecipeTags(@PathParam("recipeName") String recipeName){
+	public List<Tag> getRecipeTags(@PathParam("recipeName") String recipeName){
         try {
             return Tag.loadTagsFromRecipe(recipeName);
         } catch (SQLException e) {

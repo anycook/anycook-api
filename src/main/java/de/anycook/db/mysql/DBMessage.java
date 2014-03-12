@@ -81,7 +81,7 @@ public class DBMessage extends DBHandler {
             int id = data.getInt("id");
 
             String text = data.getString("messages.text");
-            Date datetime = DateParser.parseDateTime(data.getString("datetime"));
+            long datetime = data.getLong("datetime");
             boolean unread = isUnread(userId, sessionId, id);
 
             int senderId = data.getInt("sender");
@@ -110,7 +110,7 @@ public class DBMessage extends DBHandler {
         while (data.next()) {
             int id = data.getInt("messages.id");
             String text = data.getString("messages.text");
-            Date datetime = DateParser.parseDateTime(data.getString("datetime"));
+            long datetime = data.getLong("datetime");
             boolean unread = isUnread(userId, sessionId, id);
 
             int senderId = data.getInt("sender");
@@ -281,16 +281,15 @@ public class DBMessage extends DBHandler {
         return data.next();
     }
 
-    public Date lastChange(int sessionId) throws SQLException {
-        Date lastChange = null;
+    public Date lastChange(int sessionId) throws SQLException, SessionNotFoundException {
         PreparedStatement pStatement = connection.prepareStatement(
                 "SELECT datetime FROM messages WHERE message_sessions_id = ? ORDER BY datetime DESC LIMIT 1");
         pStatement.setInt(1, sessionId);
         ResultSet data = pStatement.executeQuery();
         if (data.next())
-            lastChange = DateParser.parseDateTime(data.getString("datetime"));
+            return DateParser.parseDateTime(data.getString("datetime"));
 
-        return lastChange;
+        throw new SessionNotFoundException(sessionId);
     }
 
     public void readMessage(int sessionId, int messageId, int userId) throws SQLException {

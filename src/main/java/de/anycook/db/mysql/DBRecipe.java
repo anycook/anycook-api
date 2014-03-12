@@ -83,21 +83,6 @@ public class DBRecipe extends DBHandler {
     }
 
 
-    public List<String> loadRecipeTags(String recipeName) throws SQLException {
-        List<String> tags = new LinkedList<>();
-        PreparedStatement pStatement = connection.prepareStatement(
-                "SELECT tags_name FROM gerichte_has_tags " +
-                        "WHERE gerichte_name = ?");
-        pStatement.setString(1, recipeName);
-        ResultSet data = pStatement.executeQuery();
-        while (data.next()) {
-            String tag = data.getString("tags_name");
-            tags.add(tag);
-        }
-
-        return tags;
-    }
-
 
     //tags
 

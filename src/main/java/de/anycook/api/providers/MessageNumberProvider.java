@@ -1,4 +1,4 @@
-package de.anycook.messages.providers;
+package de.anycook.api.providers;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -7,19 +7,18 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.container.AsyncResponse;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.concurrent.*;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
-public enum MessageSessionProvider {
+public enum MessageNumberProvider {
     INSTANCE;
 
     private final Logger logger;
     private final Cache<Integer, BlockingQueue<AsyncResponse>> suspended;
 
-    private MessageSessionProvider(){
+    private MessageNumberProvider(){
         logger = Logger.getLogger(getClass());
         suspended = CacheBuilder.newBuilder()
                 .maximumSize(10000)
@@ -32,13 +31,13 @@ public enum MessageSessionProvider {
         BlockingQueue<AsyncResponse> queue = suspended.getIfPresent(userId);
         if(queue == null) return;
 
-        List<MessageSession> sessions = MessageSession.getSessionsFromUser(userId);
+        int newNumber = MessageSession.getNewMessageNum(userId);
 
         while(!queue.isEmpty()){
             Logger.getLogger(MessageSession.class).debug("reading response");
             try {
                 AsyncResponse response = queue.take();
-                if(response.isSuspended()) response.resume(sessions);
+                if(response.isSuspended()) response.resume(newNumber);
             } catch (InterruptedException e) {
                 logger.warn(e, e);
             }

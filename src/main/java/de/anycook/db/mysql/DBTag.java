@@ -48,27 +48,33 @@ public class DBTag extends DBHandler {
         }
     }
 
-    public String get(String tag) throws SQLException, TagNotFoundException {
-        PreparedStatement pStatement = connection.prepareStatement("SELECT name FROM tags WHERE name= ?");
+    public Tag get(String tag) throws SQLException, TagNotFoundException {
+        PreparedStatement pStatement = connection.prepareStatement("SELECT name, count(tags_name) AS counter FROM tags " +
+                "LEFT JOIN gerichte_has_tags ON name = tags_name WHERE name = ?");
 
         pStatement.setString(1, tag);
         ResultSet data = pStatement.executeQuery();
-        if (data.next())
-            return data.getString("name");
+        if (data.next()){
+            String tagName = data.getString("name");
+            int counter = data.getInt("counter");
+            return new Tag(tagName, counter);
+        }
         throw new TagNotFoundException(tag);
     }
 
-    public Tag getTagRecipes(String tagName) throws SQLException, TagNotFoundException {
-        tagName = get(tagName);
-
-        PreparedStatement pStatement = connection.prepareStatement("SELECT gerichte_name FROM gerichte_has_tags WHERE tags_name= ? GROUP BY gerichte_name");
-        pStatement.setString(1, tagName);
-        ResultSet data = pStatement.executeQuery();
-        List<String> recipes = new LinkedList<>();
+    public List<Tag> getTagsForRecipe(String recipeName) throws SQLException {
+        List<Tag> tags = new LinkedList<>();
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT name, count(tags_name) AS counter FROM tags " +
+                "LEFT JOIN gerichte_has_tags ON name = tags_name WHERE gerichte_name = ? GROUP BY name");
+        preparedStatement.setString(1, recipeName);
+        ResultSet data = preparedStatement.executeQuery();
         while (data.next()) {
-            recipes.add(data.getString("gerichte_name"));
+            String tag = data.getString("name");
+            int count = data.getInt("counter");
+            tags.add(new Tag(tag, count));
         }
-        return new Tag(tagName, recipes);
+
+        return tags;
     }
 
     public int getTotal() {

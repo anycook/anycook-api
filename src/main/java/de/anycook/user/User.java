@@ -22,7 +22,7 @@ import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.image.Image;
 import de.anycook.image.UserImage;
-import de.anycook.news.life.LifeHandler;
+import de.anycook.news.life.Lifes;
 import de.anycook.notifications.Notification;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.utils.enumerations.ImageType;
@@ -224,7 +224,7 @@ public class User implements Comparable<User> {
     public static void activateById(String activationId) throws SQLException, DBUser.ActivationFailedException {
         try (DBUser dbuser = new DBUser()) {
             int userid = dbuser.activateById(activationId);
-            LifeHandler.addLife("newuser", userid);
+            Lifes.addLife("newuser", userid);
 //			TODO SitemapGenerator.generateProfileSitemap();
         }
 
@@ -233,7 +233,7 @@ public class User implements Comparable<User> {
     public static void activateByUserId(int userId) throws SQLException {
         try (DBUser dbuser = new DBUser()) {
             dbuser.activateUser(userId);
-            LifeHandler.addLife("newuser", userId);
+            Lifes.addLife("newuser", userId);
 //			TODO SitemapGenerator.generateProfileSitemap();
         }
     }

@@ -18,22 +18,15 @@
 
 package de.anycook.news.life;
 
-import com.google.common.collect.ImmutableList;
+import de.anycook.api.providers.LifeProvider;
 import de.anycook.db.mysql.DBLive;
-import org.apache.log4j.Logger;
 
-import javax.ws.rs.container.AsyncResponse;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 
-public class LifeHandler {
-
-    private static BlockingQueue<AsyncResponse> suspended = new ArrayBlockingQueue<>(500);
-
+public class Lifes {
     public static List<Life> getLastLives(int lastId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
             return dbLive.getLastLives(lastId, 10);
@@ -58,7 +51,7 @@ public class LifeHandler {
         try (DBLive dbLive = new DBLive()) {
             if (!dbLive.checkLife(userId, caseName, recipeName)) {
                 dbLive.newLife(userId, recipeName, caseName);
-                wakeUpSuspended();
+                LifeProvider.wakeUpSuspended();
             }
         }
     }
@@ -72,25 +65,6 @@ public class LifeHandler {
     public static Set<Life> getLastLifesFromFollowing(int lastId, int limit, int userId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
             return dbLive.getLastLivesFromFollowers(lastId, limit, userId);
-        }
-    }
-
-    public static void suspend(AsyncResponse response){
-        suspended.add(response);
-    }
-
-    private static void wakeUpSuspended() throws SQLException {
-        Life newLife = getLastLife();
-        List<Life> list = ImmutableList.of(newLife);
-        while(!suspended.isEmpty()){
-            try {
-                AsyncResponse response = suspended.take();
-                if(response.isSuspended()){
-                    response.resume(list);
-                }
-            } catch (InterruptedException e) {
-                Logger.getLogger(LifeHandler.class).warn(e, e);
-            }
         }
     }
 }

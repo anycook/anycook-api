@@ -1,4 +1,4 @@
-package de.anycook.messages.providers;
+package de.anycook.api.providers;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

@@ -21,9 +21,10 @@ package de.anycook.news.life;
 import de.anycook.news.News;
 import de.anycook.user.User;
 
+import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
 
-
+@XmlType
 public class Life extends News {
     private String syntax;
     private String recipe;

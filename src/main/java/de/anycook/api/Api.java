@@ -32,10 +32,12 @@ import javax.ws.rs.ApplicationPath;
 public class Api extends ResourceConfig{
     public Api(){
 
+        //packages("de.anycook.api");
         packages("de.anycook.api");
 
         register(MultiPartFeature.class);
         register(ExceptionListener.class);
         register(MOXyJsonProvider.class);
+        //register(JsonMoxyConfigurationContextResolver.class);
     }
 }

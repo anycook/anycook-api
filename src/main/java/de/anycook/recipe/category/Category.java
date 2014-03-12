@@ -19,50 +19,66 @@
 package de.anycook.recipe.category;
 
 import de.anycook.db.mysql.DBCategory;
-import de.anycook.db.mysql.DBSearch;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class Category {
 
-    public final String name;
-    public final List<String> recipes;
-    public final Integer recipeNumber;
+    private String name;
+    private int recipeNumber;
+    private int sortId;
+
+    public Category(){}
 
     public Category(String name) {
         this.name = name;
-        this.recipes = null;
-        this.recipeNumber = null;
     }
 
-    public Category(String name, List<String> recipes) {
+    public Category(String name, int sortId, int recipeNumber) {
         this.name = name;
-        this.recipes = recipes;
-        this.recipeNumber = recipes.size();
+        this.sortId = sortId;
+        this.recipeNumber = recipeNumber;
     }
 
     public static Category init(String categoryName) throws SQLException, DBCategory.CategoryNotFoundException {
-        try(DBCategory dbCategory = new DBCategory();
-            DBSearch dbsearch = new DBSearch()) {
-
-            String category = dbCategory.get(categoryName);
-            Set<String> recipes = dbsearch.getRecipesByCategory(category);
-            return new Category(category, new LinkedList<>(recipes));
+        try(DBCategory dbCategory = new DBCategory()) {
+            return dbCategory.get(categoryName);
         }
     }
 
-    public static Map<String, Integer> getAll() throws SQLException {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getRecipeNumber() {
+        return recipeNumber;
+    }
+
+    public void setRecipeNumber(int recipeNumber) {
+        this.recipeNumber = recipeNumber;
+    }
+
+    public int getSortId() {
+        return sortId;
+    }
+
+    public void setSortId(int sortId) {
+        this.sortId = sortId;
+    }
+
+    public static List<Category> getAll() throws SQLException {
         try (DBCategory dbCategory = new DBCategory()) {
             return dbCategory.getAllCategories();
         }
     }
 
-    public static Map<String, Integer> getAllSorted() throws SQLException {
+    public static List<Category> getAllSorted() throws SQLException {
         try (DBCategory dbCategory = new DBCategory()) {
             return dbCategory.getAllCategoriesSorted();
         }

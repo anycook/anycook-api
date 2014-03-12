@@ -17,15 +17,14 @@
  */
 
 /**
- * 
+ *
  */
 package de.anycook.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import de.anycook.api.providers.LifeProvider;
 import de.anycook.api.util.MediaType;
 import de.anycook.news.life.Life;
-import de.anycook.news.life.LifeHandler;
-import de.anycook.user.views.Views;
+import de.anycook.news.life.Lifes;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
 
@@ -33,6 +32,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.List;
@@ -40,19 +40,19 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Graph for lifes stream
- * @author Jan Graßegger <jan@anycook.de>
  *
+ * @author Jan Graßegger <jan@anycook.de>
  */
 @Path("/life")
 public class LifeApi {
     private final Logger logger = Logger.getLogger(getClass());
 
-	@GET
+    @GET
     @ManagedAsync
-    @JsonView(Views.ResultView.class)
-	@Produces(MediaType.APPLICATION_JSON)
-	public void getLives(@Suspended AsyncResponse asyncResponse, @QueryParam("newestid") Integer newestId,
-                         @QueryParam("oldestid") Integer oldestId){
+    @Produces(MediaType.APPLICATION_JSON)
+    public void getLives(@Suspended final AsyncResponse asyncResponse,
+                         @DefaultValue("0") @QueryParam("newestid") final int newestId,
+                         @QueryParam("oldestid") final Integer oldestId) {
 
         asyncResponse.setTimeoutHandler(new TimeoutHandler() {
             @Override
@@ -64,17 +64,20 @@ public class LifeApi {
 
         asyncResponse.setTimeout(5, TimeUnit.MINUTES);
 
-        try{
-            List<Life> lives = newestId != null ?
-                    LifeHandler.getLastLives(newestId) : LifeHandler.getOlderLives(oldestId);
+        try {
+            List<Life> lives = oldestId == null ?
+                    Lifes.getLastLives(newestId) : Lifes.getOlderLives(oldestId);
 
-            if(lives.size() > 0) asyncResponse.resume(lives);
-            else LifeHandler.suspend(asyncResponse);
+            if (lives.size() > 0) {
+                final GenericEntity<List<Life>> entity = new GenericEntity<List<Life>>(lives) {
+                };
+                asyncResponse.resume(entity);
+            } else LifeProvider.suspend(asyncResponse);
 
-        } catch (SQLException e){
-            logger.error(e,e);
+        } catch (SQLException e) {
+            logger.error(e, e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
 
-	}
+    }
 }

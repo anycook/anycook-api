@@ -2,7 +2,7 @@ package de.anycook.api.backend;
 
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.MessageSession;
-import de.anycook.messages.providers.MessageSessionProvider;
+import de.anycook.api.providers.MessageSessionProvider;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
