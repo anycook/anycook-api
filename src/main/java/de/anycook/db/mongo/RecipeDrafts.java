@@ -19,12 +19,12 @@
 package de.anycook.db.mongo;
 
 import com.mongodb.*;
+import de.anycook.drafts.DraftRecipe;
 import de.anycook.newrecipe.DraftNumberProvider;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
         coll = getCollection("recipedrafts");
     }
 
-    public List<Map<String, Object>> getAll(int user_id) throws IOException {
+    public List<DraftRecipe> getAll(int user_id) throws IOException {
         String map = "function(){" +
                 "var percentage = 0;" +
                 "for(var key in this){" +
@@ -79,15 +79,16 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
                 new MapReduceCommand(coll, map, reduce, null, MapReduceCommand.OutputType.INLINE, query);
 
         MapReduceOutput out = coll.mapReduce(mapReduce);
-        List<Map<String, Object>> drafts = new LinkedList<>();
+        List<DraftRecipe> drafts = new LinkedList<>();
 
         for (DBObject res : out.results()) {
             String id = res.get("_id").toString();
 
-            Map<String, Object> data = new HashMap<>();
+            /*Map<String, Object> data = new HashMap<>();
             data.put("id", id);
             data.put("data", res.get("value"));
-            drafts.add(data);
+            drafts.add(data);*/
+            drafts.add(new DraftRecipe(res));
         }
         return drafts;
     }
@@ -115,6 +116,12 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
         DBObject query = getQuery(user_id, draft_id);
         DBObject set = new BasicDBObject("$set", updateObj);
         coll.update(query, set);
+    }
+
+    public void update(DraftRecipe data, int user_id, String draft_id) {
+        DBObject updateObj = new BasicDBObject();
+        data.write(updateObj);
+        update(updateObj, user_id, draft_id);
     }
 
     public void update(Map<String, Object> data, int user_id, String draft_id) {
@@ -151,9 +158,9 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
         return new BasicDBObject("_id", new ObjectId(draft_id)).append("user_id", user_id);
     }
 
-    public DBObject loadDraft(String draft_id, int user_id) {
+    public DraftRecipe loadDraft(String draft_id, int user_id) {
         DBObject query = getQuery(user_id, draft_id);
-        return coll.findOne(query);
+        return new DraftRecipe(coll.findOne(query));
     }
 
     @Override

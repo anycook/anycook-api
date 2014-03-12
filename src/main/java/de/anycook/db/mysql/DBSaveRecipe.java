@@ -88,7 +88,7 @@ public class DBSaveRecipe extends DBRecipe {
 
     private void addSteps(String recipeName, int versionId, List<Step> steps) throws SQLException {
         for (Step step : steps) {
-            addStep(recipeName, step.id, versionId, step.text, step.ingredients);
+            addStep(recipeName, step.getId(), versionId, step.getText(), step.getIngredients());
         }
     }
 

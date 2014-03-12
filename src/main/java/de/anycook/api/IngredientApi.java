@@ -67,7 +67,7 @@ public class IngredientApi {
 	@GET
 	@Path("extract")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Set<String> extractIngredients(@QueryParam("q") String query){
+	public Set<Ingredient> extractIngredients(@QueryParam("q") String query){
         try {
             return Ingredient.searchNGram(query, 3);
         } catch (SQLException e) {

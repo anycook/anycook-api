@@ -31,6 +31,7 @@ import de.anycook.image.Image;
 import de.anycook.image.RecipeImage;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
+import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 import de.anycook.utils.DateParser;
 import de.anycook.utils.enumerations.ImageType;
@@ -308,13 +309,13 @@ public class Recipe implements Comparable<Recipe> {
      *
      * @return Map mit den tags und ihrem relativecount
      */
-    public static Map<String, Integer> getPopularTags() throws SQLException {
+    public static List<Tag> getPopularTags() throws SQLException {
         try (DBRecipe dbRecipe = new DBRecipe()) {
             return dbRecipe.getPopularTags(50);
         }
     }
 
-    public static Map<String, Integer> getPopularTags(String recipe) throws SQLException {
+    public static List<Tag> getPopularTags(String recipe) throws SQLException {
         try (DBRecipe dbRecipe = new DBRecipe()) {
             return dbRecipe.getPopularTagsNotInRecipe(50, recipe);
         }

@@ -21,13 +21,16 @@ package de.anycook.recipe.step;
 import de.anycook.db.mysql.DBStep;
 import de.anycook.recipe.ingredient.Ingredient;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 
-public class Step {
-    public int id = -1;
-    public String text = null;
-    public List<Ingredient> ingredients = null;
+public class Step implements Serializable {
+    static final long serialVersionUID = 42L;
+
+    private int id = -1;
+    private String text = null;
+    private List<Ingredient> ingredients = null;
 
     public Step() {
     }
@@ -38,7 +41,31 @@ public class Step {
         this.ingredients = ingredients;
     }
 
-	/*@Override
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    /*@Override
 	public String toJSONString() {		
 		return toJSON().toJSONString();
 	}*/

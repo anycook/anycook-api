@@ -28,7 +28,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 
 @Path("tag")
@@ -71,7 +70,7 @@ public class TagApi {
 	@GET
 	@Path("popular")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Integer> getPopularTags(@QueryParam("recipe") String recipe){
+	public List<Tag> getPopularTags(@QueryParam("recipe") String recipe){
 		try {
             if(recipe==null)
                 return Recipe.getPopularTags();
