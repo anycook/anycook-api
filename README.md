@@ -17,13 +17,12 @@ To use the full test stack you will also need to clone and start the [anycook-pa
 - Install [Virtual Box](https://www.virtualbox.org/)
 - Install [Vagrant](http://www.vagrantup.com/) (Having problems with vagrant in OSX Mavericks? Execute ```sudo /Library/StartupItems/VirtualBox/VirtualBox restart``` and try again ([source](http://www.asquera.de/development/2013/06/20/vagrant-on-mavericks/)))
 - Execute ```git submodule init && git submodule update``` in project root to download required submodules. These are:
-  - [anycook-core](https://github.com/anycook/anycook-core)
   - [puppetlabs/mysql](https://forge.puppetlabs.com/puppetlabs/mysql)
   - [puppetlabs/apt](https://forge.puppetlabs.com/puppetlabs/apt)
   - [puppetlabs/stdlib](https://forge.puppetlabs.com/puppetlabs/stdlib)
-- If you are an anycook internal and want to commit changes to anycook-core change your git remotes (Execute the following command inside the __anycook-core__ folder): ```git remote set-url --push origin git@github.com:anycook/anycook-core.git``
 
 ### Configuration
+TODO
 Available properties can be found [here](https://github.com/anycook/anycook-core/wiki/Configuration-File).
 
 If you want to set your own global conf in the test environment place it in the project as ```test-environment/api-manifests/anycook.properties```
