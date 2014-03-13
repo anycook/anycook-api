@@ -18,17 +18,18 @@
 
 package de.anycook.messages;
 
-import de.anycook.db.mysql.DBMessage;
-import de.anycook.db.mysql.DBUser;
 import de.anycook.api.providers.MessageNumberProvider;
 import de.anycook.api.providers.MessageProvider;
 import de.anycook.api.providers.MessageSessionProvider;
+import de.anycook.db.mysql.DBMessage;
+import de.anycook.db.mysql.DBUser;
 import de.anycook.news.News;
 import de.anycook.notifications.Notification;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.NotificationType;
 import org.apache.log4j.Logger;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -114,7 +115,6 @@ public class MessageSession extends News {
     }
 
     private final Logger logger;
-    private int id;
     private List<Message> messages;
     private Set<User> recipients;
 
@@ -125,7 +125,6 @@ public class MessageSession extends News {
 
     public MessageSession(int id, Set<User> recipients, List<Message> messages, Date lastChange) {
         super(id, lastChange);
-        this.id = id;
         this.messages = messages;
         this.recipients = recipients;
         logger = Logger.getLogger(getClass());
@@ -140,12 +139,16 @@ public class MessageSession extends News {
         return logger;
     }
 
+    @Override
+    @XmlElement
     public int getId() {
-        return id;
+        return super.getId();
     }
 
-    public void setId(int id) {
-        this.id = id;
+    @Override
+    @XmlElement
+    public long getDatetime(){
+        return super.getDatetime();
     }
 
     public List<Message> getMessages() {

@@ -23,7 +23,7 @@ import de.anycook.db.mongo.RecipeDrafts;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.drafts.DraftRecipe;
 import de.anycook.newrecipe.DraftNumberProvider;
-import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Recipes;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 
@@ -101,7 +101,7 @@ public class DraftApi {
             session.checkLogin(hh.getCookies());
             int user_id = session.getUser().getId();
 
-            return Recipe.initDraftWithRecipe(recipeName, versionid, user_id);
+            return Recipes.initDraftWithRecipe(recipeName, versionid, user_id);
         } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

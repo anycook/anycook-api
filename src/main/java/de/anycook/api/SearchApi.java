@@ -18,10 +18,9 @@
 
 package de.anycook.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Multimap;
 import de.anycook.api.util.MediaType;
-import de.anycook.recipe.Views;
+import de.anycook.api.views.TasteNumView;
 import de.anycook.search.Query;
 import de.anycook.search.Search;
 import de.anycook.search.SearchResult;
@@ -39,7 +38,7 @@ public class SearchApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
 	@POST
-    @JsonView(Views.TasteNumView.class)
+    @TasteNumView
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public SearchResult search(Query query){

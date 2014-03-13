@@ -19,7 +19,7 @@ public class JsonMoxyConfigurationContextResolver implements ContextResolver<Mox
         final Map<String, String> namespacePrefixMapper = new HashMap<>();
         namespacePrefixMapper.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
 
-        config = new MoxyJsonConfig()
+        config = new MoxyJsonConfig().setFormattedOutput(true)
                 .setNamespacePrefixMapper(namespacePrefixMapper)
                 .setNamespaceSeparator(':');
     }

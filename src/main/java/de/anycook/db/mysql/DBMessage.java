@@ -81,7 +81,7 @@ public class DBMessage extends DBHandler {
             int id = data.getInt("id");
 
             String text = data.getString("messages.text");
-            long datetime = data.getLong("datetime");
+            Date datetime = data.getDate("datetime");
             boolean unread = isUnread(userId, sessionId, id);
 
             int senderId = data.getInt("sender");
@@ -110,7 +110,7 @@ public class DBMessage extends DBHandler {
         while (data.next()) {
             int id = data.getInt("messages.id");
             String text = data.getString("messages.text");
-            long datetime = data.getLong("datetime");
+            Date datetime = data.getDate("datetime");
             boolean unread = isUnread(userId, sessionId, id);
 
             int senderId = data.getInt("sender");

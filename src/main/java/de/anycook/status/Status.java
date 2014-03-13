@@ -3,6 +3,7 @@ package de.anycook.status;
 import de.anycook.db.mysql.DBHandler;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Recipes;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
@@ -19,10 +20,10 @@ public class Status {
     private final Map<String, Integer> connectionStatus;
 
     public Status() throws SQLException, DBRecipe.RecipeNotFoundException {
-        dailyDish = Recipe.getRecipeOfTheDay();
+        dailyDish = Recipes.getRecipeOfTheDay();
         tags = Tag.getTotal();
         ingredients = Ingredient.getTotal();
-        recipes = Recipe.getTotal();
+        recipes = Recipes.getTotal();
         users = User.getTotal();
         connectionStatus = DBHandler.getConnectionsStatus();
     }

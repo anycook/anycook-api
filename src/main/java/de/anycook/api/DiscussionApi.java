@@ -18,14 +18,12 @@
 
 package de.anycook.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.base.Preconditions;
+import de.anycook.api.providers.DiscussionProvider;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBDiscussion;
 import de.anycook.discussion.Discussion;
-import de.anycook.api.providers.DiscussionProvider;
 import de.anycook.session.Session;
-import de.anycook.user.views.Views;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +48,6 @@ public class DiscussionApi {
 
     @GET
     @Path("{recipeName}")
-    @JsonView(Views.ResultView.class)
     @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse, @PathParam("recipeName") final String recipeName,
                     @DefaultValue("-1") @QueryParam("lastid") final int lastId, @Context HttpServletRequest request){

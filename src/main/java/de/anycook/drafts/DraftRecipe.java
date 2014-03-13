@@ -8,20 +8,15 @@ import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
 import de.anycook.recipe.tag.Tag;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
+@XmlRootElement
 public class DraftRecipe{
-    private static ObjectMapper mapper;
-
-    static {
-        mapper = new ObjectMapper();
-    }
-
-
     private String id;
     private long timestamp;
     private String image;
@@ -35,7 +30,7 @@ public class DraftRecipe{
     private int calorie;
     private List<Tag> tags;
     private Time time;
-    private int percentage;
+    private double percentage;
 
     public DraftRecipe(){}
 
@@ -147,11 +142,11 @@ public class DraftRecipe{
         this.time = time;
     }
 
-    public int getPercentage() {
+    public double getPercentage() {
         return percentage;
     }
 
-    public void setPercentage(int percentage) {
+    public void setPercentage(double percentage) {
         this.percentage = percentage;
     }
 
@@ -174,10 +169,17 @@ public class DraftRecipe{
         */
 
         this.id = dbObject.get("_id").toString();
+        if(dbObject.containsField("value")){
+            dbObject = (DBObject)dbObject.get("value");
+        }
+
+
         if(dbObject.containsField("timestamp")) this.timestamp = (long)dbObject.get("timestamp");
         if(dbObject.containsField("image")) this.image = (String)dbObject.get("image");
         if(dbObject.containsField("name")) this.name = (String)dbObject.get("name");
         if(dbObject.containsField("description")) this.description = (String)dbObject.get("description");
+
+        ObjectMapper mapper = new ObjectMapper();
         if(dbObject.containsField("steps")) {
             this.steps = mapper.convertValue(dbObject.get("steps"),
                     new TypeReference<List<Step>>(){});
@@ -195,7 +197,7 @@ public class DraftRecipe{
                     new TypeReference<List<Tag>>(){});
         }
         if(dbObject.containsField("time")) this.time =  mapper.convertValue(dbObject.get("time"), Time.class);
-        if(dbObject.containsField("percentage")) this.percentage = (int)dbObject.get("percentage");
+        if(dbObject.containsField("percentage")) this.percentage = (double)dbObject.get("percentage");
     }
 
     public void write(DBObject updateObj) {
@@ -218,6 +220,8 @@ public class DraftRecipe{
         if(image != null) updateObj.put("image", image);
         if(name != null) updateObj.put("name", name);
         if(description != null) updateObj.put("description", description);
+
+        ObjectMapper mapper = new ObjectMapper();
         if(steps != null) {
             List<Map<String, Object>> stepList = mapper.convertValue(steps, new TypeReference<List<Map<String, Object>>>(){});
             updateObj.put("steps", stepList);

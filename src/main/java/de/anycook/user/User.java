@@ -18,6 +18,7 @@
 
 package de.anycook.user;
 
+import de.anycook.api.views.PrivateView;
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.image.Image;
@@ -27,6 +28,7 @@ import de.anycook.notifications.Notification;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.api.views.PublicView;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.log4j.Logger;
@@ -361,17 +363,46 @@ public class User implements Comparable<User> {
 
     private int id;
     private String name;
-    private String mail;
-    private long facebookID;
     private Image image;
-    private String text;
-    private int level;
-    private Date createdate;
-    private Date lastlogin;
-    private String place;
-    private List<Integer> following;
-    private List<Integer> followers;
+
+    @PrivateView
+    private String mail;
+
+    @PrivateView
+    private long facebookID;
+
+    @PrivateView
     private String emailCandidate;
+
+    @PublicView
+    @PrivateView
+    private String text;
+
+    @PublicView
+    @PrivateView
+    private int level;
+
+    @PublicView
+    @PrivateView
+    private Date createdate;
+
+    @PublicView
+    @PrivateView
+    private Date lastlogin;
+
+    @PublicView
+    @PrivateView
+    private String place;
+
+    @PublicView
+    @PrivateView
+    private List<Integer> following;
+
+    @PublicView
+    @PrivateView
+    private List<Integer> followers;
+
+
 
     public User(){}
 

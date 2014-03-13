@@ -23,8 +23,8 @@ import java.util.Date;
 
 @XmlRootElement
 public class News implements Comparable<News> {
-    private int id;
-    private long datetime;
+    protected int id;
+    protected long datetime;
 
     public News(){}
 

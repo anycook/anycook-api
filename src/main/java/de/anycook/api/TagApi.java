@@ -20,7 +20,7 @@ package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBTag;
-import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Recipes;
 import de.anycook.recipe.tag.Tag;
 import org.apache.log4j.Logger;
 
@@ -73,8 +73,8 @@ public class TagApi {
 	public List<Tag> getPopularTags(@QueryParam("recipe") String recipe){
 		try {
             if(recipe==null)
-                return Recipe.getPopularTags();
-            return Recipe.getPopularTags(recipe);
+                return Recipes.getPopularTags();
+            return Recipes.getPopularTags(recipe);
         } catch (SQLException e){
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

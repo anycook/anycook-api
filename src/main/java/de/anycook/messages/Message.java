@@ -23,6 +23,7 @@ import de.anycook.user.User;
 import de.anycook.utils.enumerations.NotificationType;
 
 import java.sql.SQLException;
+import java.util.Date;
 
 
 public class Message {
@@ -34,11 +35,11 @@ public class Message {
 
     public Message() {}
 
-    public Message(int id, User sender, String text, long datetime, boolean unread) {
+    public Message(int id, User sender, String text, Date datetime, boolean unread) {
         this.id = id;
         this.sender = sender;
         this.text = text;
-        this.datetime = datetime;
+        this.datetime = datetime.getTime();
         this.unread = unread;
     }
 

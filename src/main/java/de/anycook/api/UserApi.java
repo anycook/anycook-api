@@ -18,17 +18,17 @@
 
 package de.anycook.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
+import de.anycook.api.views.PublicView;
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.discussion.Discussion;
 import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Recipes;
 import de.anycook.recommendation.Recommendation;
 import de.anycook.session.Session;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
-import de.anycook.user.views.Views;
 import de.anycook.utils.enumerations.ImageType;
 import org.apache.log4j.Logger;
 
@@ -115,7 +115,6 @@ public class UserApi {
 	@GET
 	@Path("recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
-    @JsonView(de.anycook.recipe.Views.ResultRecipeView.class)
 	public List<Recipe> getRecommendations(@Context HttpServletRequest request){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
@@ -130,7 +129,7 @@ public class UserApi {
 	
 	@GET
 	@Path("{userId}")
-    @JsonView(Views.PublicUserView.class)
+    @PublicView
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public User getUser(@PathParam("userId") int userId){
         try {
@@ -207,11 +206,10 @@ public class UserApi {
 	
 	@GET
 	@Path("{userId}/schmeckt")
-    @JsonView(de.anycook.recipe.Views.ResultRecipeView.class)
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public List<Recipe> schmeckt(@PathParam("userId") int userId){
         try {
-            return Recipe.getTastingRecipesForUser(userId);
+            return Recipes.getTastingRecipesForUser(userId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
