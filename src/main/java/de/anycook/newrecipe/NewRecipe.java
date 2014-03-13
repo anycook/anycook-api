@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.anycook.db.mongo.RecipeDrafts;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.discussion.Discussion;
-import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Recipes;
 import de.anycook.recipe.Time;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
@@ -96,7 +96,7 @@ public class NewRecipe {
 
 
         for (String tag : tags)
-            Recipe.suggestTag(name, tag, userid);
+            Recipes.suggestTag(name, tag, userid);
 
         if (mongoid != null) {
             RecipeDrafts drafts = new RecipeDrafts();
@@ -138,7 +138,7 @@ public class NewRecipe {
 
 
         for (String tag : tags)
-            Recipe.suggestTag(name, tag);
+            Recipes.suggestTag(name, tag);
 
         if (id == 0) Discussion.addNewRecipeEvent(name, comment, id);
         else Discussion.addNewVersionEvent(name, comment, id);

@@ -22,7 +22,7 @@ package de.anycook.session;
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.db.mysql.DBUser;
-import de.anycook.news.life.LifeHandler;
+import de.anycook.news.life.Lifes;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -250,7 +250,7 @@ public class Session {
         if (login != null && !checkSchmeckt(gericht)) {
             DBSaveRecipe savegericht = new DBSaveRecipe();
             savegericht.makeTasty(gericht, login.getId());
-            LifeHandler.addLife("schmeckt", login.getId(), gericht);
+            Lifes.addLife("schmeckt", login.getId(), gericht);
             savegericht.close();
 
             //send to recipemaker

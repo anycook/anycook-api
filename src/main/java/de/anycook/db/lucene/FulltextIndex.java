@@ -88,7 +88,7 @@ public class FulltextIndex {
             List<Step> steps = Step.loadRecipeSteps(recipeName);
             StringBuilder stepText = new StringBuilder();
             for(Step step : steps)
-                stepText.append(" ").append(step.text);
+                stepText.append(" ").append(step.getText());
 
             try (IndexWriter writer = new IndexWriter(index, createIndexWriterConfig())){
                 Document doc = new Document();
@@ -143,7 +143,7 @@ public class FulltextIndex {
             List<Step> steps = Step.loadRecipeSteps(recipeName);
             StringBuilder stepText = new StringBuilder();
             for(Step step : steps)
-                stepText.append(" ").append(step.text);
+                stepText.append(" ").append(step.getText());
 
             int id = dbGetRecipe.getActiveIdfromRecipe(recipeName);
             String date = DateTools.dateToString(new Date(), Resolution.DAY);

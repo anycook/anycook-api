@@ -18,6 +18,7 @@
 
 package de.anycook.api;
 
+import de.anycook.api.listener.ExceptionListener;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -30,12 +31,17 @@ import javax.ws.rs.ApplicationPath;
 @ApplicationPath("/*")
 public class Api extends ResourceConfig{
     public Api(){
+
+        //packages("de.anycook.api");
         packages("de.anycook.api");
 
-        register(EntityFilteringFeature.class);
+        //property(EntityFilteringFeature.ENTITY_FILTERING_SCOPE, new Annotation[]{PublicView.Factory.get()});
+
         register(MultiPartFeature.class);
-
+        register(EntityFilteringFeature.class);
+        register(ExceptionListener.class);
+        //register(MOXyJsonProvider.class);
+        //register(new MoxyJsonConfig().setFormattedOutput(true).resolver());
+        //register(JsonMoxyConfigurationContextResolver.class);
     }
-
-
 }

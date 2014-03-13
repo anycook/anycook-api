@@ -18,17 +18,18 @@
 
 package de.anycook.messages;
 
+import de.anycook.api.providers.MessageNumberProvider;
+import de.anycook.api.providers.MessageProvider;
+import de.anycook.api.providers.MessageSessionProvider;
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.db.mysql.DBUser;
-import de.anycook.messages.providers.MessageNumberProvider;
-import de.anycook.messages.providers.MessageProvider;
-import de.anycook.messages.providers.MessageSessionProvider;
 import de.anycook.news.News;
 import de.anycook.notifications.Notification;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.NotificationType;
 import org.apache.log4j.Logger;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -39,7 +40,6 @@ public class MessageSession extends News {
 
     static {
         sLogger = Logger.getLogger(MessageSession.class);
-
     }
 
     public static MessageSession getSession(int sessionId, int userId) throws SQLException, DBMessage.SessionNotFoundException {
@@ -114,19 +114,57 @@ public class MessageSession extends News {
         return sessions;
     }
 
-
-    public final int id;
-    public final List<Message> messages;
-    public final Set<User> recipients;
     private final Logger logger;
+    private List<Message> messages;
+    private Set<User> recipients;
+
+
+    public MessageSession() {
+        logger = Logger.getLogger(getClass());
+    }
 
     public MessageSession(int id, Set<User> recipients, List<Message> messages, Date lastChange) {
         super(id, lastChange);
-        this.id = id;
         this.messages = messages;
         this.recipients = recipients;
         logger = Logger.getLogger(getClass());
 
+    }
+
+    public static Logger getsLogger() {
+        return sLogger;
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    @Override
+    @XmlElement
+    public int getId() {
+        return super.getId();
+    }
+
+    @Override
+    @XmlElement
+    public long getDatetime(){
+        return super.getDatetime();
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
+    public Set<User> getRecipients() {
+        return recipients;
+    }
+
+    public void setRecipients(Set<User> recipients) {
+        this.recipients = recipients;
     }
 
     public void newMessage(int sender, String text) throws SQLException {

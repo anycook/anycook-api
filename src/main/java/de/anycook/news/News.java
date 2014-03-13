@@ -18,28 +18,39 @@
 
 package de.anycook.news;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
 
+@XmlRootElement
+public class News implements Comparable<News> {
+    protected int id;
+    protected long datetime;
 
-public abstract class News implements Comparable<News> {
-    private final int id;
-    private final Date datetime;
+    public News(){}
 
     public News(int id, Date datetime) {
         this.id = id;
-        this.datetime = datetime;
+        this.datetime = datetime.getTime();
     }
 
     public int getId() {
         return id;
     }
 
-    public Date getDatetime() {
+    public long getDatetime() {
         return datetime;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setDatetime(long datetime) {
+        this.datetime = datetime;
     }
 
     @Override
     public int compareTo(News o) {
-        return datetime.compareTo(o.datetime);
+        return Long.compare(datetime, o.datetime);
     }
 }

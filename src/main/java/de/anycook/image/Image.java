@@ -5,16 +5,41 @@ import de.anycook.conf.Configuration;
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
-public class Image{
-    public final String small;
-    public final String big;
-    public final String original;
+public  class Image{
+    private String small, big, original;
+
+    public Image(){}
 
     public Image(String image, String path){
         String imageRoot = Configuration.getPropertyImageBasePath();
         imageRoot += path;
-        small = imageRoot+"/small/"+image;
-        big = imageRoot+"/big/"+image;
-        original = imageRoot+"/original/"+image;
+        this.small = imageRoot+"/small/"+image;
+        this.big =  imageRoot+"/big/"+image;
+        this.original = imageRoot+"/original/"+image;
+
+    }
+
+    public String getSmall() {
+        return small;
+    }
+
+    public void setSmall(String small) {
+        this.small = small;
+    }
+
+    public String getBig() {
+        return big;
+    }
+
+    public void setBig(String big) {
+        this.big = big;
+    }
+
+    public String getOriginal() {
+        return original;
+    }
+
+    public void setOriginal(String original) {
+        this.original = original;
     }
 }

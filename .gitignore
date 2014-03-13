@@ -11,3 +11,4 @@ build/
 *.iws
 .DS_Store
 test-environment/api-manifests/anycook.properties
+classes

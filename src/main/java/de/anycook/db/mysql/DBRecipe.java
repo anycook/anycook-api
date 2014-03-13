@@ -20,6 +20,8 @@ package de.anycook.db.mysql;
 
 import de.anycook.recipe.Recipe;
 import de.anycook.recipe.Time;
+import de.anycook.recipe.ingredient.Ingredient;
+import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 
 import java.sql.PreparedStatement;
@@ -83,21 +85,6 @@ public class DBRecipe extends DBHandler {
     }
 
 
-    public List<String> loadRecipeTags(String recipeName) throws SQLException {
-        List<String> tags = new LinkedList<>();
-        PreparedStatement pStatement = connection.prepareStatement(
-                "SELECT tags_name FROM gerichte_has_tags " +
-                        "WHERE gerichte_name = ?");
-        pStatement.setString(1, recipeName);
-        ResultSet data = pStatement.executeQuery();
-        while (data.next()) {
-            String tag = data.getString("tags_name");
-            tags.add(tag);
-        }
-
-        return tags;
-    }
-
 
     //tags
 
@@ -144,8 +131,8 @@ public class DBRecipe extends DBHandler {
      * @param numTags Anzahl der Tags, die man bekommen moechte.
      * @return {@link java.util.Map} mit Tags und Anzahl ihres auftretens.
      */
-    public Map<String, Integer> getPopularTags(int numTags) throws SQLException {
-        Map<String, Integer> map = new LinkedHashMap<>();
+    public List<Tag> getPopularTags(int numTags) throws SQLException {
+        List<Tag> tags = new LinkedList<>();
         PreparedStatement pStatement = connection.prepareStatement("SELECT tags_name AS tag, COUNT(gerichte_name) " +
                 "AS count FROM gerichte_has_tags " +
                 "WHERE active = 1 GROUP BY tag ORDER BY count DESC LIMIT ?");
@@ -153,15 +140,16 @@ public class DBRecipe extends DBHandler {
         ResultSet data = pStatement.executeQuery();
 
         while (data.next()) {
+            String tagName = data.getString("tag");
             int count = data.getInt("count");
-            map.put(data.getString("tag"), count);
+            tags.add(new Tag(tagName, count));
         }
 
-        return map;
+        return tags;
     }
 
-    public Map<String, Integer> getPopularTagsNotInRecipe(int numTags, String recipe) throws SQLException {
-        Map<String, Integer> map = new LinkedHashMap<>();
+    public List<Tag> getPopularTagsNotInRecipe(int numTags, String recipe) throws SQLException {
+        List<Tag> tags = new LinkedList<>();
         PreparedStatement pStatement = connection.prepareStatement("SELECT tags_name, COUNT(gerichte_name) AS count FROM gerichte_has_tags " +
                 "WHERE active = 1 AND " +
                 "tags_name NOT IN (SELECT tags_name FROM gerichte_has_tags WHERE gerichte_name = ? GROUP BY tags_name) " +
@@ -171,20 +159,21 @@ public class DBRecipe extends DBHandler {
         ResultSet data = pStatement.executeQuery();
 
         while (data.next()) {
+            String tagName = data.getString("tag");
             int count = data.getInt("count");
-            map.put(data.getString("tags_name"), count);
+            tags.add(new Tag(tagName, count));
         }
 
-        return map;
+        return tags;
     }
 
     //ingredients
-    public String getFullIngredientName(String stem) throws SQLException, DBIngredient.IngredientNotFoundException {
+    public Ingredient getIngredientForStem(String stem) throws SQLException, DBIngredient.IngredientNotFoundException {
         PreparedStatement pStatement = connection.prepareStatement("SELECT name from zutaten WHERE stem = ?");
         pStatement.setString(1, stem);
         ResultSet data = pStatement.executeQuery();
         if (data.next())
-            return data.getString("name");
+            return new Ingredient(data.getString("name"));
         throw new DBIngredient.IngredientNotFoundException(stem);
     }
 

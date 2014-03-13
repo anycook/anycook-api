@@ -18,18 +18,17 @@
 
 package de.anycook.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonView;
+import de.anycook.api.views.PrivateView;
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.image.Image;
 import de.anycook.image.UserImage;
-import de.anycook.news.life.LifeHandler;
+import de.anycook.news.life.Lifes;
 import de.anycook.notifications.Notification;
 import de.anycook.social.facebook.FacebookHandler;
-import de.anycook.user.views.Views;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.api.views.PublicView;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.apache.log4j.Logger;
@@ -227,7 +226,7 @@ public class User implements Comparable<User> {
     public static void activateById(String activationId) throws SQLException, DBUser.ActivationFailedException {
         try (DBUser dbuser = new DBUser()) {
             int userid = dbuser.activateById(activationId);
-            LifeHandler.addLife("newuser", userid);
+            Lifes.addLife("newuser", userid);
 //			TODO SitemapGenerator.generateProfileSitemap();
         }
 
@@ -236,7 +235,7 @@ public class User implements Comparable<User> {
     public static void activateByUserId(int userId) throws SQLException {
         try (DBUser dbuser = new DBUser()) {
             dbuser.activateUser(userId);
-            LifeHandler.addLife("newuser", userId);
+            Lifes.addLife("newuser", userId);
 //			TODO SitemapGenerator.generateProfileSitemap();
         }
     }
@@ -364,17 +363,48 @@ public class User implements Comparable<User> {
 
     private int id;
     private String name;
-    private String mail;
-    private long facebookID;
     private Image image;
-    private String text;
-    private Integer level;
-    private Date createdate;
-    private Date lastlogin;
-    private String place;
-    private List<Integer> following;
-    private List<Integer> followers;
+
+    @PrivateView
+    private String mail;
+
+    @PrivateView
+    private long facebookID;
+
+    @PrivateView
     private String emailCandidate;
+
+    @PublicView
+    @PrivateView
+    private String text;
+
+    @PublicView
+    @PrivateView
+    private int level;
+
+    @PublicView
+    @PrivateView
+    private Date createdate;
+
+    @PublicView
+    @PrivateView
+    private Date lastlogin;
+
+    @PublicView
+    @PrivateView
+    private String place;
+
+    @PublicView
+    @PrivateView
+    private List<Integer> following;
+
+    @PublicView
+    @PrivateView
+    private List<Integer> followers;
+
+
+
+    public User(){}
 
 
     public User(int id, String name, String image) {
@@ -421,7 +451,6 @@ public class User implements Comparable<User> {
         return name;
     }
 
-    @JsonView(Views.PrivateUserView.class)
     public String getMail() {
         return mail;
     }
@@ -430,67 +459,99 @@ public class User implements Comparable<User> {
         return image;
     }
 
-    @JsonView(Views.PublicUserView.class)
     public String getText() {
         return text;
     }
 
-    @JsonView(Views.PublicUserView.class)
     public Date getCreatedate() {
         return createdate;
     }
 
-    @JsonView(Views.PrivateUserView.class)
     public Date getLastlogin() {
         return lastlogin;
     }
 
-    @JsonView(Views.PublicUserView.class)
     public String getPlace() {
         return place;
     }
 
-    @JsonView(Views.PublicUserView.class)
     public List<Integer> getFollowing() {
         return following;
     }
 
-    @JsonView(Views.PublicUserView.class)
     public List<Integer> getFollowers() {
         return followers;
     }
 
-    @JsonView(Views.PrivateUserView.class)
     public long getFacebookID() {
         return facebookID;
     }
 
-    @JsonView(Views.PublicUserView.class)
     public int getLevel() {
         return level;
     }
 
-    @JsonIgnore
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public void setFacebookID(long facebookID) {
+        this.facebookID = facebookID;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public void setCreatedate(Date createdate) {
+        this.createdate = createdate;
+    }
+
+    public void setLastlogin(Date lastlogin) {
+        this.lastlogin = lastlogin;
+    }
+
+    public void setFollowing(List<Integer> following) {
+        this.following = following;
+    }
+
+    public void setFollowers(List<Integer> followers) {
+        this.followers = followers;
+    }
+
+    public void setEmailCandidate(String emailCandidate) {
+        this.emailCandidate = emailCandidate;
+    }
+
+    //@JsonIgnore
     public boolean isAdmin() {
         return level == 2;
     }
 
-    @JsonIgnore
+    //@JsonIgnore
     public String getUserImage(ImageType type) throws SQLException, IOException, DBUser.UserNotFoundException {
         return getUserImage(id, type);
     }
 
-    @JsonIgnore
+    //@JsonIgnore
     public String getFaceBookAccessToken() throws IOException {
         return facebookID == 0 ? null : FacebookHandler.getUsersOAuthToken(facebookID);
     }
 
-    @JsonIgnore
+    //@JsonIgnore
     public String getFacebookPermissions() throws IOException {
         return FacebookHandler.getPermissions(getFaceBookAccessToken(), facebookID);
     }
 
-    @JsonView(Views.PrivateUserView.class)
+    //@JsonView(Views.PrivateUserView.class)
     public String getEmailCandidate() {
         return emailCandidate;
     }

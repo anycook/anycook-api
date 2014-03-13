@@ -26,6 +26,8 @@ public class SearchResult {
     private int size;
     private List<Recipe> results;
 
+    public SearchResult() {};
+
     public SearchResult(int size, List<Recipe> results) {
         this.size = size;
         this.results = results;
@@ -39,4 +41,11 @@ public class SearchResult {
         return results;
     }
 
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public void setResults(List<Recipe> results) {
+        this.results = results;
+    }
 }

@@ -21,8 +21,9 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mongo.RecipeDrafts;
 import de.anycook.db.mysql.DBRecipe;
+import de.anycook.drafts.DraftRecipe;
 import de.anycook.newrecipe.DraftNumberProvider;
-import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Recipes;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 
@@ -36,7 +37,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 @Path("/drafts")
 public class DraftApi {
@@ -51,8 +51,7 @@ public class DraftApi {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Map<String, Object>> get(@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	public List<DraftRecipe> get(){
 		Session session = Session.init(request.getSession());
 
 		try(RecipeDrafts drafts = new RecipeDrafts()){
@@ -65,8 +64,7 @@ public class DraftApi {
 	}
 	
 	@PUT
-	public String newDraft(@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	public String newDraft(@Context HttpServletRequest request){
 		try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
             Session session = Session.init(request.getSession());
             session.checkLogin(hh.getCookies());
@@ -88,16 +86,14 @@ public class DraftApi {
         RecipeDrafts drafts = new RecipeDrafts();
 
         int newNum = drafts.count(userId);
-        if(lastNum == null || newNum != lastNum) asyncResponse.resume(newNum);
+        if(lastNum == null || newNum != lastNum) asyncResponse.resume(String.valueOf(newNum));
         else DraftNumberProvider.INSTANCE.suspend(userId, asyncResponse);
     }
 	
 	@PUT
 	@Path("{recipeName}")
-	public String initWithRecipe(@Context HttpHeaders hh,
-			@Context HttpServletRequest request,
-			@PathParam("recipeName") String recipeName,
-			@FormParam("versionid") Integer versionid){
+	public String initWithRecipe(@PathParam("recipeName") String recipeName,
+                                 @FormParam("versionid") Integer versionid){
 		if(recipeName == null) throw new WebApplicationException(400);
 
         try {
@@ -105,7 +101,7 @@ public class DraftApi {
             session.checkLogin(hh.getCookies());
             int user_id = session.getUser().getId();
 
-            return Recipe.initDraftWithRecipe(recipeName, versionid, user_id);
+            return Recipes.initDraftWithRecipe(recipeName, versionid, user_id);
         } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -118,9 +114,7 @@ public class DraftApi {
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map getDraft(@PathParam("id") String draft_id,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	public DraftRecipe getDraft(@PathParam("id") String draft_id){
         try (RecipeDrafts recipeDrafts = new RecipeDrafts()) {
 
             Session session = Session.init(request.getSession());
@@ -128,7 +122,7 @@ public class DraftApi {
             int userId = session.getUser().getId();
 		
 
-			return recipeDrafts.loadDraft(draft_id, userId).toMap();
+			return recipeDrafts.loadDraft(draft_id, userId);
 		} catch (IOException e){
             logger.error(e,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -138,8 +132,7 @@ public class DraftApi {
 	@POST
 	@Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-	public Response setData(Map<String, Object> draftData,@PathParam("id") String draft_id,
-			@Context HttpHeaders hh, @Context HttpServletRequest request){
+	public Response setData(DraftRecipe draftData, @PathParam("id") String draft_id){
 
 		try (RecipeDrafts drafts = new RecipeDrafts()) {
             Session session = Session.init(request.getSession());
@@ -158,9 +151,7 @@ public class DraftApi {
 	
 	@DELETE
 	@Path("{id}")
-	public void remove(@PathParam("id") String draft_id,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	public void remove(@PathParam("id") String draft_id){
 		Session session = Session.init(request.getSession());
         try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
             session.checkLogin(hh.getCookies());

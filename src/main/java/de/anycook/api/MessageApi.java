@@ -18,17 +18,15 @@
 
 package de.anycook.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
+import de.anycook.api.providers.MessageNumberProvider;
+import de.anycook.api.providers.MessageProvider;
+import de.anycook.api.providers.MessageSessionProvider;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.Message;
 import de.anycook.messages.MessageSession;
-import de.anycook.messages.providers.MessageNumberProvider;
-import de.anycook.messages.providers.MessageProvider;
-import de.anycook.messages.providers.MessageSessionProvider;
 import de.anycook.session.Session;
 import de.anycook.user.User;
-import de.anycook.user.views.Views;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -38,6 +36,7 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -62,7 +61,6 @@ public class MessageApi {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @JsonView(Views.ResultView.class)
     public void get(@Suspended final AsyncResponse asyncResponse, @QueryParam("lastChange") Long lastChange){
         asyncResponse.setTimeoutHandler(new TimeoutHandler() {
             @Override
@@ -78,7 +76,9 @@ public class MessageApi {
 
         if(lastChange == null){
             try {
-                asyncResponse.resume(MessageSession.getSessionsFromUser(user.getId()));
+                List<MessageSession> sessions = MessageSession.getSessionsFromUser(user.getId());
+                GenericEntity<List<MessageSession>> entity = new GenericEntity<List<MessageSession>>(sessions){};
+                asyncResponse.resume(entity);
             } catch (SQLException e) {
                 logger.error(e, e);
                 asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
@@ -89,7 +89,8 @@ public class MessageApi {
         Date changeDate = new Date(lastChange);
         try{
             List<MessageSession> sessions = MessageSession.getSessionsFromUser(user.getId(), changeDate);
-            if(!sessions.isEmpty()) asyncResponse.resume(sessions);
+            GenericEntity<List<MessageSession>> entity = new GenericEntity<List<MessageSession>>(sessions){};
+            if(!sessions.isEmpty()) asyncResponse.resume(entity);
             else MessageSessionProvider.INSTANCE.suspend(user.getId(), asyncResponse);
         } catch (SQLException | DBMessage.SessionNotFoundException e){
             logger.error(e,e);
@@ -144,7 +145,6 @@ public class MessageApi {
     @GET
     @Path("{sessionId}")
     @Produces(MediaType.APPLICATION_JSON)
-    @JsonView(Views.ResultView.class)
     public void getMessagesFromSession(@Suspended AsyncResponse asyncResponse, @PathParam("sessionId") int sessionId,
                                        @QueryParam("lastId") Integer lastId){
         Session session = Session.init(req.getSession());

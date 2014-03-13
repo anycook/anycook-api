@@ -18,13 +18,13 @@
 
 package de.anycook.db.mysql;
 
+import de.anycook.recipe.category.Category;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public class DBCategory extends DBHandler {
     public DBCategory() throws SQLException {
@@ -39,12 +39,22 @@ public class DBCategory extends DBHandler {
      * @param q String mit der gesuchten Kategorie.
      * @return String mit dem Kategorienamen aus der Datenbank oder null.
      */
-    public String get(String q) throws SQLException, CategoryNotFoundException {
-        PreparedStatement pStatement = connection.prepareStatement("SELECT name from kategorien WHERE name = ?");
+    public Category get(String q) throws SQLException, CategoryNotFoundException {
+        PreparedStatement pStatement = connection.prepareStatement("SELECT kategorien.name, sortid, COUNT(gerichte.name) AS recipeNumber FROM kategorien " +
+                "LEFT JOIN versions ON kategorien.name = kategorien_name " +
+                "LEFT JOIN gerichte ON gerichte.name = gerichte_name AND id = active_id " +
+                "WHERE kategorien.name = ?" +
+                "GROUP BY kategorien.name ORDER BY kategorien.name");
 
         pStatement.setString(1, q);
         ResultSet data = pStatement.executeQuery();
-        if (data.next()) return data.getString("name");
+        if (data.next()) {
+            String name = data.getString("kategorien.name");
+            int sortId = data.getInt("sortid");
+            int recipeNumber = data.getInt("recipeNumber");
+            return new Category(name, sortId, recipeNumber);
+
+        }
         throw new CategoryNotFoundException(q);
     }
 
@@ -53,8 +63,8 @@ public class DBCategory extends DBHandler {
      *
      * @return {@link java.util.List} mit den Kategorien.
      */
-    public Map<String, Integer> getAllCategories() throws SQLException {
-        Map<String, Integer> categories = new LinkedHashMap<>();
+    public List<Category> getAllCategories() throws SQLException {
+        List<Category> categories = new LinkedList<>();
 
         PreparedStatement pStatement = connection.prepareStatement("SELECT kategorien.name, sortid, COUNT(gerichte.name) AS recipe_count FROM kategorien " +
                 "LEFT JOIN versions ON kategorien.name = kategorien_name " +
@@ -64,8 +74,9 @@ public class DBCategory extends DBHandler {
 
         while (data.next()) {
             String category = data.getString("kategorien.name");
+            int sortId = data.getInt("sortid");
             Integer recipeCount = data.getInt("recipe_count");
-            categories.put(category, recipeCount);
+            categories.add(new Category(category, sortId, recipeCount));
         }
 
         return categories;
@@ -76,8 +87,8 @@ public class DBCategory extends DBHandler {
      *
      * @return sortierte List mit den Kategorienamen
      */
-    public Map<String, Integer> getAllCategoriesSorted() throws SQLException {
-        Map<String, Integer> categories = new LinkedHashMap<>();
+    public List<Category> getAllCategoriesSorted() throws SQLException {
+        List<Category> categories = new LinkedList<>();
 
         PreparedStatement pStatement = connection.prepareStatement("SELECT kategorien.name, sortid, COUNT(gerichte.name) AS recipe_count FROM kategorien " +
                 "LEFT JOIN versions ON kategorien.name = kategorien_name " +
@@ -87,8 +98,9 @@ public class DBCategory extends DBHandler {
 
         while (data.next()) {
             String category = data.getString("kategorien.name");
+            int sortId = data.getInt("sortid");
             Integer recipeCount = data.getInt("recipe_count");
-            categories.put(category, recipeCount);
+            categories.add(new Category(category, sortId, recipeCount));
         }
         return categories;
     }

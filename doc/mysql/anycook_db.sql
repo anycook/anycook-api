@@ -665,7 +665,7 @@ USE `anycook_db`$$
 CREATE PROCEDURE `anycook_db`.`get_recipe` (IN recipe_name VARCHAR(45))
 BEGIN
 
-SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, nickname, viewed 
+SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
 FROM gerichte
 INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 INNER JOIN users ON users_id = users.id
@@ -706,7 +706,7 @@ DELIMITER $$
 USE `anycook_db`$$
 CREATE PROCEDURE `anycook_db`.`get_discussion` (IN recipe_name VARCHAR(45), IN maxid INT, IN userid INT)
 BEGIN
-	SELECT parent_id, discussions.id, nickname, users.id, versions_id, discussions.text, discussions.eingefuegt, 
+	SELECT parent_id, discussions.id, nickname, users.id, users.image, versions_id, discussions.text, discussions.eingefuegt, 
 		syntax, COUNT(discussions_like.users_id) AS votes, IF(discussions_like.users_id = userid, 1, 0) AS liked,
 		gerichte.active_id FROM discussions
 		LEFT JOIN users ON discussions.users_id = users.id 
@@ -892,7 +892,7 @@ CREATE PROCEDURE `tasty_recipes` (IN length INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, COUNT(users_id) AS counter, viewed 
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, viewed 
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -916,7 +916,7 @@ CREATE PROCEDURE `popular_recipes` (IN length INT)
 BEGIN
 
 SELECT beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, viewed 
+	min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -940,7 +940,7 @@ CREATE PROCEDURE `newest_recipes` (IN length INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, viewed 
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -964,7 +964,7 @@ CREATE PROCEDURE `user_recipes` (IN userId INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, COUNT(users_id) AS counter, viewed
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, viewed
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -988,7 +988,7 @@ USE `anycook_db`$$
 CREATE PROCEDURE `active_recipes` ()
 BEGIN
 
-SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, nickname 
+SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, users.image, nickname 
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -1012,7 +1012,7 @@ CREATE PROCEDURE `tasting_recipes` (IN user_id INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users.id AS users_id, nickname, viewed 
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users.id AS users_id, nickname, users.image, viewed 
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON versions.users_id = users.id
@@ -1036,7 +1036,7 @@ USE `anycook_db`$$
 CREATE PROCEDURE `anycook_db`.`get_version` (IN recipe_name VARCHAR(45), IN version_id INT)
 BEGIN
 
-SELECT beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, viewed 
+SELECT beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
 FROM gerichte
 INNER JOIN versions ON gerichte.name = gerichte_name
 INNER JOIN users ON users_id = users.id
@@ -1059,7 +1059,7 @@ USE `anycook_db`$$
 CREATE PROCEDURE `anycook_db`.`get_all_versions` (IN recipe_name VARCHAR(45))
 BEGIN
 
-SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, versions.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname 
+SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, versions.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image 
 FROM versions
 LEFT JOIN gerichte ON gerichte.name = versions.gerichte_name
 INNER JOIN users ON users_id = users.id
@@ -1082,7 +1082,7 @@ USE `anycook_db`$$
 CREATE PROCEDURE `anycook_db`.`get_all_recipes` ()
 BEGIN
 
-SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, nickname, viewed 
+SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, users.image, nickname, viewed 
 FROM gerichte
 INNER JOIN versions ON gerichte.name = gerichte_name 
 INNER JOIN users ON users_id = users.id

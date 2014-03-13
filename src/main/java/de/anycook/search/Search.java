@@ -23,7 +23,7 @@ import com.google.common.collect.Multimap;
 import de.anycook.db.lucene.FulltextIndex;
 import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBSearch;
-import de.anycook.recipe.Recipe;
+import de.anycook.recipe.Recipes;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -116,7 +116,7 @@ public class Search {
 
 
 
-        return new SearchResult(resultLength, Recipe.load(results));
+        return new SearchResult(resultLength, Recipes.load(results));
 
 
     }

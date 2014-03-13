@@ -30,24 +30,34 @@ public class Discussion {
     /**
      *
      */
-    private String recipe_name;
+    private String recipeName;
     private List<DiscussionElement> elements;
 
-    public Discussion(String recipe_name) {
-        this(recipe_name, new LinkedList<DiscussionElement>());
+    public Discussion(){}
+
+    public Discussion(String recipeName) {
+        this(recipeName, new LinkedList<DiscussionElement>());
     }
 
-    public Discussion(String recipe_name, List<DiscussionElement> discElems) {
-        this.recipe_name = recipe_name;
+    public Discussion(String recipeName, List<DiscussionElement> discElems) {
+        this.recipeName = recipeName;
         this.elements = discElems;
     }
 
-    public String getRecipe_name() {
-        return recipe_name;
+    public String getRecipeName() {
+        return recipeName;
     }
 
     public List<DiscussionElement> getElements() {
         return elements;
+    }
+
+    public void setRecipeName(String recipeName) {
+        this.recipeName = recipeName;
+    }
+
+    public void setElements(List<DiscussionElement> elements) {
+        this.elements = elements;
     }
 
     public void addElement(DiscussionElement element) {

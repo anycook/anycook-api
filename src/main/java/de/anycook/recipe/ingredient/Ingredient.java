@@ -31,7 +31,9 @@ import org.tartarus.snowball.ext.GermanStemmer;
 import java.sql.SQLException;
 import java.util.*;
 
-public class Ingredient {
+public class Ingredient{
+    static final long serialVersionUID = 41L;
+
     public String name = null;
     public String singular = null;
     public String menge = null;
@@ -74,6 +76,16 @@ public class Ingredient {
         this.recipecounter = recipecounter;
     }
 
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Ingredient && name.equals(((Ingredient) obj).name);
+    }
 
     public static Ingredient init(String name) throws SQLException, DBIngredient.IngredientNotFoundException {
         try (DBIngredient db = new DBIngredient()) {
@@ -161,9 +173,9 @@ public class Ingredient {
 		return new Ingredient(name, null, menge);
 	}*/
 
-    private static Set<String> searchNGram(List<String> terms, int n, DBRecipe dbRecipe) throws SQLException {
+    private static Set<Ingredient> searchNGram(List<String> terms, int n, DBRecipe dbRecipe) throws SQLException {
         SnowballProgram stemmer = new GermanStemmer();
-        Set<String> ingredients = new LinkedHashSet<>();
+        Set<Ingredient> ingredients = new LinkedHashSet<>();
 
         StringBuffer sb;
         List<Integer> indexToDelete = new LinkedList<>();
@@ -184,12 +196,10 @@ public class Ingredient {
             String stem = stemmer.getCurrent();
 
             try {
-                String ingredientName = dbRecipe.getFullIngredientName(stem);
-                if (ingredientName != null) {
-                    ingredients.add(ingredientName);
-                    for (int k = i; k < j; ++k)
-                        indexToDelete.add(k);
-                }
+                Ingredient ingredient = dbRecipe.getIngredientForStem(stem);
+                ingredients.add(ingredient);
+                for (int k = i; k < j; ++k)
+                    indexToDelete.add(k);
             } catch (DBIngredient.IngredientNotFoundException e) {
                 //nothing to do
             }
@@ -209,7 +219,7 @@ public class Ingredient {
         return ingredients;
     }
 
-    public static Set<String> searchNGram(String q, int n) throws SQLException {
+    public static Set<Ingredient> searchNGram(String q, int n) throws SQLException {
         StringTokenizer tokenizer = new StringTokenizer(q.toLowerCase(), " ,.;/-!?+(){}*^[]");
         List<String> terms = new ArrayList<>();
         while (tokenizer.hasMoreElements()) {

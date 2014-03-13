@@ -21,17 +21,20 @@ package de.anycook.news.life;
 import de.anycook.news.News;
 import de.anycook.user.User;
 
+import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
 
-
+@XmlType
 public class Life extends News {
-    private final String syntax;
-    private final String recipe;
-    private final User user;
+    private String syntax;
+    private String recipe;
+    private User user;
 
     //	public Life(int id, int userId, String syntax, String recipe, Date datetime) {
 //		this(id, userId, User.getUsername(userId), syntax, recipe, datetime);
 //	}
+
+    public Life(){}
 //	
     public Life(int id, User user, String syntax, String recipe, Date datetime) {
         super(id, datetime);
@@ -50,5 +53,17 @@ public class Life extends News {
 
     public User getUser() {
         return user;
+    }
+
+    public void setSyntax(String syntax) {
+        this.syntax = syntax;
+    }
+
+    public void setRecipe(String recipe) {
+        this.recipe = recipe;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

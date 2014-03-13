@@ -27,17 +27,59 @@ import java.util.Date;
 
 
 public class Message {
-    public final int id;
-    public final User sender;
-    public final String text;
-    public final Date datetime;
-    public final boolean unread;
+    private int id;
+    private User sender;
+    private String text;
+    private long datetime;
+    private boolean unread;
+
+    public Message() {}
 
     public Message(int id, User sender, String text, Date datetime, boolean unread) {
         this.id = id;
         this.sender = sender;
         this.text = text;
+        this.datetime = datetime.getTime();
+        this.unread = unread;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public long getDatetime() {
+        return datetime;
+    }
+
+    public void setDatetime(long datetime) {
         this.datetime = datetime;
+    }
+
+    public boolean isUnread() {
+        return unread;
+    }
+
+    public void setUnread(boolean unread) {
         this.unread = unread;
     }
 

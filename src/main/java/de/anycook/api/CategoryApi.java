@@ -19,15 +19,14 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
-import de.anycook.recipe.category.Category;
 import de.anycook.db.mysql.DBCategory;
+import de.anycook.recipe.category.Category;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 
 @Path("/category")
@@ -37,7 +36,7 @@ public class CategoryApi {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Integer> getAll(@QueryParam("sorted") boolean sorted){
+	public List<Category> getAll(@QueryParam("sorted") boolean sorted){
         try {
             return sorted ? Category.getAllSorted() : Category.getAll();
         } catch (SQLException e) {

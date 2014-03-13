@@ -18,17 +18,17 @@
 
 package de.anycook.api;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import de.anycook.api.util.MediaType;
+import de.anycook.api.views.PublicView;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSaveRecipe;
-import de.anycook.recipe.Views;
-import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.newrecipe.NewRecipe;
 import de.anycook.recipe.Recipe;
-import de.anycook.session.Session;
+import de.anycook.recipe.Recipes;
+import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
 import de.anycook.recipe.tag.Tag;
+import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
 import org.apache.log4j.Logger;
@@ -51,12 +51,11 @@ public class RecipeApi {
 	Logger logger = Logger.getLogger(getClass());
 
 	@GET
-    @JsonView(Views.ResultRecipeView.class)
 	public List<Recipe> getAll(@QueryParam("userId") Integer userId){
         try{
             if(userId != null)
-                return Recipe.getRecipesFromUser(userId);
-            return Recipe.getAll();
+                return Recipes.getRecipesFromUser(userId);
+            return Recipes.getAll();
         } catch (Exception e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -70,7 +69,7 @@ public class RecipeApi {
 	@Path("number")
 	public Integer getNum(){
         try {
-            return Recipe.getTotal();
+            return Recipes.getTotal();
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -85,7 +84,7 @@ public class RecipeApi {
 	@Path("oftheday")
 	public Recipe getRecipeOfTheDay(){
         try {
-            return Recipe.getRecipeOfTheDay();
+            return Recipes.getRecipeOfTheDay();
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -97,7 +96,7 @@ public class RecipeApi {
 	
 	@GET
 	@Path("{recipeName}")
-    @JsonView(Views.RecipeView.class)
+    @PublicView
 	public Recipe getRecipe(@PathParam("recipeName") String recipeName){
         try {
             return Recipe.init(recipeName);
@@ -123,7 +122,7 @@ public class RecipeApi {
 	
 	@GET
 	@Path("{recipeName}/tags")
-	public List<String> getRecipeTags(@PathParam("recipeName") String recipeName){
+	public List<Tag> getRecipeTags(@PathParam("recipeName") String recipeName){
         try {
             return Tag.loadTagsFromRecipe(recipeName);
         } catch (SQLException e) {
@@ -167,7 +166,7 @@ public class RecipeApi {
     @Path("{recipeName}/version")
     public List<Recipe> getAllVersion(@PathParam("recipeName") String recipeName){
         try {
-            return Recipe.getAllVersions(recipeName);
+            return Recipes.getAllVersions(recipeName);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -176,7 +175,7 @@ public class RecipeApi {
 
 	@GET
 	@Path("{recipeName}/version/{versionid}")
-    @JsonView(Views.RecipeView.class)
+    @PublicView
 	public Recipe getVersion(@PathParam("recipeName") String recipeName,
 			@PathParam("versionid") int versionid){
         try {
@@ -221,7 +220,7 @@ public class RecipeApi {
 			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
 		try {
-			return Response.temporaryRedirect(Recipe.getRecipeImage(recipeName, type)).build();
+			return Response.temporaryRedirect(Recipes.getRecipeImage(recipeName, type)).build();
 		} catch (URISyntaxException e) {
 			logger.error(e, e);
 			throw new WebApplicationException(400);

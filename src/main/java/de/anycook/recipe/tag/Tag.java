@@ -18,7 +18,6 @@
 
 package de.anycook.recipe.tag;
 
-import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBTag;
 
 import java.sql.SQLException;
@@ -26,24 +25,30 @@ import java.util.List;
 
 
 public class Tag {
-    public final String name;
-    public final int count;
-    public final List<String> recipes;
+    private String name;
+    private int recipeNumber;
 
-    public Tag(String name) {
-        this(name, 0);
+    public Tag() {}
+
+    public Tag(String name, int recipeNumber) {
+        this.name = name;
+        this.recipeNumber = recipeNumber;
     }
 
-    public Tag(String name, int count) {
-        this.name = name;
-        this.count = count;
-        this.recipes = null;
+    public String getName() {
+        return name;
     }
 
-    public Tag(String name, List<String> recipes) {
+    public void setName(String name) {
         this.name = name;
-        this.count = recipes.size();
-        this.recipes = recipes;
+    }
+
+    public int getRecipeNumber() {
+        return recipeNumber;
+    }
+
+    public void setRecipeNumber(int recipeNumber) {
+        this.recipeNumber = recipeNumber;
     }
 
     @Override
@@ -53,7 +58,7 @@ public class Tag {
 
     public static Tag init(String tagName) throws SQLException, DBTag.TagNotFoundException {
         try (DBTag db = new DBTag()) {
-            return db.getTagRecipes(tagName);
+            return db.get(tagName);
         }
     }
 
@@ -63,9 +68,9 @@ public class Tag {
         }
     }
 
-    public static List<String> loadTagsFromRecipe(String recipeName) throws SQLException {
-        try (DBGetRecipe db = new DBGetRecipe()) {
-            return db.loadRecipeTags(recipeName);
+    public static List<Tag> loadTagsFromRecipe(String recipeName) throws SQLException {
+        try (DBTag db = new DBTag()) {
+            return db.getTagsForRecipe(recipeName);
         }
     }
 
