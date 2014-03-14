@@ -3,7 +3,7 @@ anycook-api
 
 REST Api for anycook
 
-[![Build Status](https://travis-ci.org/anycook/anycook-api.png?branch=master)](https://travis-ci.org/anycook/anycook-api)
+[![Build Status](https://jenkins.anycook.de:443/buildStatus/icon?job=anycook-api)](https://jenkins.anycook.de:443/job/anycook-api/)
 
 ## Documentation
 A detailed API documentation can be found [here](http://docs.anycook.apiary.io/) (still in progress).
