@@ -369,6 +369,7 @@ public class User implements Comparable<User> {
     private String mail;
 
     @PrivateView
+    @PublicView
     private long facebookID;
 
     @PrivateView
@@ -384,11 +385,11 @@ public class User implements Comparable<User> {
 
     @PublicView
     @PrivateView
-    private Date createdate;
+    private long createDate;
 
     @PublicView
     @PrivateView
-    private Date lastlogin;
+    private long lastLogin;
 
     @PublicView
     @PrivateView
@@ -434,8 +435,8 @@ public class User implements Comparable<User> {
         this.image = new UserImage(image);
         this.text = text;
         this.level = level;
-        this.createdate = createDate;
-        this.lastlogin = lastLogin;
+        this.createDate = createDate.getTime();
+        this.lastLogin = lastLogin != null ? lastLogin.getTime() : -1;
         this.place = place;
         this.following = following;
         this.followers = followers;
@@ -463,12 +464,12 @@ public class User implements Comparable<User> {
         return text;
     }
 
-    public Date getCreatedate() {
-        return createdate;
+    public long getCreateDate() {
+        return createDate;
     }
 
-    public Date getLastlogin() {
-        return lastlogin;
+    public long getLastLogin() {
+        return lastLogin;
     }
 
     public String getPlace() {
@@ -511,12 +512,12 @@ public class User implements Comparable<User> {
         this.level = level;
     }
 
-    public void setCreatedate(Date createdate) {
-        this.createdate = createdate;
+    public void setCreateDate(long createDate) {
+        this.createDate = createDate;
     }
 
-    public void setLastlogin(Date lastlogin) {
-        this.lastlogin = lastlogin;
+    public void setLastLogin(long lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
     public void setFollowing(List<Integer> following) {
