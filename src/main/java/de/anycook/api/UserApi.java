@@ -19,6 +19,7 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
+import de.anycook.api.views.PrivateView;
 import de.anycook.api.views.PublicView;
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -46,14 +48,16 @@ import java.util.List;
 @Path("/user")
 public class UserApi {
 	private final Logger logger = Logger.getLogger(getClass());
-	
-	
+    @Context HttpServletRequest request;
+
 	@GET
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public List<User> getUsers(){
-        logger.info("test");
+	public Response getUsers(){
         try {
-            return User.getAll();
+            Session session = Session.init(request.getSession());
+            Annotation[] annotations = session.checkAdminLogin() ?
+                    new Annotation[]{PrivateView.Factory.get()} : new Annotation[]{};
+            return Response.ok().entity(User.getAll(),annotations).build();
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

@@ -37,9 +37,11 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
@@ -48,14 +50,21 @@ import java.util.List;
 @Path("/recipe")
 @Produces(MediaType.APPLICATION_JSON)
 public class RecipeApi {
-	Logger logger = Logger.getLogger(getClass());
+	private final Logger logger = Logger.getLogger(getClass());
+
+    @Context
+    private HttpServletRequest request;
 
 	@GET
-	public List<Recipe> getAll(@QueryParam("userId") Integer userId){
+	public Response getAll(@QueryParam("userId") Integer userId, @QueryParam("detailed") final boolean detailed){
         try{
+            Annotation[] annotations = detailed ?
+                    new Annotation[]{PublicView.Factory.get()} : new Annotation[]{};
+
             if(userId != null)
-                return Recipes.getRecipesFromUser(userId);
-            return Recipes.getAll();
+                return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getRecipesFromUser(userId)){},
+                        annotations).build();
+            return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getAll()){}, annotations).build();
         } catch (Exception e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -163,6 +172,7 @@ public class RecipeApi {
 
     //version
     @GET
+    @PublicView
     @Path("{recipeName}/version")
     public List<Recipe> getAllVersion(@PathParam("recipeName") String recipeName){
         try {

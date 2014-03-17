@@ -26,7 +26,6 @@ import de.anycook.db.mysql.DBRecipe;
 import de.anycook.image.Image;
 import de.anycook.image.RecipeImage;
 import de.anycook.user.User;
-import de.anycook.utils.DateParser;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -85,7 +84,7 @@ public class Recipe implements Comparable<Recipe> {
     private User author;
 
     @PublicView
-    private Date created;
+    private long created;
 
     @PublicView
     private int views;
@@ -104,7 +103,7 @@ public class Recipe implements Comparable<Recipe> {
         this.calorie = calorie;
         this.time = time;
         this.id = id;
-        this.created = created;
+        this.created = created.getTime();
         this.author = author;
         this.activeId = activeId;
         this.views = views;
@@ -167,7 +166,7 @@ public class Recipe implements Comparable<Recipe> {
         return author;
     }
 
-    public Date getCreated() {
+    public long getCreated() {
         return created;
     }
 
@@ -220,7 +219,7 @@ public class Recipe implements Comparable<Recipe> {
         this.author = author;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(long created) {
         this.created = created;
     }
 
@@ -246,7 +245,7 @@ public class Recipe implements Comparable<Recipe> {
         ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
         builder.put("name", name);
         builder.put("description", description);
-        builder.put("created", DateParser.dateToString(created));
+        builder.put("created", created);
         builder.put("calorie", calorie);
         builder.put("skill", skill);
         builder.put("time", ImmutableMap.of("std", time.std, "min", time.min));

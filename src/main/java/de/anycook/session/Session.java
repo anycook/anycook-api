@@ -90,8 +90,6 @@ public class Session {
         throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
 
-	
-	
 	/*@SuppressWarnings("unused")
 	private void checkSessiontime(){
 		long oldtime = session.getLastAccessedTime();
@@ -111,6 +109,14 @@ public class Session {
         if (login == null)
             throw new WebApplicationException(401);
         return true;
+    }
+
+    public boolean checkLoginWithoutException(){
+        return login != null;
+    }
+
+    public boolean checkAdminLogin(){
+        return login != null && login.isAdmin();
     }
 
     public boolean checkLogin(Map<String, Cookie> cookies) throws IOException {
