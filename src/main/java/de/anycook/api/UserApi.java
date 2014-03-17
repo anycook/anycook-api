@@ -50,14 +50,14 @@ import java.util.List;
 public class UserApi {
 	private final Logger logger = Logger.getLogger(getClass());
     @Context HttpServletRequest request;
+    @Context HttpHeaders hh;
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response getUsers(@QueryParam("detailed") final boolean isDetailed){
         try {
-            Session session = Session.init(request.getSession());
             Annotation[] annotations = isDetailed ?
-                    session.checkAdminLogin() ? new Annotation[]{PrivateView.Factory.get()} : new Annotation[]{PublicView.Factory.get()} :
+                    new Annotation[]{PublicView.Factory.get()} :
                     new Annotation[]{};
             return Response.ok().entity(new GenericEntity<List<User>>(User.getAll()) {}, annotations).build();
         } catch (SQLException e) {
@@ -121,7 +121,7 @@ public class UserApi {
 	@GET
 	@Path("recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Recipe> getRecommendations(@Context HttpServletRequest request){
+	public List<Recipe> getRecommendations(){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
 		int userId = session.getUser().getId();
@@ -135,11 +135,16 @@ public class UserApi {
 	
 	@GET
 	@Path("{userId}")
-    @PublicView
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public User getUser(@PathParam("userId") int userId){
+	public Response getUser(@PathParam("userId") int userId, @QueryParam("adminDetails") boolean isAdminDetails){
         try {
-            return User.init(userId);
+            if(isAdminDetails){
+                logger.debug("showing admin details");
+                Session.checkAdminLogin(request, hh);
+                return Response.ok().entity(User.init(userId), new Annotation[]{PrivateView.Factory.get()}).build();
+            }
+
+            return Response.ok().entity(User.init(userId), new Annotation[]{PublicView.Factory.get()}).build();
         } catch (IOException | SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -147,12 +152,33 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
+
+    @PUT
+    @Path("{userId}")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public void updateUser(@PathParam("userId") int userId, User user){
+        try {
+            Session.checkAdminLogin(request, hh);
+            try(DBUser dbUser = new DBUser()){
+                User old = dbUser.getUser(userId);
+                if(old.getLevel() != user.getLevel()) {
+                    dbUser.setUserLevel(userId, user.getLevel());
+                    logger.info(String.format("changed user level for user %d to %d", userId, user.getLevel()));
+                }
+            }
+        } catch (SQLException |IOException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBUser.UserNotFoundException e) {
+            logger.warn(e, e);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
+    }
 	
 	@PUT
 	@Path("{userId}/follow")
 	public Response follow(@PathParam("userId") int userId,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+			@Context HttpHeaders hh){
 		Session session = Session.init(request.getSession());
 
         try {
