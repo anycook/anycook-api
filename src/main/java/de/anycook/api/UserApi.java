@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -52,12 +53,13 @@ public class UserApi {
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response getUsers(){
+	public Response getUsers(@QueryParam("detailed") final boolean isDetailed){
         try {
             Session session = Session.init(request.getSession());
-            Annotation[] annotations = session.checkAdminLogin() ?
-                    new Annotation[]{PrivateView.Factory.get()} : new Annotation[]{};
-            return Response.ok().entity(User.getAll(),annotations).build();
+            Annotation[] annotations = isDetailed ?
+                    session.checkAdminLogin() ? new Annotation[]{PrivateView.Factory.get()} : new Annotation[]{PublicView.Factory.get()} :
+                    new Annotation[]{};
+            return Response.ok().entity(new GenericEntity<List<User>>(User.getAll()) {}, annotations).build();
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
