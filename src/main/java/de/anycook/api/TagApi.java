@@ -41,7 +41,7 @@ public class TagApi {
         try {
             return Tag.getAll();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -57,7 +57,7 @@ public class TagApi {
         try {
             return Tag.getTotal();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
@@ -76,7 +76,7 @@ public class TagApi {
                 return Recipes.getPopularTags();
             return Recipes.getPopularTags(recipe);
         } catch (SQLException e){
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
@@ -88,7 +88,7 @@ public class TagApi {
         try {
             return Tag.init(tagName);
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBTag.TagNotFoundException e) {
             logger.warn(e);
