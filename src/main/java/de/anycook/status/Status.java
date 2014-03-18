@@ -2,25 +2,23 @@ package de.anycook.status;
 
 import de.anycook.db.mysql.DBHandler;
 import de.anycook.db.mysql.DBRecipe;
-import de.anycook.recipe.Recipe;
 import de.anycook.recipe.Recipes;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 
 import java.sql.SQLException;
-import java.util.Map;
 
 public class Status {
-    private final Recipe dailyDish;
-    private final int tags;
-    private final int ingredients;
-    private final int recipes;
-    private final int users;
-    private final Map<String, Integer> connectionStatus;
+    private String dailyDish;
+    private int tags;
+    private int ingredients;
+    private int recipes;
+    private int users;
+    private DBHandler.ConnectionStatus connectionStatus;
 
     public Status() throws SQLException, DBRecipe.RecipeNotFoundException {
-        dailyDish = Recipes.getRecipeOfTheDay();
+        dailyDish = Recipes.getRecipeOfTheDay().getName();
         tags = Tag.getTotal();
         ingredients = Ingredient.getTotal();
         recipes = Recipes.getTotal();
@@ -30,7 +28,7 @@ public class Status {
 
 
     public String getDailyDish() {
-        return dailyDish.getName();
+        return dailyDish;
     }
 
     public int getTags() {
@@ -49,7 +47,31 @@ public class Status {
         return users;
     }
 
-    public Map<String, Integer> getConnectionStatus() {
+    public void setDailyDish(String dailyDish) {
+        this.dailyDish = dailyDish;
+    }
+
+    public void setTags(int tags) {
+        this.tags = tags;
+    }
+
+    public void setIngredients(int ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setRecipes(int recipes) {
+        this.recipes = recipes;
+    }
+
+    public void setUsers(int users) {
+        this.users = users;
+    }
+
+    public void setConnectionStatus(DBHandler.ConnectionStatus connectionStatus) {
+        this.connectionStatus = connectionStatus;
+    }
+
+    public DBHandler.ConnectionStatus getConnectionStatus() {
         return connectionStatus;
     }
 }

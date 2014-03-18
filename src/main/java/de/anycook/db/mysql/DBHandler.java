@@ -27,10 +27,11 @@ import de.anycook.conf.Configuration;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.log4j.Logger;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -175,69 +176,53 @@ public class DBHandler implements AutoCloseable {
         return dataSource.getMaxIdle();
     }
 
-    public static Map<String, Integer> getConnectionsStatus() {
-        Map<String, Integer> connectionStati = new HashMap<>();
-        connectionStati.put("numactive", getNumActive());
-        connectionStati.put("maxactive", getMaxActive());
-        connectionStati.put("numidle", getNumIdle());
-        connectionStati.put("maxidle", getMaxIdle());
-        return connectionStati;
+    public static ConnectionStatus getConnectionsStatus() {
+        ConnectionStatus status = new ConnectionStatus();
+        status.setNumActive(getNumActive());
+        status.setMaxActive(getMaxActive());
+        status.setNumIdle(getNumIdle());
+        status.setMaxIdle(getMaxIdle());
+        return status;
     }
 
-    /**
-     * Loescht alle Daten in der Datenbank
-     *
-     * @throws java.sql.SQLException
-     */
-    protected void clearDB() throws SQLException {
-        logger.info("clearing DB");
-        clearTable("activationids");
-        clearTable("apps_has_users");
-        clearTable("apps");
-        resetAutoIncremement("apps");
-        clearTable("cases");
-        clearTable("discussions");
-        clearTable("discussions_events");
-        clearTable("discussions_like");
-        clearTable("facebooksettings");
-        clearTable("followers");
-        clearTable("gerichte");
-        clearTable("gerichte_has_tags");
-        clearTable("kategorien");
-        clearTable("life");
-        clearTable("mailanbieter");
-        clearTable("maildomains");
-        clearTable("users_has_mailnotifications");
-        clearTable("mailnotifications");
-        clearTable("message_sessions");
-        clearTable("message_sessions_has_users");
-        clearTable("messages");
-        clearTable("messages_unread");
-        clearTable("permanent_cookies");
-        clearTable("schmeckt");
-        clearTable("schritte");
-        clearTable("schritte_has_zutaten");
-        clearTable("tagesrezepte");
-        clearTable("tags");
-        clearTable("tumblr");
-        clearTable("userlevels");
-        clearTable("users");
-        resetAutoIncremement("users");
-        clearTable("versions");
-        clearTable("versions_has_zutaten");
-        clearTable("zutaten");
+    public static class ConnectionStatus {
+        private int numActive;
+        private int maxActive;
+        private int numIdle;
+        private int maxIdle;
+
+        public int getNumActive() {
+            return numActive;
+        }
+
+        public void setNumActive(int numActive) {
+            this.numActive = numActive;
+        }
+
+        public int getMaxActive() {
+            return maxActive;
+        }
+
+        public void setMaxActive(int maxActive) {
+            this.maxActive = maxActive;
+        }
+
+        public int getNumIdle() {
+            return numIdle;
+        }
+
+        public void setNumIdle(int numIdle) {
+            this.numIdle = numIdle;
+        }
+
+        public int getMaxIdle() {
+            return maxIdle;
+        }
+
+        public void setMaxIdle(int maxIdle) {
+            this.maxIdle = maxIdle;
+        }
     }
 
-    protected void clearTable(String tablename) throws SQLException {
-        logger.info("clearing " + tablename);
-        Statement statement = connection.createStatement();
-        String query = "TRUNCATE TABLE " + tablename;
-        statement.execute(query);
-    }
 
-    protected void resetAutoIncremement(String tablename) throws SQLException {
-        Statement statement = connection.createStatement();
-        String query = "ALTER TABLE " + tablename + " AUTO_INCREMENT = 1";
-        statement.execute(query);
-    }
 }
