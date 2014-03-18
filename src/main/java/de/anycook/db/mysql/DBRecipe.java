@@ -159,7 +159,7 @@ public class DBRecipe extends DBHandler {
         ResultSet data = pStatement.executeQuery();
 
         while (data.next()) {
-            String tagName = data.getString("tag");
+            String tagName = data.getString("tags_name");
             int count = data.getInt("count");
             tags.add(new Tag(tagName, count));
         }
