@@ -22,9 +22,7 @@ import de.anycook.db.mysql.DBAutocomplete;
 import de.anycook.user.User;
 
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
@@ -64,43 +62,91 @@ public class Autocomplete {
         }
     }
 
-    public static Map<String, Object> autoCompleteAll(String query, String excludedCategory,
+    public static Result autoCompleteAll(String query, String excludedCategory,
                                                       Set<String> excludedIngredients, Set<String> excludedTags,
                                                       Set<Integer> excludedUsers, int maxResults) throws SQLException {
-        Map<String, Object> resultMap = new HashMap<>();
+        Result result = new Result();
         List<String> results;
 
         //getRecipes
         results = autocompleteRecipe(query, maxResults);
-        resultMap.put("recipes", results);
+        result.setRecipes(results);
         maxResults -= results.size();
 
         if (maxResults > 0) {
             // getIngredientResults
             results = autocompleteIngredient(query, maxResults, excludedIngredients);
-            resultMap.put("ingredients", results);
+            result.setIngredients(results);
             maxResults -= results.size();
         }
 
         if (maxResults > 0) {
             // getCategoryResults
             results = autocompleteCategory(query, maxResults, excludedCategory);
-            resultMap.put("categories", results);
+            result.setCategories(results);
             maxResults -= results.size();
         }
 
         if (maxResults > 0) {
             //getTagsResults
             results = autocompleteTag(query, maxResults, excludedTags);
-            resultMap.put("tags", results);
+            result.setTags(results);
             maxResults -= results.size();
         }
         if (maxResults > 0) {
             List<User> userResults = autocompleteUsers(query, maxResults, excludedUsers);
-            resultMap.put("user", userResults);
+            result.setUser(userResults);
         }
 
-        return resultMap;
+        return result;
+    }
+
+    public static class Result {
+        private List<String> recipes;
+        private List<String> ingredients;
+        private List<String> categories;
+        private List<String> tags;
+        private List<User> user;
+
+        public List<String> getRecipes() {
+            return recipes;
+        }
+
+        public void setRecipes(List<String> recipes) {
+            this.recipes = recipes;
+        }
+
+        public List<String> getIngredients() {
+            return ingredients;
+        }
+
+        public void setIngredients(List<String> ingredients) {
+            this.ingredients = ingredients;
+        }
+
+        public List<String> getCategories() {
+            return categories;
+        }
+
+        public void setCategories(List<String> categories) {
+            this.categories = categories;
+        }
+
+        public List<String> getTags() {
+            return tags;
+        }
+
+        public void setTags(List<String> tags) {
+            this.tags = tags;
+        }
+
+        public List<User> getUser() {
+            return user;
+        }
+
+        public void setUser(List<User> user) {
+            this.user = user;
+        }
     }
 
 }
