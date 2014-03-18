@@ -20,6 +20,7 @@ package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
 import de.anycook.autocomplete.Autocomplete;
+import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.user.User;
 import org.apache.log4j.Logger;
 
@@ -66,7 +67,7 @@ public class AutocompleteApi {
 	@GET
 	@Path("ingredient")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> autocompleteIngredient(@QueryParam("query") String query,
+	public List<Ingredient> autocompleteIngredient(@QueryParam("query") String query,
 			                                   @QueryParam("exclude") StringSet exclude,
 			                                   @QueryParam("maxResults") @DefaultValue("10") int maxResults){
 		if(query == null)

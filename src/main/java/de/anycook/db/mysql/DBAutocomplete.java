@@ -18,6 +18,7 @@
 
 package de.anycook.db.mysql;
 
+import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.user.User;
 
 import java.sql.PreparedStatement;
@@ -45,9 +46,9 @@ public class DBAutocomplete extends DBHandler {
      * @param q Zu vervollstaendigender String
      * @return {@link java.util.List} mit Strings, die q enthalten.
      */
-    public List<String> autocompleteIngredient(String q, int maxResults, Set<String> excludedIngredients)
+    public List<Ingredient> autocompleteIngredient(String q, int maxResults, Set<String> excludedIngredients)
             throws SQLException {
-        List<String> list = new LinkedList<>();
+        List<Ingredient> list = new LinkedList<>();
 
         PreparedStatement pStatement = connection.prepareStatement("SELECT name from zutaten WHERE name LIKE ? LIMIT ?");
         pStatement.setString(1, q + "%");
@@ -61,7 +62,7 @@ public class DBAutocomplete extends DBHandler {
                 if (excludedIngredients != null && excludedIngredients.contains(name))
                     continue;
 
-                list.add(name);
+                list.add(new Ingredient(name));
             }
         }
         return list;

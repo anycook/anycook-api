@@ -19,6 +19,7 @@
 package de.anycook.autocomplete;
 
 import de.anycook.db.mysql.DBAutocomplete;
+import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.user.User;
 
 import java.sql.SQLException;
@@ -28,7 +29,7 @@ import java.util.Set;
 
 public class Autocomplete {
 
-    public static List<String> autocompleteIngredient(String query, int maxResults,
+    public static List<Ingredient> autocompleteIngredient(String query, int maxResults,
                                                       Set<String> excludedIngredients) throws SQLException {
         try(DBAutocomplete dbAutocomplete = new DBAutocomplete()) {
             return dbAutocomplete.autocompleteIngredient(query, maxResults, excludedIngredients);
@@ -66,30 +67,30 @@ public class Autocomplete {
                                                       Set<String> excludedIngredients, Set<String> excludedTags,
                                                       Set<Integer> excludedUsers, int maxResults) throws SQLException {
         Result result = new Result();
-        List<String> results;
-
         //getRecipes
-        results = autocompleteRecipe(query, maxResults);
-        result.setRecipes(results);
-        maxResults -= results.size();
+        if(maxResults > 0){
+            List<String> results = autocompleteRecipe(query, maxResults);
+            result.setRecipes(results);
+            maxResults -= results.size();
+        }
 
         if (maxResults > 0) {
             // getIngredientResults
-            results = autocompleteIngredient(query, maxResults, excludedIngredients);
+            List<Ingredient> results = autocompleteIngredient(query, maxResults, excludedIngredients);
             result.setIngredients(results);
             maxResults -= results.size();
         }
 
         if (maxResults > 0) {
             // getCategoryResults
-            results = autocompleteCategory(query, maxResults, excludedCategory);
+            List<String> results = autocompleteCategory(query, maxResults, excludedCategory);
             result.setCategories(results);
             maxResults -= results.size();
         }
 
         if (maxResults > 0) {
             //getTagsResults
-            results = autocompleteTag(query, maxResults, excludedTags);
+            List<String> results = autocompleteTag(query, maxResults, excludedTags);
             result.setTags(results);
             maxResults -= results.size();
         }
@@ -103,7 +104,7 @@ public class Autocomplete {
 
     public static class Result {
         private List<String> recipes;
-        private List<String> ingredients;
+        private List<Ingredient> ingredients;
         private List<String> categories;
         private List<String> tags;
         private List<User> user;
@@ -116,11 +117,11 @@ public class Autocomplete {
             this.recipes = recipes;
         }
 
-        public List<String> getIngredients() {
+        public List<Ingredient> getIngredients() {
             return ingredients;
         }
 
-        public void setIngredients(List<String> ingredients) {
+        public void setIngredients(List<Ingredient> ingredients) {
             this.ingredients = ingredients;
         }
 
