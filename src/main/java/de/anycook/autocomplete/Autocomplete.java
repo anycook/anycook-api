@@ -20,6 +20,7 @@ package de.anycook.autocomplete;
 
 import de.anycook.db.mysql.DBAutocomplete;
 import de.anycook.recipe.ingredient.Ingredient;
+import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 
 import java.sql.SQLException;
@@ -36,7 +37,7 @@ public class Autocomplete {
         }
     }
 
-    public static List<String> autocompleteTag(String query, int maxResults,
+    public static List<Tag> autocompleteTag(String query, int maxResults,
                                                Set<String> excludedTags) throws SQLException {
         try(DBAutocomplete dbAutocomplete = new DBAutocomplete()) {
             return dbAutocomplete.autocompleteTag(query, maxResults, excludedTags);
@@ -90,7 +91,7 @@ public class Autocomplete {
 
         if (maxResults > 0) {
             //getTagsResults
-            List<String> results = autocompleteTag(query, maxResults, excludedTags);
+            List<Tag> results = autocompleteTag(query, maxResults, excludedTags);
             result.setTags(results);
             maxResults -= results.size();
         }
@@ -106,7 +107,7 @@ public class Autocomplete {
         private List<String> recipes;
         private List<Ingredient> ingredients;
         private List<String> categories;
-        private List<String> tags;
+        private List<Tag> tags;
         private List<User> user;
 
         public List<String> getRecipes() {
@@ -133,11 +134,11 @@ public class Autocomplete {
             this.categories = categories;
         }
 
-        public List<String> getTags() {
+        public List<Tag> getTags() {
             return tags;
         }
 
-        public void setTags(List<String> tags) {
+        public void setTags(List<Tag> tags) {
             this.tags = tags;
         }
 

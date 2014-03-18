@@ -26,11 +26,15 @@ import java.util.List;
 
 public class Tag {
     private String name;
-    private int recipeNumber;
+    private Integer recipeNumber;
 
     public Tag() {}
 
-    public Tag(String name, int recipeNumber) {
+    public Tag(String name){
+        this(name, null);
+    }
+
+    public Tag(String name, Integer recipeNumber) {
         this.name = name;
         this.recipeNumber = recipeNumber;
     }
@@ -43,11 +47,11 @@ public class Tag {
         this.name = name;
     }
 
-    public int getRecipeNumber() {
+    public Integer getRecipeNumber() {
         return recipeNumber;
     }
 
-    public void setRecipeNumber(int recipeNumber) {
+    public void setRecipeNumber(Integer recipeNumber) {
         this.recipeNumber = recipeNumber;
     }
 

@@ -19,6 +19,7 @@
 package de.anycook.db.mysql;
 
 import de.anycook.recipe.ingredient.Ingredient;
+import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 
 import java.sql.PreparedStatement;
@@ -120,8 +121,8 @@ public class DBAutocomplete extends DBHandler {
      * @param excludedTags
      * @return {@link java.util.LinkedList} mit Strings mit Kategorienamen, die q enthalten.
      */
-    public List<String> autocompleteTag(String q, int maxResults, Set<String> excludedTags) throws SQLException {
-        List<String> list = new LinkedList<>();
+    public List<Tag> autocompleteTag(String q, int maxResults, Set<String> excludedTags) throws SQLException {
+        List<Tag> list = new LinkedList<>();
         PreparedStatement pStatement = connection.prepareStatement("SELECT name from tags LEFT JOIN gerichte_has_tags " +
                 "ON name = tags_name WHERE active = 1 AND name LIKE ? GROUP BY name LIMIT ?");
         pStatement.setString(1, q + "%");
@@ -134,7 +135,7 @@ public class DBAutocomplete extends DBHandler {
             if (excludedTags != null && excludedTags.contains(name))
                 continue;
 
-            list.add(name);
+            list.add(new Tag(name));
 
         }
         return list;
