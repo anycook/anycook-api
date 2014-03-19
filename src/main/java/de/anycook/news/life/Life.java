@@ -21,6 +21,7 @@ package de.anycook.news.life;
 import de.anycook.news.News;
 import de.anycook.user.User;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
 
@@ -41,6 +42,18 @@ public class Life extends News {
         this.syntax = syntax;
         this.recipe = recipe;
         this.user = user;
+    }
+
+    @XmlElement
+    @Override
+    public int getId() {
+        return super.getId();
+    }
+
+    @XmlElement
+    @Override
+    public long getDatetime() {
+        return super.getDatetime();
     }
 
     public String getSyntax() {
