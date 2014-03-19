@@ -3,6 +3,7 @@ apply plugin: "idea"
 
 //current project version
 version = '0.1.0'
+sourceCompatibility = 1.7
 // base package
 group = 'de.anycook.api'
 
