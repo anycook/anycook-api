@@ -22,6 +22,7 @@ import de.anycook.api.util.MediaType;
 import de.anycook.api.views.PublicView;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSaveRecipe;
+import de.anycook.db.mysql.DBUser;
 import de.anycook.newrecipe.NewRecipe;
 import de.anycook.notifications.Notification;
 import de.anycook.recipe.Recipe;
@@ -216,8 +217,14 @@ public class RecipeApi {
             Recipe oldVersion = Recipe.init(recipeName, versionId);
             if(oldVersion.isActive() != newVersion.isActive()){
                 Recipes.setActiveId(recipeName, newVersion.isActive() ? newVersion.getId() : -1);
+                if(newVersion.isActive()){
+                    Map<String, String> data = new HashMap<>();
+                    data.put("recipeName", recipeName);
+                    Notification.sendNotification(oldVersion.getActiveAuthor(),
+                            NotificationType.RECIPE_ACTIVATION, data);
+                }
             }
-        } catch (SQLException | IOException e) {
+        } catch (SQLException | IOException | DBUser.UserNotFoundException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
