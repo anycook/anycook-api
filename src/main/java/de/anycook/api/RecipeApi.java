@@ -223,9 +223,12 @@ public class RecipeApi {
                 if(newVersion.isActive()){
                     Map<String, String> data = new HashMap<>();
                     data.put("recipeName", recipeName);
-                    Notification.sendNotification(oldVersion.getActiveAuthor(),
-                            NotificationType.RECIPE_ACTIVATION, data);
-                    Lifes.addLife(Lifes.Case.NEW_VERSION, newVersion.getActiveAuthor(), recipeName);
+
+                    if(oldVersion.getActiveAuthor() >= 0) {
+                        Notification.sendNotification(oldVersion.getActiveAuthor(),
+                                NotificationType.RECIPE_ACTIVATION, data);
+                        Lifes.addLife(Lifes.Case.NEW_VERSION, newVersion.getActiveAuthor(), recipeName);
+                    }
                 }
             }
         } catch (SQLException | IOException | DBUser.UserNotFoundException e) {
