@@ -217,4 +217,10 @@ public class Recipes {
             return dbGetRecipe.getVersions(recipeName);
         }
     }
+
+    public static void setActiveId(String recipeName, int activeId) throws SQLException {
+        try(DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()){
+            dbSaveRecipe.setActiveId(recipeName, activeId);
+        }
+    }
 }

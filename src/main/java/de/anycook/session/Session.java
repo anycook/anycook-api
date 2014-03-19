@@ -81,7 +81,7 @@ public class Session {
         return shandler;
     }
 
-    public static void checkAdminLogin(HttpServletRequest request, HttpHeaders hh) throws SQLException, IOException, DBUser.UserNotFoundException {
+    public static void checkAdminLogin(HttpServletRequest request, HttpHeaders hh) throws SQLException, IOException {
         Session session = Session.init(request.getSession(true));
 
         if (session.checkLogin(hh.getCookies()) && session.getUser().isAdmin())

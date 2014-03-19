@@ -72,7 +72,7 @@ public class DBGetRecipe extends DBRecipe {
     }
 
     public Recipe getVersionData(String recipeName, int versionId) throws RecipeNotFoundException, SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call get_version(?, ?)");
+        CallableStatement callableStatement = connection.prepareCall("{call get_version(?, ?)}");
         callableStatement.setString(1, recipeName);
         callableStatement.setInt(2, versionId);
         ResultSet data = callableStatement.executeQuery();

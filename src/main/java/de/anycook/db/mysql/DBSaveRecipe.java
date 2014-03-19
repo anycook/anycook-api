@@ -267,4 +267,10 @@ public class DBSaveRecipe extends DBRecipe {
     }
 
 
+    public void setActiveId(String recipeName, int activeId) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE gerichte SET active_id = ? WHERE name = ?");
+        preparedStatement.setInt(1, activeId);
+        preparedStatement.setString(2, recipeName);
+        preparedStatement.executeUpdate();
+    }
 }

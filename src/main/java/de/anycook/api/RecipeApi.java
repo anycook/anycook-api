@@ -54,6 +54,8 @@ public class RecipeApi {
 
     @Context
     private HttpServletRequest request;
+    @Context
+    private HttpHeaders hh;
 
 	@GET
 	public Response getAll(@QueryParam("userId") Integer userId, @QueryParam("detailed") final boolean detailed){
@@ -143,8 +145,7 @@ public class RecipeApi {
     @POST
     @Path("{recipeName}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void suggestTags(@Context HttpServletRequest request,
-                            @PathParam("recipeName") String recipeName,
+    public void suggestTags(@PathParam("recipeName") String recipeName,
                             List<String> tags) {
         Session session = Session.init(request.getSession());
         int userId = session.getUser().getId();
@@ -184,13 +185,35 @@ public class RecipeApi {
     }
 
 	@GET
-	@Path("{recipeName}/version/{versionid}")
+	@Path("{recipeName}/version/{versionId}")
     @PublicView
 	public Recipe getVersion(@PathParam("recipeName") String recipeName,
-			@PathParam("versionid") int versionid){
+			@PathParam("versionId") int versionId){
         try {
-            return Recipe.init(recipeName, versionid);
+            return Recipe.init(recipeName, versionId);
         } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBRecipe.RecipeNotFoundException e) {
+            logger.warn(e, e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
+
+    @PUT
+    @Path("{recipeName}/version/{versionId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateVersion(@PathParam("recipeName") String recipeName,
+                              @PathParam("versionId") int versionId,
+                              Recipe newVersion){
+
+        try {
+            Session.checkAdminLogin(request, hh);
+            Recipe oldVersion = Recipe.init(recipeName, versionId);
+            if(oldVersion.isActive() != newVersion.isActive()){
+                Recipes.setActiveId(recipeName, newVersion.isActive() ? newVersion.getId() : -1);
+            }
+        } catch (SQLException | IOException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
@@ -242,8 +265,7 @@ public class RecipeApi {
 	
 	@GET
 	@Path("{recipeName}/schmeckt")
-	public Boolean checkSchmeckt(@PathParam("recipeName") String recipeName,
-			@Context HttpServletRequest request){
+	public Boolean checkSchmeckt(@PathParam("recipeName") String recipeName){
 		Session session = Session.init(request.getSession());
 		session.checkLogin();
         try {
@@ -256,9 +278,7 @@ public class RecipeApi {
 	
 	@PUT
 	@Path("{recipeName}/schmeckt")
-	public void schmeckt(@PathParam("recipeName") String recipeName,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	public void schmeckt(@PathParam("recipeName") String recipeName){
 		
 		Session session = Session.init(request.getSession());
 
@@ -277,9 +297,7 @@ public class RecipeApi {
 	
 	@DELETE
 	@Path("{recipeName}/schmeckt")
-	public void schmecktNicht(@PathParam("recipeName") String recipeName,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	public void schmecktNicht(@PathParam("recipeName") String recipeName){
 		Session session = Session.init(request.getSession());
 
 
@@ -298,9 +316,7 @@ public class RecipeApi {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public void saveRecipe(@Context HttpHeaders hh,
-			@Context HttpServletRequest request,			
-			NewRecipe newRecipe){
+	public void saveRecipe(NewRecipe newRecipe){
 		logger.info("want to save recipe");
 		Session  session = Session.init(request.getSession());
 

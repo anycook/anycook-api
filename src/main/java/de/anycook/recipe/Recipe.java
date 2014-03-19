@@ -66,7 +66,7 @@ public class Recipe implements Comparable<Recipe> {
     private int id;
 
     @PublicView
-    private int activeId;
+    private boolean active;
 
     @PublicView
     private String category;
@@ -105,7 +105,7 @@ public class Recipe implements Comparable<Recipe> {
         this.id = id;
         this.created = created.getTime();
         this.author = author;
-        this.activeId = activeId;
+        this.active = id == activeId;
         this.views = views;
     }
 
@@ -114,8 +114,8 @@ public class Recipe implements Comparable<Recipe> {
         return name;
     }
 
-    public int getActiveId() {
-        return activeId;
+    public boolean isActive() {
+        return active;
     }
 
     public String getCategory() {
@@ -174,6 +174,10 @@ public class Recipe implements Comparable<Recipe> {
         return views;
     }
 
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     //setter
     public void setName(String name) {
         this.name = name;
@@ -181,10 +185,6 @@ public class Recipe implements Comparable<Recipe> {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public void setActiveId(int activeId) {
-        this.activeId = activeId;
     }
 
     public void setCategory(String category) {
