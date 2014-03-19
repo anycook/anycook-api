@@ -18,7 +18,6 @@
 
 package de.anycook.api.listener;
 
-import de.anycook.db.lucene.FulltextIndex;
 import de.anycook.db.mysql.DBHandler;
 import org.apache.log4j.Logger;
 
@@ -49,7 +48,6 @@ public class StartListener implements ServletContextListener {
 
         try {
             DBHandler.init();
-            FulltextIndex.init().addAllRecipes();
         } catch (Exception e) {
             logger.error(e, e);
             e.printStackTrace();
