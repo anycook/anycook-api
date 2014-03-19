@@ -11,6 +11,7 @@ import de.anycook.db.mysql.DBTag;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
 import de.anycook.recipe.tag.Tag;
+import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
 import org.apache.log4j.Logger;
 
@@ -221,6 +222,12 @@ public class Recipes {
     public static void setActiveId(String recipeName, int activeId) throws SQLException {
         try(DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()){
             dbSaveRecipe.setActiveId(recipeName, activeId);
+        }
+    }
+
+    public static List<User> getAuthors(String recipeName) throws SQLException {
+        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+            return dbGetRecipe.getAuthors(recipeName);
         }
     }
 }

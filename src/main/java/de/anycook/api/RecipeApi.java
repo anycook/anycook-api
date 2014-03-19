@@ -125,6 +125,17 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
+
+    @GET
+    @Path("{recipeName}/authors")
+    public List<User> getAuthors(@PathParam("recipeName") String recipeName){
+        try {
+            return Recipes.getAuthors(recipeName);
+        } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("{recipeName}/ingredients")
