@@ -50,11 +50,14 @@ public class MessageSession extends News {
             DBMessage.SessionNotFoundException {
         try (DBMessage db = new DBMessage()) {
             if (!db.checkSession(sessionId, userId))
-                throw new DBMessage.SessionNotFoundException(sessionId);
+                throw new DBMessage.SessionNotFoundException(sessionId, userId);
 
             Set<User> recipients = db.getRecipients(sessionId);
             List<Message> messages = db.getMessages(sessionId, lastId, userId, 100);
-            Date lastChange = db.lastChange(sessionId);
+
+            Date lastChange = null;
+            if(messages.size() > 0)
+                lastChange = db.lastChange(sessionId);
 
             return new MessageSession(sessionId, recipients, messages, lastChange);
         }
@@ -72,7 +75,7 @@ public class MessageSession extends News {
             try {
                 sessionId = db.getSessionIDFromUsers(userIds);
             } catch (DBMessage.SessionNotFoundException e) {
-                Logger.getLogger(MessageSession.class).debug(e, e);
+                sLogger.debug(e);
                 sessionId = db.newSession();
                 db.addRecipientsToSession(sessionId, userIds);
             }
@@ -189,7 +192,7 @@ public class MessageSession extends News {
                             Map<String, String> data = new HashMap<>();
                             data.put("sender", User.getUsername(sender));
                             data.put("content", text);
-                            Notification.sendNotification(recipient.getId(), NotificationType.NEWMESSAGE, data);
+                            Notification.sendNotification(recipient.getId(), NotificationType.NEW_MESSAGE, data);
                         } catch (DBUser.UserNotFoundException e) {
                             logger.error(e, e);
                         }

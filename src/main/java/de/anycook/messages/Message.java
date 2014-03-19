@@ -91,10 +91,10 @@ public class Message {
 
     public static boolean check(NotificationType type) {
         switch (type) {
-            case NEWMESSAGE:
-            case RESETPASSWORD:
-            case ACCOUNTACTIVATION:
-            case NEWMAIL:
+            case NEW_MESSAGE:
+            case RESET_PASSWORD:
+            case ACCOUNT_ACTIVATION:
+            case NEW_MAIL:
                 return false;
             default:
                 return true;

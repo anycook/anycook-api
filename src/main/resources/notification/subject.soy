@@ -77,3 +77,11 @@
 {template .recipeActivation}
     Deine Version von {$recipeName} wurde aktiviert
 {/template}
+
+/**
+ * Mail subject to notify admins for new version
+ * @param recipeName name of the activated recipe
+ */
+{template .adminNewVersion}
+    Neue Version von {$recipeName}
+{/template}

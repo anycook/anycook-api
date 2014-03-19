@@ -564,6 +564,17 @@ public class DBUser extends DBHandler {
         }
     }
 
+    public List<Integer> getAdminIds() throws SQLException {
+        PreparedStatement statement = connection.prepareStatement("SELECT id FROM users WHERE userlevels_id = 2;");
+        List<Integer> adminIds = new LinkedList<>();
+        try(ResultSet data = statement.executeQuery()){
+            while (data.next()){
+                adminIds.add(data.getInt("id"));
+            }
+        }
+        return adminIds;
+    }
+
     public static class UserNotFoundException extends Exception {
         public UserNotFoundException(String username) {
             super("user does not exist: " + username);

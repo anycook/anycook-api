@@ -19,43 +19,46 @@
 package de.anycook.utils.enumerations;
 
 public enum NotificationType {
-    RECIPEACTIVATION,
+    RECIPE_ACTIVATION,
     DISCUSSION,
-    TAGACCEPTED,
-    TAGDENIED,
+    TAG_ACCEPTED,
+    TAG_DENIED,
     NEWSLETTER,
-    DISCUSSIONANSWER,
+    DISCUSSION_ANSWER,
     TASTES,
-    RESETPASSWORD,
-    ACCOUNTACTIVATION,
-    NEWMESSAGE,
-    NEWMAIL;
+    RESET_PASSWORD,
+    ACCOUNT_ACTIVATION,
+    NEW_MESSAGE,
+    NEW_MAIL,
+    ADMIN_NEW_VERSION;
 
     @Override
     public String toString() {
         switch (this){
-            case RECIPEACTIVATION:
+            case RECIPE_ACTIVATION:
                 return "recipeActivation";
             case DISCUSSION:
                 return "discussion";
-            case DISCUSSIONANSWER:
+            case DISCUSSION_ANSWER:
                 return "discussionAnswer";
-            case TAGACCEPTED:
+            case TAG_ACCEPTED:
                 return "tagAccepted";
-            case TAGDENIED:
+            case TAG_DENIED:
                 return "tagDenied";
-            case ACCOUNTACTIVATION:
+            case ACCOUNT_ACTIVATION:
                 return "accountActivation";
-            case RESETPASSWORD:
+            case RESET_PASSWORD:
                 return "resetPassword";
             case TASTES:
                 return "tastes";
             case NEWSLETTER:
                 return "newsletter";
-            case NEWMESSAGE:
+            case NEW_MESSAGE:
                 return "newMessage";
-            case NEWMAIL:
+            case NEW_MAIL:
                 return "newMail";
+            case ADMIN_NEW_VERSION:
+                return "adminNewVersion";
         }
         return null;
     }

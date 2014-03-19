@@ -155,7 +155,7 @@ public class UserApi {
 
     @PUT
     @Path("{userId}")
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Consumes(javax.ws.rs.core.MediaType.APPLICATION_JSON)
     public void updateUser(@PathParam("userId") int userId, User user){
         try {
             Session.checkAdminLogin(request, hh);
@@ -177,8 +177,7 @@ public class UserApi {
 	
 	@PUT
 	@Path("{userId}/follow")
-	public Response follow(@PathParam("userId") int userId,
-			@Context HttpHeaders hh){
+	public Response follow(@PathParam("userId") int userId){
 		Session session = Session.init(request.getSession());
 
         try {
@@ -196,9 +195,7 @@ public class UserApi {
 	
 	@DELETE
 	@Path("{userId}/follow")
-	public Response unfollow(@PathParam("userId") int userId,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	public Response unfollow(@PathParam("userId") int userId){
 		Session session = Session.init(request.getSession());
 
         try {

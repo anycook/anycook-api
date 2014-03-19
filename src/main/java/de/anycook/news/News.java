@@ -30,7 +30,7 @@ public class News implements Comparable<News> {
 
     public News(int id, Date datetime) {
         this.id = id;
-        this.datetime = datetime.getTime();
+        this.datetime = datetime != null ? datetime.getTime() : -1;
     }
 
     public int getId() {

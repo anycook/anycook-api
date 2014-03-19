@@ -136,3 +136,12 @@
     Dein anycook-Team
 {/template}
 
+/**
+ * Message body to notify admin if a new version has been created
+ * @param recipeName name of the new recipe
+ * @param versionId id of the version
+ */
+{template .adminNewVersion}
+    Version #{$versionId} von {$recipeName} wurde erstellt.
+{/template}
+

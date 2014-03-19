@@ -23,6 +23,7 @@ import de.anycook.api.views.PublicView;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.newrecipe.NewRecipe;
+import de.anycook.notifications.Notification;
 import de.anycook.recipe.Recipe;
 import de.anycook.recipe.Recipes;
 import de.anycook.recipe.ingredient.Ingredient;
@@ -31,6 +32,7 @@ import de.anycook.recipe.tag.Tag;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
+import de.anycook.utils.enumerations.NotificationType;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
@@ -44,7 +46,9 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Path("/recipe")
@@ -326,25 +330,25 @@ public class RecipeApi {
 
 
         try {
-            try {
-                session.checkLogin(hh.getCookies());
+            int newId;
+            if(session.checkLoginWithoutException()) {
                 User user = session.getUser();
-                if(!newRecipe.save(user.getId()))
-                    throw new WebApplicationException(Response.Status.BAD_REQUEST);
-            } catch (WebApplicationException e){
-                    logger.debug("user is not authentificated");
-                if(e.getResponse().getStatus() == 401)
-                    if(!newRecipe.save()){
-                        logger.warn("bad request");
-                        throw new WebApplicationException(Response.Status.BAD_REQUEST);
-                    }
-                else
-                    throw new WebApplicationException(e);
-
+                newId = newRecipe.save(user.getId());
             }
+            else {
+                logger.debug("user is not authentificated");
+                newId = newRecipe.save();
+            }
+            Map<String, String> data = new HashMap<>();
+            data.put("recipeName", newRecipe.name);
+            data.put("versionId", Integer.toString(newId));
+            Notification.sendAdminNotification(NotificationType.ADMIN_NEW_VERSION, data);
         } catch (SQLException | IOException | ParseException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (NewRecipe.InvalidRecipeException e) {
+            logger.warn(e, e);
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
     }

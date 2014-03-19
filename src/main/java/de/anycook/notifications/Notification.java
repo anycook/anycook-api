@@ -68,6 +68,15 @@ public class Notification {
         notification.send();
     }
 
+    public static void sendAdminNotification(NotificationType type, Map<String, String> data) throws SQLException{
+        List<Integer> admins = User.getAdminIds();
+        try {
+            sendNotifications(admins, type, data);
+        } catch (DBUser.UserNotFoundException e) {
+            //nope
+        }
+    }
+
     private static String getMessage(NotificationType type, Map<String, String> data){
         return tofu.newRenderer(".message."+type).setData(data).render();
     }
@@ -98,8 +107,8 @@ public class Notification {
 
         if (Configuration.isInDeveloperMode()) {
             try {
-                sendMail = type == NotificationType.ACCOUNTACTIVATION || type == NotificationType.RESETPASSWORD ||
-                        type == NotificationType.NEWMAIL ||
+                sendMail = type == NotificationType.ACCOUNT_ACTIVATION || type == NotificationType.RESET_PASSWORD ||
+                        type == NotificationType.NEW_MAIL ||
                         User.init(recipientId).isAdmin() && NotificationSettings.init(recipientId).check(type);
                 logger.debug("sendMail is "+sendMail+" for "+type+" for user "+recipientId);
             } catch (DBUser.UserNotFoundException | IOException e) {
@@ -114,7 +123,7 @@ public class Notification {
         String message = getMessage(type, data);
 
         if (sendMail) {
-            String userMail = type == NotificationType.NEWMAIL ?
+            String userMail = type == NotificationType.NEW_MAIL ?
                     User.getMailCandidate(recipientId) : User.getUseremail(recipientId);
             String subject = getSubject(type, data);
             logger.debug(String.format("sending mail to %d", recipientId));

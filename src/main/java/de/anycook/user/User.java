@@ -257,7 +257,7 @@ public class User implements Comparable<User> {
         data.put("userName", name);
         data.put("baseUrl", Configuration.getPropertyRedirectDomain());
         data.put("activationKey", activationKey);
-        Notification.sendNotification(id, NotificationType.ACCOUNTACTIVATION, data);
+        Notification.sendNotification(id, NotificationType.ACCOUNT_ACTIVATION, data);
     }
 
     public static String getUsername(int userId) throws SQLException, DBUser.UserNotFoundException {
@@ -570,7 +570,7 @@ public class User implements Comparable<User> {
         Map<String, String> data = new HashMap<>();
         data.put("resetKey", passwordId);
         try {
-            Notification.sendNotification(id, NotificationType.RESETPASSWORD, data);
+            Notification.sendNotification(id, NotificationType.RESET_PASSWORD, data);
         } catch (DBUser.UserNotFoundException e) {
             logger.error(e, e);
         }
@@ -648,7 +648,7 @@ public class User implements Comparable<User> {
         Map<String, String> data = new HashMap<>();
         data.put("activationKey", mailActivationCode);
         try {
-            Notification.sendNotification(id, NotificationType.NEWMAIL, data);
+            Notification.sendNotification(id, NotificationType.NEW_MAIL, data);
         } catch (DBUser.UserNotFoundException e) {
             //nope
         }
@@ -679,6 +679,12 @@ public class User implements Comparable<User> {
     @Override
     public int compareTo(User anotherUser) {
         return Integer.valueOf(id).compareTo(anotherUser.id);
+    }
+
+    public static List<Integer> getAdminIds() throws SQLException {
+        try(DBUser dbUser = new DBUser()){
+            return dbUser.getAdminIds();
+        }
     }
 
     // inner classes

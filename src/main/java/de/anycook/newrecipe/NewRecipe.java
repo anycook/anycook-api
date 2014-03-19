@@ -79,8 +79,8 @@ public class NewRecipe {
     }
 
 
-    public boolean save(int userid) throws SQLException, IOException, ParseException {
-        if (!check()) return false;
+    public int save(int userId) throws SQLException, IOException, ParseException, InvalidRecipeException {
+        if (!check()) throw new InvalidRecipeException(name);
 
         int id = 0;
 
@@ -91,24 +91,24 @@ public class NewRecipe {
                 id = db.getLastId(name) + 1;
 
 
-            db.newVersion(id, this, userid);
+            db.newVersion(id, this, userId);
         }
 
 
         for (String tag : tags)
-            Recipes.suggestTag(name, tag, userid);
+            Recipes.suggestTag(name, tag, userId);
 
         if (mongoid != null) {
             RecipeDrafts drafts = new RecipeDrafts();
-            drafts.remove(userid, mongoid);
+            drafts.remove(userId, mongoid);
             drafts.close();
         }
 
-        if (id == 0) Discussion.addNewRecipeEvent(name, userid, comment, id);
-        else Discussion.addNewVersionEvent(name, userid, comment, id);
+        if (id == 0) Discussion.addNewRecipeEvent(name, userId, comment, id);
+        else Discussion.addNewVersionEvent(name, userId, comment, id);
 
 
-        return true;
+        return id;
     }
 
     /**
@@ -119,9 +119,9 @@ public class NewRecipe {
      * @throws java.io.IOException
      * @throws org.apache.lucene.queryparser.classic.ParseException
      */
-    public boolean save() throws SQLException, IOException, ParseException {
+    public int save() throws SQLException, IOException, ParseException, InvalidRecipeException {
         if (!check()) {
-            return false;
+            throw new InvalidRecipeException(name);
         }
 
         int id = 0;
@@ -144,7 +144,13 @@ public class NewRecipe {
         else Discussion.addNewVersionEvent(name, comment, id);
 
 
-        return true;
+        return id;
+    }
+
+    public static class InvalidRecipeException extends Exception{
+        public InvalidRecipeException(String recipeName){
+            super(recipeName+ "was not valid");
+        }
     }
 
 

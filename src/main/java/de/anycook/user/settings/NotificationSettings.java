@@ -147,23 +147,24 @@ public class NotificationSettings {
 
     public boolean check(NotificationType type) {
         switch (type){
-            case DISCUSSIONANSWER:
+            case DISCUSSION_ANSWER:
                 return isDiscussionAnswer();
-            case RECIPEACTIVATION:
+            case RECIPE_ACTIVATION:
                 return isRecipeActivation();
             case DISCUSSION:
                 return isRecipeDiscussion();
-            case TAGACCEPTED:
+            case TAG_ACCEPTED:
                 return isTagAccepted();
-            case TAGDENIED:
+            case TAG_DENIED:
                 return isTagDenied();
             case TASTES:
                 return isTastes();
-            case NEWMESSAGE:
+            case NEW_MESSAGE:
                 return isNewMessage();
-            case RESETPASSWORD:
-            case ACCOUNTACTIVATION:
-            case NEWMAIL:
+            case RESET_PASSWORD:
+            case ACCOUNT_ACTIVATION:
+            case NEW_MAIL:
+            case ADMIN_NEW_VERSION:
                 return true;
             default:
                 return false;

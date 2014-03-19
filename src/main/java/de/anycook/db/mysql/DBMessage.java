@@ -321,5 +321,9 @@ public class DBMessage extends DBHandler {
         public SessionNotFoundException(int sessionId) {
             super(String.format("Session with id %d does not exist", sessionId));
         }
+
+        public SessionNotFoundException(int sessionId, int userId) {
+            super(String.format("Session with id %d does not include userid %d", sessionId, userId));
+        }
     }
 }
