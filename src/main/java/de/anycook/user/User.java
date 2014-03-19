@@ -226,7 +226,7 @@ public class User implements Comparable<User> {
     public static void activateById(String activationId) throws SQLException, DBUser.ActivationFailedException {
         try (DBUser dbuser = new DBUser()) {
             int userid = dbuser.activateById(activationId);
-            Lifes.addLife("newuser", userid);
+            Lifes.addLife(Lifes.Case.NEW_USER, userid);
 //			TODO SitemapGenerator.generateProfileSitemap();
         }
 
@@ -235,7 +235,7 @@ public class User implements Comparable<User> {
     public static void activateByUserId(int userId) throws SQLException {
         try (DBUser dbuser = new DBUser()) {
             dbuser.activateUser(userId);
-            Lifes.addLife("newuser", userId);
+            Lifes.addLife(Lifes.Case.NEW_USER, userId);
 //			TODO SitemapGenerator.generateProfileSitemap();
         }
     }

@@ -256,7 +256,7 @@ public class Session {
         if (login != null && !checkSchmeckt(gericht)) {
             DBSaveRecipe savegericht = new DBSaveRecipe();
             savegericht.makeTasty(gericht, login.getId());
-            Lifes.addLife("schmeckt", login.getId(), gericht);
+            Lifes.addLife(Lifes.Case.TASTES, login.getId(), gericht);
             savegericht.close();
 
             //send to recipemaker

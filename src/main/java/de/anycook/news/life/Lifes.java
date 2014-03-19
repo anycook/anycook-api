@@ -27,6 +27,29 @@ import java.util.Set;
 
 
 public class Lifes {
+    public static enum Case{
+        NEW_VERSION,
+        NEW_USER,
+        TASTES;
+
+        @Override
+        public String toString() {
+            switch (this){
+                case NEW_VERSION:
+                    return "erstellt";
+                case NEW_USER:
+                    return "newuser";
+                case TASTES:
+                    return "schmeckt";
+            }
+
+            return null;
+        }
+
+
+    }
+
+
     public static List<Life> getLastLives(int lastId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
             return dbLive.getLastLives(lastId, 10);
@@ -39,18 +62,18 @@ public class Lifes {
         }
     }
 
-    public static void addLife(String caseName, int userId) throws SQLException {
+    public static void addLife(Case lifeCase, int userId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
-            if (!dbLive.checkLife(userId, caseName)) {
-                dbLive.newLife(userId, caseName);
+            if (!dbLive.checkLife(userId, lifeCase)) {
+                dbLive.newLife(userId, lifeCase);
             }
         }
     }
 
-    public static void addLife(String caseName, int userId, String recipeName) throws SQLException {
+    public static void addLife(Case lifeCase, int userId, String recipeName) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
-            if (!dbLive.checkLife(userId, caseName, recipeName)) {
-                dbLive.newLife(userId, recipeName, caseName);
+            if (!dbLive.checkLife(userId, lifeCase, recipeName)) {
+                dbLive.newLife(userId, recipeName, lifeCase);
                 LifeProvider.wakeUpSuspended();
             }
         }

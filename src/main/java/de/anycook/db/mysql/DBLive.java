@@ -19,6 +19,7 @@
 package de.anycook.db.mysql;
 
 import de.anycook.news.life.Life;
+import de.anycook.news.life.Lifes;
 import de.anycook.user.User;
 import de.anycook.utils.DateParser;
 
@@ -52,21 +53,21 @@ public class DBLive extends DBHandler {
         logger.info("new case " + caseName + " added");
     }
 
-    public void newLife(int userId, String recipeName, String caseName) throws SQLException {
+    public void newLife(int userId, String recipeName, Lifes.Case lifeCase) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO life (users_id, gerichte_name, cases_name, lifetime) VALUES (?,?,?, NOW())");
         pStatement.setInt(1, userId);
         pStatement.setString(2, recipeName);
-        pStatement.setString(3, caseName);
+        pStatement.setString(3, lifeCase.toString());
         pStatement.executeUpdate();
-        logger.info("new life entry " + caseName + " from " + userId + " for " + recipeName + " added to DB");
+        logger.info("new life entry " + lifeCase + " from " + userId + " for " + recipeName + " added to DB");
     }
 
-    public void newLife(int userId, String caseName) throws SQLException {
+    public void newLife(int userId, Lifes.Case lifeCase) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO life (users_id, cases_name, lifetime) VALUES (?,?, NOW())");
         pStatement.setInt(1, userId);
-        pStatement.setString(2, caseName);
+        pStatement.setString(2, lifeCase.toString());
         pStatement.executeUpdate();
-        logger.info("new life entry " + caseName + " from " + userId + " added to DB");
+        logger.info("new life entry " + lifeCase + " from " + userId + " added to DB");
     }
 
     public List<Life> getLastLives(int lastId, int limit) throws SQLException {
@@ -116,21 +117,21 @@ public class DBLive extends DBHandler {
         throw new RuntimeException("no new life found");
     }
 
-    public boolean checkLife(int userId, String caseName) throws SQLException {
+    public boolean checkLife(int userId, Lifes.Case lifeCase) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("SELECT * FROM life WHERE users_id = ? AND cases_name = ?");
         pStatement.setInt(1, userId);
-        pStatement.setString(2, caseName);
+        pStatement.setString(2, lifeCase.toString());
         try (ResultSet data = pStatement.executeQuery()) {
             return data.next();
         }
 
     }
 
-    public boolean checkLife(int userId, String caseName, String recipeName) throws SQLException {
+    public boolean checkLife(int userId, Lifes.Case lifeCase, String recipeName) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("SELECT * FROM life WHERE users_id = ? " +
                 "AND cases_name = ? AND gerichte_name = ?");
         pStatement.setInt(1, userId);
-        pStatement.setString(2, caseName);
+        pStatement.setString(2, lifeCase.toString());
         pStatement.setString(3, recipeName);
         try (ResultSet data = pStatement.executeQuery()) {
             return data.next();
