@@ -1,6 +1,5 @@
 package de.anycook.api.filter;
 
-import de.anycook.db.mysql.DBUser;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 
@@ -45,8 +44,6 @@ public class BackendAuthFilter implements ContainerRequestFilter {
             } catch (SQLException|IOException e) {
                 logger.error(e ,e);
                 throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-            } catch (DBUser.UserNotFoundException e) {
-                throw new WebApplicationException(Response.Status.UNAUTHORIZED);
             }
         }
     }
