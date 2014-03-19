@@ -89,11 +89,14 @@ public class Recipe implements Comparable<Recipe> {
     @PublicView
     private int views;
 
+    @PublicView
+    private long lastChange;
+
     public Recipe() {
     }
 
-    public Recipe(int id, String name, String description, String image, int person, Date created, String category,
-                  int skill, int calorie, Time time, int activeId, int views, User author) {
+    public Recipe(int id, String name, String description, String image, int person, Date created, Date lastChange,
+                  String category, int skill, int calorie, Time time, int activeId, int views, User author) {
         this.name = name;
         this.description = description;
         this.image = new RecipeImage(image);
@@ -103,7 +106,8 @@ public class Recipe implements Comparable<Recipe> {
         this.calorie = calorie;
         this.time = time;
         this.id = id;
-        this.created = created.getTime();
+        this.created = created != null ? created.getTime() : -1;
+        this.lastChange = lastChange != null ? lastChange.getTime() : -1;
         this.author = author;
         this.active = id == activeId;
         this.views = views;
@@ -170,6 +174,10 @@ public class Recipe implements Comparable<Recipe> {
         return created;
     }
 
+    public long getLastChange() {
+        return lastChange;
+    }
+
     public int getViews() {
         return views;
     }
@@ -221,6 +229,10 @@ public class Recipe implements Comparable<Recipe> {
 
     public void setCreated(long created) {
         this.created = created;
+    }
+
+    public void setLastChange(long lastChange) {
+        this.lastChange = lastChange;
     }
 
     public void setViews(int views) {

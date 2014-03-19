@@ -224,6 +224,7 @@ public class DBRecipe extends DBHandler {
     protected Recipe getRecipe(ResultSet data) throws SQLException {
         String description = data.getString("beschreibung");
         Date created = data.getDate("created");
+        Date lastChange = data.getDate("lastChange");
         Time time = new Time(data.getInt("std"), data.getInt("min"));
         int skill = data.getInt("skill");
         int calorie = data.getInt("kalorien");
@@ -240,7 +241,7 @@ public class DBRecipe extends DBHandler {
         String category = data.getString("kategorien_name");
         int views = data.getInt("viewed");
 
-        return new Recipe(id, name, description, image, person, created, category,
+        return new Recipe(id, name, description, image, person, created, lastChange, category,
                 skill, calorie, time, activeId, views, user);
     }
 
