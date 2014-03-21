@@ -23,14 +23,15 @@ Autocompletes a query for all types
 + Response 200 (application/json)
 
         { 
+            "recipes":["Johannisbeer-Blechkuchen"],
+            "ingredients":["Joghurt"],
+            "categories":[],
             "tags":["japanisch","joghurt"],
-            "kategorien":[],
-            "zutaten":["Joghurt"],
             "user":[
                 {"id":24,"name":"jaminka"},
                 {"id":83,"name":"jasmin"},
-                {"id":60,"name":"Johänni"}],
-            "gerichte":["Johannisbeer-Blechkuchen"]
+                {"id":60,"name":"Johänni"}]
+            
         }
 
 ## Ingredient [/autocomplete/ingredient?query={query}&exclude={exclude}&maxResults={maxResults}]
