@@ -108,23 +108,25 @@ Returns all category names with number of recipes. Sorted by name or in the anyc
 
 + Response 200 (application/json)
 
-        {
-            "Grundrezepte":0,
-            "Vorspeisen und Häppchen":0,
-            "Gemüse und Salate":18,
-            "Suppen und Eintöpfe":15,
-            "Fleisch":17,
-            "Fisch":3,
-            "Nudeln und Reis":24,
-            "Kartoffelgerichte":4,
-            "Ofengerichte":22,
-            "Eierspeisen":4,
-            "Soßen und Dips":5,
-            "Kuchen und Torten":0,
-            "Backwaren":6,
-            "Desserts":46,
-            "Sonstiges":0
-        }
+        [ 
+            {
+               "name" : "Backwaren",
+               "recipeNumber" : 6,
+               "sortId" : 13
+            }, {
+               "name" : "Desserts",
+               "recipeNumber" : 46,
+               "sortId" : 14
+            }, {
+               "name" : "Eierspeisen",
+               "recipeNumber" : 3,
+               "sortId" : 10
+            }, {
+               "name" : "Fisch",
+               "recipeNumber" : 3,
+               "sortId" : 6
+            }
+        ]
 
 
 ## Category [/category/{name}]
