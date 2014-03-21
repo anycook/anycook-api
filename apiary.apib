@@ -68,7 +68,12 @@ Autocompletes only tag names
 
 + Response 200 (application/json)
         
-        ["matschepampe","mediteran","mexikanisch","minze"]
+        [
+            {"name":"matschepampe"},
+            {"name":"mediteran"},
+            {"name":"mexikanisch"},
+            {"name":"minze"}
+        ]
 
 ## User [/autocomplete/user?query={query}&exclude={exclude}&maxResults={maxResults}]
 Autocompletes only user names
