@@ -46,7 +46,15 @@ Autocompletes only ingredient names
 
 + Response 200 (application/json)
         
-        ["Lasagneplatten","Lauch","Lauchzwiebel","Lauchzwiebeln","lauwarmes Wasser","Linsen","Loffelbiscuits"]
+        [
+            {"name":"Lasagneplatten"},
+            {"name":"Lauch"},
+            {"name":"Lauchzwiebel"},
+            {"name":"Lauchzwiebeln"},
+            {"name":"lauwarmes Wasser"},
+            {"name":"Linsen"},
+            {"name":"Loffelbiscuits"}
+        ]
 
 ## Tag [/autocomplete/tag?query={query}&exclude={exclude}&maxResults={maxResults}]
 Autocompletes only tag names
