@@ -40,12 +40,31 @@ import java.util.List;
 public class DiscoverApi {
 
     private final Logger logger = Logger.getLogger(getClass());
+    @Context
+    private HttpHeaders hh;
+    @Context
+    private HttpServletRequest request;
+
+    @GET
+    public Discover.Recipes get(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
+        Session session = Session.init(request.getSession());
+        try {
+            try {
+                session.checkLogin(hh.getCookies());
+                User user = session.getUser();
+                return Discover.getDiscoverRecipes(recipeNumber, user.getId());
+            } catch (WebApplicationException e) {
+                return Discover.getDiscoverRecipes(recipeNumber);
+            }
+        } catch (IOException | SQLException e){
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	@GET
 	@Path("recommended")
-	public List<Recipe> getDiscoverRecommended(@Context HttpHeaders hh,
-			@Context HttpServletRequest request,
-			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
+	public List<Recipe> getDiscoverRecommended(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
 		Session session = Session.init(request.getSession());
         try {
             try {

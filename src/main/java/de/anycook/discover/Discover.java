@@ -27,6 +27,30 @@ import java.util.List;
 
 
 public class Discover {
+    public static Discover.Recipes getDiscoverRecipes(int num) throws SQLException {
+        Recipes recipes = new Recipes();
+        try (DBDiscover dbDiscover = new DBDiscover()){
+            recipes.setNewest(dbDiscover.getNewestRecipes(num));
+            recipes.setTasty(dbDiscover.getTastyRecipes(num));
+            recipes.setRecommended(dbDiscover.getPopularRecipes(num));
+        }
+        return recipes;
+    }
+
+    public static Discover.Recipes getDiscoverRecipes(int num, int userId) throws SQLException {
+        Recipes recipes = new Recipes();
+        try (DBDiscover dbDiscover = new DBDiscover()){
+            recipes.setNewest(dbDiscover.getNewestRecipes(num));
+            recipes.setTasty(dbDiscover.getTastyRecipes(num));
+            List<Recipe> recommended = Recommendation.recommend(userId, num);
+            if(recommended.size() < 0)
+                recommended = dbDiscover.getPopularRecipes(num);
+            recipes.setRecommended(recommended);
+        }
+        return recipes;
+    }
+
+
     public static List<Recipe> getRecommendedRecipes(int num, int userId) throws SQLException {
         List<Recipe> recommended = Recommendation.recommend(userId, num);
         if (recommended.size() > 0)
@@ -50,6 +74,36 @@ public class Discover {
     public static List<Recipe> getPopularRecipes(int num) throws SQLException {
         try(DBDiscover discover = new DBDiscover()) {
             return discover.getPopularRecipes(num);
+        }
+    }
+
+    public static class Recipes{
+        private List<Recipe> recommended;
+        private List<Recipe> tasty;
+        private List<Recipe> newest;
+
+        public List<Recipe> getRecommended() {
+            return recommended;
+        }
+
+        public void setRecommended(List<Recipe> recommended) {
+            this.recommended = recommended;
+        }
+
+        public List<Recipe> getTasty() {
+            return tasty;
+        }
+
+        public void setTasty(List<Recipe> tasty) {
+            this.tasty = tasty;
+        }
+
+        public List<Recipe> getNewest() {
+            return newest;
+        }
+
+        public void setNewest(List<Recipe> newest) {
+            this.newest = newest;
         }
     }
 }

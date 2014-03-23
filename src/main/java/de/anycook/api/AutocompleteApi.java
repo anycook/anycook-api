@@ -82,23 +82,6 @@ public class AutocompleteApi {
 	}
 	
 	@GET
-	@Path("user")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<User> autoCompleteUser(@QueryParam("query") String query,
-                                       @QueryParam("exclude") IntSet exclude,
-                                       @QueryParam("maxResults") @DefaultValue("10") int maxResults){
-		if(query == null)
-			throw new WebApplicationException(Response.Status.BAD_REQUEST);
-
-        try {
-            return Autocomplete.autocompleteUsers(query, maxResults, exclude);
-        } catch (SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-	}
-	
-	@GET
 	@Path("tag")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Tag> autocompleteTags(@QueryParam("query") String query,
@@ -113,6 +96,23 @@ public class AutocompleteApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
+
+    @GET
+    @Path("user")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<User> autoCompleteUser(@QueryParam("query") String query,
+                                       @QueryParam("exclude") IntSet exclude,
+                                       @QueryParam("maxResults") @DefaultValue("10") int maxResults){
+        if(query == null)
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+
+        try {
+            return Autocomplete.autocompleteUsers(query, maxResults, exclude);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
 	
 	public static class IntSet extends HashSet<Integer>{
 		private static final long serialVersionUID = 1L;
