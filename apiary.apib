@@ -23,14 +23,15 @@ Autocompletes a query for all types
 + Response 200 (application/json)
 
         { 
+            "recipes":["Johannisbeer-Blechkuchen"],
+            "ingredients":["Joghurt"],
+            "categories":[],
             "tags":["japanisch","joghurt"],
-            "kategorien":[],
-            "zutaten":["Joghurt"],
             "user":[
                 {"id":24,"name":"jaminka"},
                 {"id":83,"name":"jasmin"},
-                {"id":60,"name":"Johänni"}],
-            "gerichte":["Johannisbeer-Blechkuchen"]
+                {"id":60,"name":"Johänni"}]
+            
         }
 
 ## Ingredient [/autocomplete/ingredient?query={query}&exclude={exclude}&maxResults={maxResults}]
@@ -45,7 +46,15 @@ Autocompletes only ingredient names
 
 + Response 200 (application/json)
         
-        ["Lasagneplatten","Lauch","Lauchzwiebel","Lauchzwiebeln","lauwarmes Wasser","Linsen","Loffelbiscuits"]
+        [
+            {"name":"Lasagneplatten"},
+            {"name":"Lauch"},
+            {"name":"Lauchzwiebel"},
+            {"name":"Lauchzwiebeln"},
+            {"name":"lauwarmes Wasser"},
+            {"name":"Linsen"},
+            {"name":"Loffelbiscuits"}
+        ]
 
 ## Tag [/autocomplete/tag?query={query}&exclude={exclude}&maxResults={maxResults}]
 Autocompletes only tag names
@@ -59,7 +68,12 @@ Autocompletes only tag names
 
 + Response 200 (application/json)
         
-        ["matschepampe","mediteran","mexikanisch","minze"]
+        [
+            {"name":"matschepampe"},
+            {"name":"mediteran"},
+            {"name":"mexikanisch"},
+            {"name":"minze"}
+        ]
 
 ## User [/autocomplete/user?query={query}&exclude={exclude}&maxResults={maxResults}]
 Autocompletes only user names
@@ -94,23 +108,25 @@ Returns all category names with number of recipes. Sorted by name or in the anyc
 
 + Response 200 (application/json)
 
-        {
-            "Grundrezepte":0,
-            "Vorspeisen und Häppchen":0,
-            "Gemüse und Salate":18,
-            "Suppen und Eintöpfe":15,
-            "Fleisch":17,
-            "Fisch":3,
-            "Nudeln und Reis":24,
-            "Kartoffelgerichte":4,
-            "Ofengerichte":22,
-            "Eierspeisen":4,
-            "Soßen und Dips":5,
-            "Kuchen und Torten":0,
-            "Backwaren":6,
-            "Desserts":46,
-            "Sonstiges":0
-        }
+        [ 
+            {
+               "name" : "Backwaren",
+               "recipeNumber" : 6,
+               "sortId" : 13
+            }, {
+               "name" : "Desserts",
+               "recipeNumber" : 46,
+               "sortId" : 14
+            }, {
+               "name" : "Eierspeisen",
+               "recipeNumber" : 3,
+               "sortId" : 10
+            }, {
+               "name" : "Fisch",
+               "recipeNumber" : 3,
+               "sortId" : 6
+            }
+        ]
 
 
 ## Category [/category/{name}]
@@ -125,8 +141,8 @@ Returns a category with a list of its recipes.
 
         {
             "name":"Fleisch",
-            "recipes":["Yakitori","Hühnerfrikassee","Wiener Schnitzel mit Pommes","Sandwich mit Minutensteak","Hühnerbrust mit Erdnusssoße","Kebab im Teigmantel","gefüllte Hackbuletten","Schweinekotelett mit Sauerkraut","Hack-Gemüsetaschen","Putenpfanne mit Spinat und Kichererbsen","Hamburger","Gebratene Ente","Schinken-Käse-Brötchen","Gefüllte Paprika mit Hackfleisch","Pute mit Parmesan und Schinken","Hähnchenbrust mit Mandelkruste","Cordon bleu"],
-            "recipeNumber":17
+            "recipeNumber":17,
+            "sortId":1
         }
         
 
@@ -143,7 +159,47 @@ Returns the newest recipes
     
 + Response 200 (application/json)
     
-        ["Schokoladen-Beeren-Gugelhupf","Nasi Goreng Ikan","Russischer Zupfkuchen","Apfel-Zwiebel-Balsamico Gemüse","Apfel-Tiramisu","Steckrüben-Lauchsuppe mit Feta","Kartoffel-Kürbis Suppe","Blätterteigsnäk","feine Plätzchen","Nougat-Karos","Cranberry-Zimt-Schnecken","Florentiner Plätzchen","gefüllte Kringel","Windbeuteltorte","selbstgemachte Nudeln","Oliven-Pesto","Omas gedeckter Apfelkuchen","Pute mit Parmesan und Schinken","Paprika-Garnelen mit Nudeln und Avocado","Pizzateig","Kebab im Teigmantel","Tomaten-Feta-Taschen","Spinat-Walnuss-Pesto","Bananenbrot","Schoko-Walnuss-Muffins","Süddeutscher Zwiebelkuchen","Kräuter-Kartoffelbrei","Sonnen-Brot","Schokibakuchen","Käse-Kirschkuchen"]
+        [ 
+            {
+                "description" : "Fluffig und saftig,\nherrlich und schmatzig,\nlecker ist dieser Kuchen, \nDu musst nicht länger suchen!",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/3SXvO8rtYh1XR777xfS2.png",
+                    "original" : "http://images.anycook.de/recipe/original/3SXvO8rtYh1XR777xfS2.png",
+                    "small" : "http://images.anycook.de/recipe/small/3SXvO8rtYh1XR777xfS2.png"
+                },
+                "name" : "Schokoladen-Beeren-Gugelhupf",
+                "time" : {
+                    "std" : 1,
+                    "min" : 10
+                }
+            }, 
+            {
+                "description" : "Gebratener Reis mit Pilzen und Fisch",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/category/nudeln_und_reis.png",
+                    "original" : "http://images.anycook.de/recipe/original/category/nudeln_und_reis.png",
+                    "small" : "http://images.anycook.de/recipe/small/category/nudeln_und_reis.png"
+                },
+                "name" : "Nasi Goreng Ikan",
+                "time" : {
+                    "std" : 1,
+                    "min" : 0
+                }
+            }, 
+            {
+                "description" : "Quark ist der elementare Bestandteil, aus dem die Atomkern-Bausteine Protonen und Neutronen bestehen sowie der Belag des Kuchens. Sie gelten heute als die fundamentalen Bausteine, aus denen alle Materie aufgebaut ist und mit dem Kakaoteig zusammen ergeben sie einen super leckeren Kuchen.",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/GlIrXIWUaH10JchOuKV3.png",
+                    "original" : "http://images.anycook.de/recipe/original/GlIrXIWUaH10JchOuKV3.png",
+                    "small" : "http://images.anycook.de/recipe/small/GlIrXIWUaH10JchOuKV3.png"
+                },
+                "name" : "Russischer Zupfkuchen",
+                "time" : {
+                    "std" : 1,
+                    "min" : 20
+                }
+            }
+        ]
 
 ## Recommended [/discover/recommended?recipeNumber={recipeNumber}]
 If logged-in it returns the recipes that are similar to the recipes you like. Otherwise it returns the most viewed recipes.
@@ -155,8 +211,47 @@ If logged-in it returns the recipes that are similar to the recipes you like. Ot
     
 + Response 200 (application/json)
 
-        ["Gratinierte Putenfilets mit Äpfeln","Zitronenrisotto","Dal","Spinat-Quiche","Gemüsewähe","Kartoffelsuppe","Kartoffelpuffer","Schinken-Käse-Gnocchi","Quiche mit Lauch und Speck","Brotauflauf","Zucchini-Champignon-Lasagne","Sandwich mit Minutensteak","Käse-Lauch-Suppe","Wiener Schnitzel mit Pommes","Nudelauflauf","Lasagne","Kürbiskuchen","Yakitori","Johannisbeer-Blechkuchen","Spinattaschen","Panna Cotta","Canelloni mit Gemüsefüllung","Mousakas","Tortellini mit Pilz-Sahnesoße","Nudeln in Brokkoli-Schinken-Sauce","Beeren-Schmand-Kuchen","Marmorkuchen","Provence-Risotto","Hühnerbrust mit Erdnusssoße","Gefüllter Kürbis"]
-        
+        [ 
+            {
+                "description" : "Fluffig und saftig,\nherrlich und schmatzig,\nlecker ist dieser Kuchen, \nDu musst nicht länger suchen!",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/3SXvO8rtYh1XR777xfS2.png",
+                    "original" : "http://images.anycook.de/recipe/original/3SXvO8rtYh1XR777xfS2.png",
+                    "small" : "http://images.anycook.de/recipe/small/3SXvO8rtYh1XR777xfS2.png"
+                },
+                "name" : "Schokoladen-Beeren-Gugelhupf",
+                "time" : {
+                    "std" : 1,
+                    "min" : 10
+                }
+            }, 
+            {
+                "description" : "Gebratener Reis mit Pilzen und Fisch",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/category/nudeln_und_reis.png",
+                    "original" : "http://images.anycook.de/recipe/original/category/nudeln_und_reis.png",
+                    "small" : "http://images.anycook.de/recipe/small/category/nudeln_und_reis.png"
+                },
+                "name" : "Nasi Goreng Ikan",
+                "time" : {
+                    "std" : 1,
+                    "min" : 0
+                }
+            }, 
+            {
+                "description" : "Quark ist der elementare Bestandteil, aus dem die Atomkern-Bausteine Protonen und Neutronen bestehen sowie der Belag des Kuchens. Sie gelten heute als die fundamentalen Bausteine, aus denen alle Materie aufgebaut ist und mit dem Kakaoteig zusammen ergeben sie einen super leckeren Kuchen.",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/GlIrXIWUaH10JchOuKV3.png",
+                    "original" : "http://images.anycook.de/recipe/original/GlIrXIWUaH10JchOuKV3.png",
+                    "small" : "http://images.anycook.de/recipe/small/GlIrXIWUaH10JchOuKV3.png"
+                },
+                "name" : "Russischer Zupfkuchen",
+                "time" : {
+                    "std" : 1,
+                    "min" : 20
+                }
+            }
+        ]
 
 ## Tasty [/discover/tasty?recipeNumber={recipeNumber}]
 Returns the recipes that the users like most.
@@ -168,8 +263,47 @@ Returns the recipes that the users like most.
     
 + Response 200 (application/json)
 
-        ["Zucchini-Champignon-Lasagne","Gratinierte Putenfilets mit Äpfeln","Pizzateig","Zitronenkuchen","Kartoffelsuppe","Dal","Spinat-Quiche","Zitronenrisotto","Yakitori","Wiener Schnitzel mit Pommes","Hühnerfrikassee","Beeren-Muffins","Gemüsewähe","Schokibakuchen","Macadamia-Cookies","Käse-Lauch-Suppe","Panna Cotta","Marmorkuchen","Brotauflauf","Gemüsebratlinge","Kartoffelpuffer","Italienischer Nudelsalat","Schinken-Käse-Gnocchi","Russischer Rotebeetesalat","Tiramisu ohne Ei","Haferbrei","Beeren-Schmand-Kuchen","Fusilli mit Ricotta","Grießbrei mit Himbeeren","Kürbiskuchen"]
-        
+        [ 
+            {
+                "description" : "Fluffig und saftig,\nherrlich und schmatzig,\nlecker ist dieser Kuchen, \nDu musst nicht länger suchen!",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/3SXvO8rtYh1XR777xfS2.png",
+                    "original" : "http://images.anycook.de/recipe/original/3SXvO8rtYh1XR777xfS2.png",
+                    "small" : "http://images.anycook.de/recipe/small/3SXvO8rtYh1XR777xfS2.png"
+                },
+                "name" : "Schokoladen-Beeren-Gugelhupf",
+                "time" : {
+                    "std" : 1,
+                    "min" : 10
+                }
+            }, 
+            {
+                "description" : "Gebratener Reis mit Pilzen und Fisch",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/category/nudeln_und_reis.png",
+                    "original" : "http://images.anycook.de/recipe/original/category/nudeln_und_reis.png",
+                    "small" : "http://images.anycook.de/recipe/small/category/nudeln_und_reis.png"
+                },
+                "name" : "Nasi Goreng Ikan",
+                "time" : {
+                    "std" : 1,
+                    "min" : 0
+                }
+            }, 
+            {
+                "description" : "Quark ist der elementare Bestandteil, aus dem die Atomkern-Bausteine Protonen und Neutronen bestehen sowie der Belag des Kuchens. Sie gelten heute als die fundamentalen Bausteine, aus denen alle Materie aufgebaut ist und mit dem Kakaoteig zusammen ergeben sie einen super leckeren Kuchen.",
+                "image" : {
+                    "big" : "http://images.anycook.de/recipe/big/GlIrXIWUaH10JchOuKV3.png",
+                    "original" : "http://images.anycook.de/recipe/original/GlIrXIWUaH10JchOuKV3.png",
+                    "small" : "http://images.anycook.de/recipe/small/GlIrXIWUaH10JchOuKV3.png"
+                },
+                "name" : "Russischer Zupfkuchen",
+                "time" : {
+                    "std" : 1,
+                    "min" : 20
+                }
+            }
+        ]
 
 
 
