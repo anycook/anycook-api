@@ -149,6 +149,104 @@ Returns a category with a list of its recipes.
 # Group Discover
 Ressources that return list of recipes by different kind of recommendation types
 
+## Discover [/discover?recipeNumber={recipeNumber}]
+Returns all discover types
+
+### Get [GET]
+
++ Parameters
+    + recipeNumber = `30` (number, optional) ... Maximum number of returned recipes
+    
++ Response 200 (application/json)
+    
+        {
+            "newest" : [ 
+                {
+                    "description" : "ads asd asd asd ",
+                    "image" : {
+                        "big" : "http://10.1.0.200/images/recipe/big/category/fleisch.png",
+                        "original" : "http://10.1.0.200/images/recipe/original/category/fleisch.png",
+                        "small" : "http://10.1.0.200/images/recipe/small/category/fleisch.png"
+                    },
+                    "name" : "adsad asd ",
+                    "tasteNum" : 0,
+                    "time" : {
+                        "std" : 2,
+                        "min" : 0
+                    }
+                }, {
+                    "description" : "Laoas",
+                    "image" : {
+                        "big" : "http://10.1.0.200/images/recipe/big/category/fisch.png",
+                        "original" : "http://10.1.0.200/images/recipe/original/category/fisch.png",
+                        "small" : "http://10.1.0.200/images/recipe/small/category/fisch.png"
+                    },
+                    "name" : "Hallo, ein Test",
+                    "time" : {
+                        "std" : 1,
+                        "min" : 0
+                    } 
+                } 
+            ],
+            "recommended" : [ 
+                {
+                    "description" : "Gazpacho ist eine spanische kalte Suppe aus ungekochtem Gemüse.\nSie stammt aus Andalusien.\nDie ursprüngliche Suppe geht auf die Mauren zurück und war eine weiße Knoblauchsuppe aus Brot, Knoblauch, Olivenöl, Essig, Salz und Wasser.",
+                    "image" : {
+                        "big" : "http://10.1.0.200/images/recipe/big/category/suppen_und_eintoepfe.png",
+                        "original" : "http://10.1.0.200/images/recipe/original/category/suppen_und_eintoepfe.png",
+                        "small" : "http://10.1.0.200/images/recipe/small/category/suppen_und_eintoepfe.png"
+                    },
+                    "name" : "scharfes Gazpacho",
+                    "time" : {
+                        "std" : 0,
+                        "min" : 10
+                    }
+                }, {
+                    "description" : "Dies ist eine kleine Beischreibung",
+                    "image" : {
+                        "big" : "http://10.1.0.200/images/recipe/big/00TBQc8adqSIzMU3jDzz.png",
+                        "original" : "http://10.1.0.200/images/recipe/original/00TBQc8adqSIzMU3jDzz.png",
+                        "small" : "http://10.1.0.200/images/recipe/small/00TBQc8adqSIzMU3jDzz.png"
+                    },
+                    "name" : "Schokibakuchen",
+                    "tasteNum" : 2,
+                    "time" : {
+                        "std" : 1,
+                        "min" : 0
+                    }
+                } 
+            ],
+           "tasty" : [ 
+                {
+                    "description" : "Ein süßer Brotteig, der zu einem süßen Frühstück super passt oder auch als Kuchen verspeist werden kann.",
+                    "image" : {
+                        "big" : "http://10.1.0.200/images/recipe/big/5UFTaVg5Y1ubbGGuDT3V.png",
+                        "original" : "http://10.1.0.200/images/recipe/original/5UFTaVg5Y1ubbGGuDT3V.png",
+                        "small" : "http://10.1.0.200/images/recipe/small/5UFTaVg5Y1ubbGGuDT3V.png"
+                    },
+                    "name" : "Bananenbrot",
+                    "tasteNum" : 0,
+                    "time" : {
+                        "std" : 1,
+                        "min" : 0
+                    }
+                }, {
+                    "description" : "Perfekt wenn man mal seinen Gästen was anbieten will, aber keine Zeit oder Lust hat sich groß zu engagieren!",
+                    "image" : {
+                        "big" : "http://10.1.0.200/images/recipe/big/vGuatfqNOsHb1M9CL4Cp.png",
+                        "original" : "http://10.1.0.200/images/recipe/original/vGuatfqNOsHb1M9CL4Cp.png",
+                        "small" : "http://10.1.0.200/images/recipe/small/vGuatfqNOsHb1M9CL4Cp.png"
+                    },
+                    "name" : "Blätterteigsnäk",
+                    "tasteNum" : 0,
+                    "time" : {
+                        "std" : 0,
+                        "min" : 24
+                    }
+                } 
+            ]
+        }
+
 ## New [/discover/new?recipeNumber={recipeNumber}]
 Returns the newest recipes
 
