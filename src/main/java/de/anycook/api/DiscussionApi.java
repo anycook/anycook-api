@@ -40,7 +40,8 @@ import java.util.concurrent.TimeUnit;
 public class DiscussionApi {
 
     private final Logger logger = Logger.getLogger(getClass());
-    @Context Session session;
+    @Context
+    private Session session;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
