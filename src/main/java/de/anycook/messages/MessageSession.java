@@ -198,9 +198,10 @@ public class MessageSession extends News {
                         }
                     }
 
-                    MessageNumberProvider.INSTANCE.wakeUpSuspended(recipient.getId());
+
                 }
 
+                MessageNumberProvider.INSTANCE.wakeUpSuspended(recipient.getId());
                 MessageSessionProvider.INSTANCE.wakeUpSuspended(recipient.getId());
                 MessageProvider.INSTANCE.wakeUpSuspended(id);
             }
