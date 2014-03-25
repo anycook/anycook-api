@@ -25,12 +25,9 @@ import de.anycook.session.Session;
 import de.anycook.user.User;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -40,23 +37,18 @@ import java.util.List;
 public class DiscoverApi {
 
     private final Logger logger = Logger.getLogger(getClass());
-    @Context
-    private HttpHeaders hh;
-    @Context
-    private HttpServletRequest request;
 
     @GET
-    public Discover.Recipes get(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
-        Session session = Session.init(request.getSession());
+    public Discover.Recipes get(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber,
+                                @Context Session session){
         try {
             try {
-                session.checkLogin(hh.getCookies());
                 User user = session.getUser();
                 return Discover.getDiscoverRecipes(recipeNumber, user.getId());
             } catch (WebApplicationException e) {
                 return Discover.getDiscoverRecipes(recipeNumber);
             }
-        } catch (IOException | SQLException e){
+        } catch (SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -64,17 +56,16 @@ public class DiscoverApi {
 	
 	@GET
 	@Path("recommended")
-	public List<Recipe> getDiscoverRecommended(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
-		Session session = Session.init(request.getSession());
+	public List<Recipe> getDiscoverRecommended(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber,
+                                               @Context Session session){
         try {
             try {
-                session.checkLogin(hh.getCookies());
                 User user = session.getUser();
                 return Discover.getRecommendedRecipes(recipeNumber, user.getId());
             } catch (WebApplicationException e) {
                 return Discover.getPopularRecipes(recipeNumber);
             }
-        } catch (IOException | SQLException e){
+        } catch (SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

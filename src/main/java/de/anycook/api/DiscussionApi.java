@@ -26,43 +26,32 @@ import de.anycook.discussion.Discussion;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 
-@Path("discussion")
+@Path("{recipeName}/discussion")
 public class DiscussionApi {
 
     private final Logger logger = Logger.getLogger(getClass());
-    @Context HttpHeaders hh;
-    @Context HttpServletRequest request;
+    @Context Session session;
 
     @GET
-    @Path("{recipeName}")
     @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse, @PathParam("recipeName") final String recipeName,
-                    @DefaultValue("-1") @QueryParam("lastid") final int lastId, @Context HttpServletRequest request){
+                    @DefaultValue("-1") @QueryParam("lastId") final int lastId){
 
-        Session session = Session.init(request.getSession());
         int userId;
         try{
-            session.checkLogin(request.getCookies());
             userId = session.getUser().getId();
         }catch(WebApplicationException e){
             userId = -1;
-        } catch (IOException | SQLException e){
-            logger.error(e);
-            asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
-            return;
         }
 
         asyncResponse.setTimeoutHandler(new TimeoutHandler() {
@@ -92,65 +81,69 @@ public class DiscussionApi {
     }
 
 	@POST
-	@Path("{recipeName}")
-	public Response discuss(@PathParam("recipeName") String recipe,
-			@FormParam("comment") String comment, @FormParam("pid") Integer pid){
+    @Consumes(MediaType.APPLICATION_JSON)
+	public void discuss(@PathParam("recipeName") String recipe,
+                            String comment){
 		
 		Preconditions.checkNotNull(comment);
 
         try {
-            Session shandler = Session.init(request.getSession());
-            shandler.checkLogin(hh.getCookies());
-            int userid = shandler.getUser().getId();
-
-
-            if(pid == null) Discussion.discuss(comment, userid, recipe);
-            else Discussion.answer(comment, pid, userid, recipe);
-        } catch (IOException | SQLException e){
+            int userId = session.getUser().getId();
+             Discussion.discuss(comment, userId, recipe);
+        } catch (SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
         DiscussionProvider.INSTANCE.wakeUpSuspended(recipe);
-		return Response.ok("true").build();
 	}
-	
-	@PUT
-	@Path("like/{recipeName}/{id}")
-	public Response like(@PathParam("recipeName") String recipe,
-			@PathParam("id") int id){
-        try{
-            Session shandler = Session.init(request.getSession());
-            shandler.checkLogin(hh.getCookies());
-            int userid = shandler.getUser().getId();
 
-            Discussion.like(userid, recipe, id);
-        } catch (IOException | SQLException e) {
-            logger.error(e);
+    @POST
+    @Path("{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void discuss(@PathParam("recipeName") String recipe,
+                            @PathParam("id") int id,
+                           String comment){
+
+        Preconditions.checkNotNull(comment);
+
+        try {
+            int userId = session.getUser().getId();
+
+
+            Discussion.answer(comment, id, userId, recipe);
+        } catch (SQLException e){
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
-        return Response.ok("true").build();
+        DiscussionProvider.INSTANCE.wakeUpSuspended(recipe);
+    }
+	
+	@PUT
+	@Path("{id}/like")
+	public void like(@PathParam("recipeName") String recipe,
+			@PathParam("id") int id){
+        try{
+            int userId = session.getUser().getId();
+
+            Discussion.like(userId, recipe, id);
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 	}
 	
 	@DELETE
-	@Path("like/{recipeName}/{id}")
-	public Response unlike(@PathParam("recipeName") String recipe,
-			@PathParam("id") int id,
-			@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
+	@Path("{id}/like")
+	public void unlike(@PathParam("recipeName") String recipe,
+			@PathParam("id") int id){
         try {
-            Session shandler = Session.init(request.getSession());
-            shandler.checkLogin(hh.getCookies());
-            int userid = shandler.getUser().getId();
-
-
-            Discussion.unlike(userid, recipe, id);
-        } catch (IOException | SQLException e) {
+            int userId = session.getUser().getId();
+            Discussion.unlike(userId, recipe, id);
+        } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-
-        return Response.ok("true").build();
 	}
 }

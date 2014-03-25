@@ -30,16 +30,13 @@ import de.anycook.user.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -49,9 +46,10 @@ import java.util.concurrent.TimeUnit;
 public class MessageApi {
 	
 	private final Logger logger;
-    @Context private HttpServletRequest req;
-    @Context private HttpHeaders hh;
-	
+
+    @Context
+    private Session session;
+
 	/**
 	 * 
 	 */
@@ -72,7 +70,7 @@ public class MessageApi {
         asyncResponse.setTimeout(5, TimeUnit.MINUTES);
 
 
-        User user = Session.init(req.getSession()).getUser();
+        User user = session.getUser();
 
         if(lastChange == null){
             try {
@@ -101,19 +99,15 @@ public class MessageApi {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-    public void newMessage(NewMessage message, @Context HttpHeaders hh, @Context HttpServletRequest request){
+    public void newMessage(NewMessage message){
         if(message == null)
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
 
-        logger.debug(message);
-
 		try {
-			Session session = Session.init(request.getSession());
-			session.checkLogin(hh.getCookies());
 			int userId = session.getUser().getId();
             message.recipients.add(userId);
 			MessageSession.getSession(message.recipients).newMessage(userId, message.text);
-		} catch (IOException | SQLException | DBMessage.SessionNotFoundException e ) {
+		} catch ( SQLException | DBMessage.SessionNotFoundException e ) {
 			logger.error(e, e);
 			throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
 		}
@@ -123,9 +117,7 @@ public class MessageApi {
     @Path("number")
     @Produces(MediaType.APPLICATION_JSON)
     public void getMessageNumber(@Suspended AsyncResponse asyncResponse, @QueryParam("lastNum") int lastNumber){
-        Session session = Session.init(req.getSession());
         try{
-            session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
 
             int newMessageNum = MessageSession.getNewMessageNum(userId);
@@ -135,7 +127,7 @@ public class MessageApi {
                 logger.info("return message num");
                 asyncResponse.resume(newMessageNum);
             }
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
@@ -147,9 +139,7 @@ public class MessageApi {
     @Produces(MediaType.APPLICATION_JSON)
     public void getMessagesFromSession(@Suspended AsyncResponse asyncResponse, @PathParam("sessionId") int sessionId,
                                        @QueryParam("lastId") Integer lastId){
-        Session session = Session.init(req.getSession());
         int userId = session.getUser().getId();
-
         try {
             if(lastId == null) {
                 asyncResponse.resume(MessageSession.getSession(sessionId, userId));
@@ -179,13 +169,10 @@ public class MessageApi {
 			throw new WebApplicationException(400);
 		}
 		
-		Session session = Session.init(req.getSession());
-
         try {
-            session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
             MessageSession.getSession(sessionId, userId).newMessage(userId, message);
-        } catch (IOException | SQLException | DBMessage.SessionNotFoundException e) {
+        } catch ( SQLException | DBMessage.SessionNotFoundException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -195,14 +182,11 @@ public class MessageApi {
 	@Path("{sessionId}/{messageId}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public void readMessage(@PathParam("sessionId") int sessionId, @PathParam("messageId") int messageId){
-		Session session = Session.init(req.getSession());
-
         try {
-            session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
             Message.read(sessionId, messageId, userId);
             MessageNumberProvider.INSTANCE.wakeUpSuspended(userId);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

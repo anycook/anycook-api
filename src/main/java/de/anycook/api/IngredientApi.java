@@ -35,7 +35,6 @@ public class IngredientApi {
 
     private Logger logger = Logger.getLogger(getClass());
 	
-	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Ingredient> getAll(@QueryParam("parent") boolean parent){

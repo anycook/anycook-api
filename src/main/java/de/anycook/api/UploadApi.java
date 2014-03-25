@@ -68,12 +68,7 @@ public class UploadApi {
 			upload = new RecipeUploader();
 			break;
 		case "user":
-            try {
-                session.checkLogin(hh.getCookies());
-            } catch (IOException e) {
-                logger.error(e, e);
-                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-            }
+            session.checkLogin();
             upload = new UserUploader();
 			break;
 		default:

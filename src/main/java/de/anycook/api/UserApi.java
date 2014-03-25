@@ -33,11 +33,9 @@ import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -49,8 +47,7 @@ import java.util.List;
 @Path("/user")
 public class UserApi {
 	private final Logger logger = Logger.getLogger(getClass());
-    @Context HttpServletRequest request;
-    @Context HttpHeaders hh;
+    @Context Session session;
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -122,8 +119,6 @@ public class UserApi {
 	@Path("recommendations")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Recipe> getRecommendations(){
-		Session session = Session.init(request.getSession());
-		session.checkLogin();
 		int userId = session.getUser().getId();
         try {
             return Recommendation.recommend(userId, 20);
@@ -140,7 +135,7 @@ public class UserApi {
         try {
             if(isAdminDetails){
                 logger.debug("showing admin details");
-                Session.checkAdminLogin(request, hh);
+                session.checkAdminLogin();
                 return Response.ok().entity(User.init(userId), new Annotation[]{PrivateView.Factory.get()}).build();
             }
 
@@ -158,7 +153,7 @@ public class UserApi {
     @Consumes(javax.ws.rs.core.MediaType.APPLICATION_JSON)
     public void updateUser(@PathParam("userId") int userId, User user){
         try {
-            Session.checkAdminLogin(request, hh);
+            session.checkAdminLogin();
             try(DBUser dbUser = new DBUser()){
                 User old = dbUser.getUser(userId);
                 if(old.getLevel() != user.getLevel()) {
@@ -178,14 +173,11 @@ public class UserApi {
 	@PUT
 	@Path("{userId}/follow")
 	public Response follow(@PathParam("userId") int userId){
-		Session session = Session.init(request.getSession());
-
         try {
-            session.checkLogin(hh.getCookies());
             User user = session.getUser();
 
             user.follow(userId);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -196,14 +188,10 @@ public class UserApi {
 	@DELETE
 	@Path("{userId}/follow")
 	public Response unfollow(@PathParam("userId") int userId){
-		Session session = Session.init(request.getSession());
-
         try {
-            session.checkLogin(hh.getCookies());
             User user = session.getUser();
-
             user.unFollow(userId);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

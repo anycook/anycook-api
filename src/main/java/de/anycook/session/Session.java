@@ -31,12 +31,8 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Map;
 
 
 /**
@@ -71,7 +67,7 @@ public class Session {
      * @param session HttpSession des Users
      * @return instanz von Sessionhandler
      */
-    synchronized static public Session init(HttpSession session) {
+    static public Session init(HttpSession session) {
         if (session.getAttribute("shandler") != null)
             return (Session) session.getAttribute("shandler");
 
@@ -81,13 +77,17 @@ public class Session {
         return shandler;
     }
 
-    public static void checkAdminLogin(HttpServletRequest request, HttpHeaders hh) throws SQLException, IOException {
-        Session session = Session.init(request.getSession(true));
+    static public Session init(HttpServletRequest request){
+        Session session = init(request.getSession(true));
+        if(session.login == null){
+            try {
+                session.loginWithCookies(request.getCookies());
+            } catch (IOException | SQLException e) {
+                Logger.getLogger(Session.class).error(e, e);
+            }
+        }
 
-        if (session.checkLogin(hh.getCookies()) && session.getUser().isAdmin())
-            return;
-
-        throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+        return session;
     }
 
 	/*@SuppressWarnings("unused")
@@ -111,87 +111,38 @@ public class Session {
         return true;
     }
 
+    public void checkAdminLogin(){
+        if(login != null && login.isAdmin()) return;
+        throw new WebApplicationException(401);
+    }
+
     public boolean checkLoginWithoutException(){
         return login != null;
     }
 
-    public boolean checkAdminLogin(){
-        return login != null && login.isAdmin();
-    }
-
-    public boolean checkLogin(Map<String, Cookie> cookies) throws IOException {
-        if (login != null)
-            return true;
-
-        try {
-            if (cookies != null) {
-                if (cookies.containsKey("anycook")) {
-                    String cookieid = cookies.get("anycook").getValue();
-                    logger.debug("found valid cookie");
-                    try {
-                        login(cookieid);
-                        return true;
-                    } catch (DBUser.CookieNotFoundException | DBUser.UserNotFoundException e) {
-                        logger.warn(e, e);
-                    }
-                }
-
-                String fbCookieKey = "fbsr_" + FacebookHandler.APP_ID;
-                if (cookies.containsKey(fbCookieKey)) {
-                    String cookieValue = cookies.get(fbCookieKey).getValue();
-                    FacebookHandler.FacebookRequest request = FacebookHandler.decode(cookieValue);
-
-                    Long uid = Long.parseLong(request.user_id);
-                    try {
-                        facebookLogin(uid);
-                        return true;
-                    } catch (DBUser.UserNotFoundException | User.LoginException e) {
-                        logger.warn(e, e);
-                    }
+    public void loginWithCookies(javax.servlet.http.Cookie[] cookies) throws IOException, SQLException {
+        for (javax.servlet.http.Cookie cookie : cookies) {
+            if (cookie.getName().equals("anycook")) {
+                String cookieId = cookie.getValue();
+                try {
+                    login(cookieId);
+                } catch (DBUser.CookieNotFoundException | DBUser.UserNotFoundException e) {
+                    logger.warn(e, e);
                 }
             }
-        } catch (SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
 
-        throw new WebApplicationException(401);
-    }
-
-    public boolean checkLogin(javax.servlet.http.Cookie[] cookies) throws SQLException, IOException {
-        if (login != null)
-            return true;
-
-
-        if (cookies != null) {
-
-            for (javax.servlet.http.Cookie cookie : cookies) {
-                if (cookie.getName().equals("anycook")) {
-                    String cookieId = cookie.getValue();
-                    try {
-                        login(cookieId);
-                    } catch (DBUser.CookieNotFoundException | DBUser.UserNotFoundException e) {
-                        logger.warn(e, e);
-                        return true;
-                    }
-                }
-
-                String fbCookieKey = "fbsr_" + FacebookHandler.APP_ID;
-                if (cookie.getName().equals(fbCookieKey)) {
-                    String cookieValue = cookie.getValue();
-                    FacebookHandler.FacebookRequest request = FacebookHandler.decode(cookieValue);
-                    Long uid = Long.parseLong(request.user_id);
-                    try {
-                        facebookLogin(uid);
-                        return true;
-                    } catch (User.LoginException | DBUser.UserNotFoundException e) {
-                        logger.warn(e, e);
-                    }
+            String fbCookieKey = "fbsr_" + FacebookHandler.APP_ID;
+            if (cookie.getName().equals(fbCookieKey)) {
+                String cookieValue = cookie.getValue();
+                FacebookHandler.FacebookRequest request = FacebookHandler.decode(cookieValue);
+                Long uid = Long.parseLong(request.user_id);
+                try {
+                    facebookLogin(uid);
+                } catch (User.LoginException | DBUser.UserNotFoundException e) {
+                    logger.warn(e, e);
                 }
             }
         }
-
-        throw new WebApplicationException(401);
     }
 
     /**

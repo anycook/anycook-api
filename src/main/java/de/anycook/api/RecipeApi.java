@@ -38,11 +38,9 @@ import de.anycook.utils.enumerations.NotificationType;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -59,9 +57,7 @@ public class RecipeApi {
 	private final Logger logger = Logger.getLogger(getClass());
 
     @Context
-    private HttpServletRequest request;
-    @Context
-    private HttpHeaders hh;
+    private Session session;
 
 	@GET
 	public Response getAll(@QueryParam("userId") Integer userId, @QueryParam("detailed") final boolean detailed){
@@ -164,7 +160,6 @@ public class RecipeApi {
     @Consumes(MediaType.APPLICATION_JSON)
     public void suggestTags(@PathParam("recipeName") String recipeName,
                             List<String> tags) {
-        Session session = Session.init(request.getSession());
         int userId = session.getUser().getId();
 
         try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()){
@@ -225,7 +220,7 @@ public class RecipeApi {
                               Recipe newVersion){
 
         try {
-            Session.checkAdminLogin(request, hh);
+            session.checkAdminLogin();
             Recipe oldVersion = Recipe.init(recipeName, versionId);
             if(oldVersion.isActive() != newVersion.isActive()){
                 Recipes.setActiveId(recipeName, newVersion.isActive() ? newVersion.getId() : -1);
@@ -242,7 +237,7 @@ public class RecipeApi {
                     }
                 }
             }
-        } catch (SQLException | IOException | DBUser.UserNotFoundException e) {
+        } catch (SQLException | DBUser.UserNotFoundException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
@@ -295,7 +290,6 @@ public class RecipeApi {
 	@GET
 	@Path("{recipeName}/schmeckt")
 	public Boolean checkSchmeckt(@PathParam("recipeName") String recipeName){
-		Session session = Session.init(request.getSession());
 		session.checkLogin();
         try {
             return session.checkSchmeckt(recipeName);
@@ -309,14 +303,12 @@ public class RecipeApi {
 	@Path("{recipeName}/schmeckt")
 	public void schmeckt(@PathParam("recipeName") String recipeName){
 		
-		Session session = Session.init(request.getSession());
-
         try {
-            session.checkLogin(hh.getCookies());
+            session.checkLogin();
             boolean schmeckt = session.checkSchmeckt(recipeName);
             if(!schmeckt)
                 session.makeSchmeckt(recipeName);
-        } catch (IOException | SQLException e){
+        } catch (SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -327,15 +319,12 @@ public class RecipeApi {
 	@DELETE
 	@Path("{recipeName}/schmeckt")
 	public void schmecktNicht(@PathParam("recipeName") String recipeName){
-		Session session = Session.init(request.getSession());
-
-
         try {
-            session.checkLogin(hh.getCookies());
+            session.checkLogin();
             boolean schmeckt = session.checkSchmeckt(recipeName);
             if(schmeckt)
                 session.removeSchmeckt(recipeName);
-        } catch (IOException | SQLException e){
+        } catch (SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -347,9 +336,6 @@ public class RecipeApi {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void saveRecipe(NewRecipe newRecipe){
 		logger.info("want to save recipe");
-		Session  session = Session.init(request.getSession());
-
-		
 		if(newRecipe == null)
 			throw new WebApplicationException(400);
 

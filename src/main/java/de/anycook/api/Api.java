@@ -19,7 +19,10 @@
 package de.anycook.api;
 
 import de.anycook.api.listener.ExceptionListener;
+import de.anycook.api.providers.SessionFactory;
 import de.anycook.conf.Configuration;
+import de.anycook.session.Session;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.message.filtering.EntityFilteringFeature;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -39,5 +42,13 @@ public class Api extends ResourceConfig{
         register(MultiPartFeature.class);
         register(EntityFilteringFeature.class);
         register(ExceptionListener.class);
+
+        // makes Session available with @Context
+        register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bindFactory(SessionFactory.class).to(Session.class);
+            }
+        });
     }
 }

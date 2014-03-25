@@ -32,7 +32,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -42,8 +41,8 @@ import java.util.List;
 public class DraftApi {
 
     private Logger logger;
-    @Context HttpHeaders hh;
-    @Context HttpServletRequest request;
+    @Context
+    private Session session;
 
     public DraftApi(){
 		logger = Logger.getLogger(getClass());
@@ -52,10 +51,8 @@ public class DraftApi {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<DraftRecipe> get(){
-		Session session = Session.init(request.getSession());
 
 		try(RecipeDrafts drafts = new RecipeDrafts()){
-            session.checkLogin(hh.getCookies());
             return drafts.getAll(session.getUser().getId());
         } catch (IOException e){
             logger.error(e, e);
@@ -66,10 +63,8 @@ public class DraftApi {
 	@PUT
 	public String newDraft(@Context HttpServletRequest request){
 		try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
-            Session session = Session.init(request.getSession());
-            session.checkLogin(hh.getCookies());
             return recipeDrafts.newDraft(session.getUser().getId());
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -81,7 +76,6 @@ public class DraftApi {
     @Produces(MediaType.APPLICATION_JSON)
     public void getDraftNum(@QueryParam("lastNum") Integer lastNum,
                             @Suspended AsyncResponse asyncResponse){
-        Session session = Session.init(request.getSession(true));
         int userId = session.getUser().getId();
         RecipeDrafts drafts = new RecipeDrafts();
 
@@ -97,12 +91,10 @@ public class DraftApi {
 		if(recipeName == null) throw new WebApplicationException(400);
 
         try {
-            Session session = Session.init(request.getSession());
-            session.checkLogin(hh.getCookies());
             int user_id = session.getUser().getId();
 
             return Recipes.initDraftWithRecipe(recipeName, versionid, user_id);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
@@ -116,18 +108,10 @@ public class DraftApi {
 	@Produces(MediaType.APPLICATION_JSON)
 	public DraftRecipe getDraft(@PathParam("id") String draft_id){
         try (RecipeDrafts recipeDrafts = new RecipeDrafts()) {
-
-            Session session = Session.init(request.getSession());
-            session.checkLogin(hh.getCookies());
             int userId = session.getUser().getId();
-		
-
 			return recipeDrafts.loadDraft(draft_id, userId);
-		} catch (IOException e){
-            logger.error(e,e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-	}
+		}
+    }
 	
 	@POST
 	@Path("{id}")
@@ -135,30 +119,20 @@ public class DraftApi {
 	public Response setData(DraftRecipe draftData, @PathParam("id") String draft_id){
 
 		try (RecipeDrafts drafts = new RecipeDrafts()) {
-            Session session = Session.init(request.getSession());
-            session.checkLogin(hh.getCookies());
-
 			int userId = session.getUser().getId();
 			drafts.update(draftData, userId, draft_id);
-			
-		} catch (IOException e){
-            logger.error(e, e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-		
-		return Response.ok("true").build();
+		}
+
+        return Response.ok("true").build();
 	}
 	
 	@DELETE
 	@Path("{id}")
 	public void remove(@PathParam("id") String draft_id){
-		Session session = Session.init(request.getSession());
         try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
-            session.checkLogin(hh.getCookies());
-
             int user_id = session.getUser().getId();
             recipeDrafts.remove(user_id, draft_id);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

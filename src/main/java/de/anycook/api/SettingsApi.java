@@ -25,12 +25,9 @@ import de.anycook.user.User;
 import de.anycook.user.settings.NotificationSettings;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.sql.SQLException;
 
 /**
@@ -41,22 +38,18 @@ public class SettingsApi {
 
     public Logger logger = Logger.getLogger(getClass());
     @Context
-    public HttpServletRequest request;
-    @Context
-    public HttpHeaders hh;
+    public Session session;
 
 
     @PUT
     @Path("name")
     @Consumes(MediaType.APPLICATION_JSON)
     public void updateUsername(String newUsername){
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
             User user = session.getUser();
             user.setName(newUsername);
 
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -66,13 +59,11 @@ public class SettingsApi {
     @Path("place")
     @Consumes(MediaType.APPLICATION_JSON)
     public void updatePlace(String newPlace){
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
             User user = session.getUser();
             user.setPlace(newPlace);
 
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -82,12 +73,10 @@ public class SettingsApi {
     @Path("text")
     @Consumes(MediaType.APPLICATION_JSON)
     public void updateText(String newText){
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
             User user = session.getUser();
             user.setText(newText);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -99,12 +88,10 @@ public class SettingsApi {
     public void updateMail(String newMail){
         if(newMail == null) throw new WebApplicationException(Response.Status.BAD_REQUEST);
 
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
             User user = session.getUser();
             user.setMailCandidate(newMail);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -115,12 +102,10 @@ public class SettingsApi {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String confirmMailUpdate(String code){
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
             User user = session.getUser();
             return user.confirmMailCandidate(code);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBUser.WrongCodeException e) {
@@ -133,13 +118,12 @@ public class SettingsApi {
     @Path("password")
     @Consumes(MediaType.APPLICATION_JSON)
     public void changePassword(NewPassword password){
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
+            session.checkLogin();
             User user = session.getUser();
             if(!User.checkPassword(password.newPassword) || !user.setNewPassword(password.oldPassword, password.newPassword))
                 throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
@@ -149,12 +133,10 @@ public class SettingsApi {
     @Path("notification")
     @Produces(MediaType.APPLICATION_JSON)
     public NotificationSettings getNotificationSettings(){
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
             return NotificationSettings.init(session.getUser().getId());
 
-        } catch (IOException | SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBUser.UserNotFoundException e) {
@@ -167,12 +149,11 @@ public class SettingsApi {
     @Path("notification")
     @Consumes(MediaType.APPLICATION_JSON)
     public void updateNotificationSettings(NotificationSettings settings){
-        Session session = Session.init(request.getSession());
         try {
-            session.checkLogin(hh.getCookies());
+            session.checkLogin();
             NotificationSettings.save(settings);
 
-        } catch (IOException|SQLException e) {
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }

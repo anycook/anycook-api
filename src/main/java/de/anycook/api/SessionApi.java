@@ -44,6 +44,9 @@ public class SessionApi {
     private final String cookieDomain;
     private final boolean cookieSecure;
 
+    @Context
+    private Session session;
+
 	
 	public SessionApi() {
 		logger = Logger.getLogger(getClass());
@@ -54,17 +57,9 @@ public class SessionApi {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
     @PrivateView
-	public User getSession(@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
-		Session session = Session.init(request.getSession(true));
-        try {
-            session.checkLogin(hh.getCookies());
-            return session.getUser();
-        } catch (IOException e) {
-            logger.error(e, e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-	}
+	public User getSession(){
+        return session.getUser();
+    }
 	
 	@POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -72,7 +67,6 @@ public class SessionApi {
 	public Response login(@Context HttpServletRequest request,
 			Session.UserAuth auth){
 		
-		Session session = Session.init(request.getSession(true));
         LoginAttempt loginAttempt = null;
 
         try{
@@ -116,8 +110,7 @@ public class SessionApi {
     @Path("facebook")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void facebookLogin(@Context HttpServletRequest request, String signedRequest){
-        Session session = Session.init(request.getSession(true));
+    public void facebookLogin(String signedRequest){
         try {
             session.facebookLogin(signedRequest);
         } catch (IOException | SQLException e) {
@@ -131,16 +124,9 @@ public class SessionApi {
 	
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response logout(@Context HttpHeaders hh,
-			@Context HttpServletRequest request){
-		Session session = Session.init(request.getSession());
+	public Response logout(@Context HttpHeaders hh){
 		Map<String, Cookie> cookies = hh.getCookies();
-        try {
-            session.checkLogin(hh.getCookies());
-        } catch (IOException e) {
-            logger.error(e, e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
+        session.checkLogin();
 
         ResponseBuilder response = Response.ok();
 		if(cookies.containsKey("anycook")){

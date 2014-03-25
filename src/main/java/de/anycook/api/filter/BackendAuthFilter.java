@@ -3,16 +3,11 @@ package de.anycook.api.filter;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -23,14 +18,14 @@ import java.sql.SQLException;
  */
 @Provider
 public class BackendAuthFilter implements ContainerRequestFilter {
-    private HttpServletRequest request;
     private HttpHeaders hh;
+    private Session session;
     private final Logger logger;
 
-    public BackendAuthFilter(@Context HttpServletRequest request, @Context HttpHeaders hh){
+    public BackendAuthFilter(@Context HttpHeaders hh, @Context Session session){
         logger = Logger.getLogger(getClass());
-        this.request = request;
         this.hh = hh;
+        this.session = session;
     }
 
     @Override
@@ -39,12 +34,7 @@ public class BackendAuthFilter implements ContainerRequestFilter {
 
         if(path.startsWith("/backend")){
             logger.debug(String.format("Authfilter: %s", path));
-            try {
-                Session.checkAdminLogin(request, hh);
-            } catch (SQLException|IOException e) {
-                logger.error(e ,e);
-                throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-            }
+            session.checkAdminLogin();
         }
     }
 }
