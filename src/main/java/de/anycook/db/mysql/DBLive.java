@@ -76,11 +76,11 @@ public class DBLive extends DBHandler {
         PreparedStatement pStatement =
                 connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
                         "life.gerichte_name AS recipeName, lifetime, " +
-                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS recipeImage FROM life " +
                         "LEFT JOIN cases ON life.cases_name = cases.name " +
                         "LEFT JOIN users ON life.users_id = users.id " +
                         "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
-                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
                         "WHERE idlife > ? " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
@@ -97,11 +97,11 @@ public class DBLive extends DBHandler {
         PreparedStatement pStatement =
                 connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
                         "life.gerichte_name AS recipeName, lifetime, " +
-                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS recipeImage FROM life " +
                         "LEFT JOIN cases ON life.cases_name = cases.name " +
                         "LEFT JOIN users ON life.users_id = users.id " +
                         "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
-                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT 1");
         try (ResultSet data = pStatement.executeQuery()) {
@@ -142,11 +142,11 @@ public class DBLive extends DBHandler {
         PreparedStatement pStatement =
                 connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
                         "life.gerichte_name AS recipeName, lifetime, " +
-                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS recipeImage FROM life " +
                         "LEFT JOIN cases ON life.cases_name = cases.name " +
                         "LEFT JOIN users ON life.users_id = users.id " +
                         "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
-                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
                         "WHERE idlife < ? " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
@@ -161,11 +161,11 @@ public class DBLive extends DBHandler {
         PreparedStatement pStatement =
                 connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
                         "life.gerichte_name AS recipeName, lifetime, " +
-                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS recipeImage FROM life " +
                         "LEFT JOIN cases ON life.cases_name = cases.name " +
                         "LEFT JOIN users ON life.users_id = users.id " +
                         "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
-                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
                         "WHERE idlife > ? AND followers.users_id = ? " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
@@ -195,7 +195,7 @@ public class DBLive extends DBHandler {
         User user = new User(userId, username, userImage);
 
         String recipeName = data.getString("recipeName");
-        String recipeImage = data.getString("image");
+        String recipeImage = data.getString("recipeImage");
         Recipe recipe = recipeName == null ? null : new Recipe();
         if(recipe != null){
             recipe.setName(recipeName);
