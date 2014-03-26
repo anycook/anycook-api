@@ -121,6 +121,8 @@ public class Session {
     }
 
     public void loginWithCookies(javax.servlet.http.Cookie[] cookies) throws IOException, SQLException {
+        if(cookies == null) return;
+
         for (javax.servlet.http.Cookie cookie : cookies) {
             if (cookie.getName().equals("anycook")) {
                 String cookieId = cookie.getValue();
