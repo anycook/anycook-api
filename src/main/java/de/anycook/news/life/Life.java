@@ -19,6 +19,7 @@
 package de.anycook.news.life;
 
 import de.anycook.news.News;
+import de.anycook.recipe.Recipe;
 import de.anycook.user.User;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -28,7 +29,7 @@ import java.util.Date;
 @XmlType
 public class Life extends News {
     private String syntax;
-    private String recipe;
+    private Recipe recipe;
     private User user;
 
     //	public Life(int id, int userId, String syntax, String recipe, Date datetime) {
@@ -37,7 +38,7 @@ public class Life extends News {
 
     public Life(){}
 //	
-    public Life(int id, User user, String syntax, String recipe, Date datetime) {
+    public Life(int id, User user, String syntax, Recipe recipe, Date datetime) {
         super(id, datetime);
         this.syntax = syntax;
         this.recipe = recipe;
@@ -60,7 +61,7 @@ public class Life extends News {
         return syntax;
     }
 
-    public String getRecipe() {
+    public Recipe getRecipe() {
         return recipe;
     }
 
@@ -72,7 +73,7 @@ public class Life extends News {
         this.syntax = syntax;
     }
 
-    public void setRecipe(String recipe) {
+    public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
     }
 

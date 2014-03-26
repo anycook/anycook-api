@@ -23,7 +23,6 @@ import de.anycook.db.mysql.DBLive;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Set;
 
 
 public class Lifes {
@@ -85,7 +84,7 @@ public class Lifes {
         }
     }
 
-    public static Set<Life> getLastLifesFromFollowing(int lastId, int limit, int userId) throws SQLException {
+    public static List<Life> getLastLifesFromFollowing(int lastId, int limit, int userId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
             return dbLive.getLastLivesFromFollowers(lastId, limit, userId);
         }

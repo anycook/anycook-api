@@ -18,8 +18,10 @@
 
 package de.anycook.db.mysql;
 
+import de.anycook.image.RecipeImage;
 import de.anycook.news.life.Life;
 import de.anycook.news.life.Lifes;
+import de.anycook.recipe.Recipe;
 import de.anycook.user.User;
 import de.anycook.utils.DateParser;
 
@@ -71,47 +73,40 @@ public class DBLive extends DBHandler {
     }
 
     public List<Life> getLastLives(int lastId, int limit) throws SQLException {
-        PreparedStatement pStatement = connection.prepareStatement("SELECT idlife, nickname, users_id, users.image, syntax, gerichte_name, lifetime FROM life LEFT JOIN cases ON life.cases_name = cases.name LEFT JOIN users ON life.users_id = users.id WHERE idlife > ? ORDER BY idlife DESC LIMIT ?");
+        PreparedStatement pStatement =
+                connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
+                        "life.gerichte_name AS recipeName, lifetime, " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "LEFT JOIN cases ON life.cases_name = cases.name " +
+                        "LEFT JOIN users ON life.users_id = users.id " +
+                        "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
+                        "WHERE idlife > ? " +
+                        "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
         pStatement.setInt(1, lastId);
         pStatement.setInt(2, limit);
         try (ResultSet data = pStatement.executeQuery()) {
-            List<Life> lives = new LinkedList<>();
-            while (data.next()) {
-                int id = data.getInt("idlife");
-                String syntax = data.getString("syntax");
-                String recipe = data.getString("gerichte_name");
-                Date datetime = DateParser.parseDateTime(data.getString("lifetime"));
-
-                String username = data.getString("nickname");
-                int userId = data.getInt("users_id");
-                String userImage = data.getString("users.image");
-                User user = new User(userId, username, userImage);
-
-                Life life = new Life(id, user, syntax, recipe, datetime);
-                lives.add(life);
-            }
+            List<Life> lives = loadLives(data);
             Collections.reverse(lives);
             return lives;
         }
     }
 
     public Life getLastLive() throws SQLException {
-        PreparedStatement pStatement = connection.prepareStatement("SELECT idlife, nickname, users_id, users.image, syntax, gerichte_name, lifetime FROM life LEFT JOIN cases ON life.cases_name = cases.name LEFT JOIN users ON life.users_id = users.id ORDER BY idlife DESC LIMIT 1");
+        PreparedStatement pStatement =
+                connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
+                        "life.gerichte_name AS recipeName, lifetime, " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "LEFT JOIN cases ON life.cases_name = cases.name " +
+                        "LEFT JOIN users ON life.users_id = users.id " +
+                        "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
+                        "WHERE idlife > ? " +
+                        "GROUP BY idlife ORDER BY idlife DESC LIMIT 1");
         try (ResultSet data = pStatement.executeQuery()) {
-            if (data.next()) {
-                int id = data.getInt("idlife");
-                String syntax = data.getString("syntax");
-                String recipe = data.getString("gerichte_name");
-                Date datetime = DateParser.parseDateTime(data.getString("lifetime"));
-
-                int userId = data.getInt("users_id");
-                String username = data.getString("nickname");
-                String userImage = data.getString("users.image");
-                User user = new User(userId, username, userImage);
-
-
-                return new Life(id, user, syntax, recipe, datetime);
-            }
+            if (data.next()) return loadLife(data);
         }
 
         throw new RuntimeException("no new life found");
@@ -145,57 +140,69 @@ public class DBLive extends DBHandler {
     }
 
     public List<Life> getOlderLives(int oldestId, int limit) throws SQLException {
-        PreparedStatement pStatement = connection.prepareStatement("SELECT idlife, nickname, users_id, users.image, syntax, gerichte_name, lifetime FROM life LEFT JOIN cases ON life.cases_name = cases.name LEFT JOIN users ON life.users_id = users.id WHERE idlife < ? ORDER BY idlife DESC LIMIT ?");
+        PreparedStatement pStatement =
+                connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
+                        "life.gerichte_name AS recipeName, lifetime, " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "LEFT JOIN cases ON life.cases_name = cases.name " +
+                        "LEFT JOIN users ON life.users_id = users.id " +
+                        "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
+                        "WHERE idlife < ? " +
+                        "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
         pStatement.setInt(1, oldestId);
         pStatement.setInt(2, limit);
         try (ResultSet data = pStatement.executeQuery()) {
-            List<Life> lives = new LinkedList<>();
-            while (data.next()) {
-                int id = data.getInt("idlife");
-                String syntax = data.getString("syntax");
-                String recipe = data.getString("gerichte_name");
-                Date datetime = DateParser.parseDateTime(data.getString("lifetime"));
-                //Life life = new Life(id, User.init(usersId), syntax, recipe, datetime);
-
-                String username = data.getString("nickname");
-                int usersId = data.getInt("users_id");
-                String userImage = data.getString("users.image");
-                User user = new User(usersId, username, userImage);
-
-                Life life = new Life(id, user, syntax, recipe, datetime);
-                lives.add(life);
-            }
-
-            return lives;
+            return loadLives(data);
         }
     }
 
-    public Set<Life> getLastLivesFromFollowers(int lastId, int limit, int userId) throws SQLException {
-        Set<Life> livesByDate = new HashSet<>();
-        PreparedStatement pStatement = connection.prepareStatement("SELECT idlife, life.users_id, nickname, syntax, gerichte_name, lifetime FROM life " +
-                "LEFT JOIN cases ON life.cases_name = cases.name " +
-                "LEFT JOIN users ON life.users_id = users.id " +
-                "INNER JOIN followers ON following = life.users_id WHERE idlife > ? AND followers.users_id = ? ORDER BY idlife DESC LIMIT ?");
+    public List<Life> getLastLivesFromFollowers(int lastId, int limit, int userId) throws SQLException {
+        PreparedStatement pStatement =
+                connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
+                        "life.gerichte_name AS recipeName, lifetime, " +
+                        "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image FROM life " +
+                        "LEFT JOIN cases ON life.cases_name = cases.name " +
+                        "LEFT JOIN users ON life.users_id = users.id " +
+                        "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
+                        "LEFT JOIN versions ON gerichte.active_id = versions.id " +
+                        "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
+                        "WHERE idlife > ? AND followers.users_id = ? " +
+                        "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
         pStatement.setInt(1, lastId);
         pStatement.setInt(2, userId);
         pStatement.setInt(3, limit);
         try (ResultSet data = pStatement.executeQuery()) {
-            while (data.next()) {
-                int id = data.getInt("idlife");
-
-                String syntax = data.getString("syntax");
-                String recipeName = data.getString("gerichte_name");
-                Date datetime = DateParser.parseDateTime(data.getString("lifetime"));
-
-                String username = data.getString("nickname");
-                int followerId = data.getInt("users_id");
-                String userImage = data.getString("users.image");
-                User user = new User(followerId, username, userImage);
-
-                livesByDate.add(new Life(id, user, syntax, recipeName, datetime));
-
-            }
-            return livesByDate;
+            return loadLives(data);
         }
+    }
+
+    private static List<Life> loadLives(ResultSet data) throws SQLException {
+        List<Life> lives = new LinkedList<>();
+        while(data.next())
+            lives.add(loadLife(data));
+        return lives;
+    }
+
+    private static Life loadLife(ResultSet data) throws SQLException {
+        int id = data.getInt("idlife");
+        String syntax = data.getString("syntax");
+        Date datetime = DateParser.parseDateTime(data.getString("lifetime"));
+
+        String username = data.getString("nickname");
+        int userId = data.getInt("userId");
+        String userImage = data.getString("users.image");
+        User user = new User(userId, username, userImage);
+
+        String recipeName = data.getString("recipeName");
+        String recipeImage = data.getString("image");
+        Recipe recipe = recipeName == null ? null : new Recipe();
+        if(recipe != null){
+            recipe.setName(recipeName);
+            recipe.setImage(new RecipeImage(recipeImage));
+        }
+
+        return new Life(id, user, syntax, recipe, datetime);
     }
 }
