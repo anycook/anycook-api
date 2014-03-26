@@ -103,7 +103,6 @@ public class DBLive extends DBHandler {
                         "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
                         "LEFT JOIN versions ON gerichte.active_id = versions.id " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
-                        "WHERE idlife > ? " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT 1");
         try (ResultSet data = pStatement.executeQuery()) {
             if (data.next()) return loadLife(data);
