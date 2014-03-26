@@ -34,7 +34,6 @@ import java.util.List;
 public class TagApi {
     private final Logger logger = Logger.getLogger(getClass());
 	
-	@SuppressWarnings("unchecked")
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Tag> getAll(){

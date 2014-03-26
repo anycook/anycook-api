@@ -124,3 +124,13 @@
     Version #{$versionId} von {$recipeName} wurde erstellt.
 {/template}
 
+/**
+ * Message body to notify admin when new tags where suggested
+ * @param userName name of the user that suggested the tag
+ * @param numTags number of tags that where suggested
+ * @param recipeName name of the recipe the tags meant for
+ */
+{template .adminSuggestedTags}
+    {$userName} hat {$numTags} Tags für das Rezept {$recipeName} vorgeschlagen.
+{/template}
+

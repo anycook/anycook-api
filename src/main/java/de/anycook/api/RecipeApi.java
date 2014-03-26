@@ -22,6 +22,7 @@ import de.anycook.api.util.MediaType;
 import de.anycook.api.views.PublicView;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSaveRecipe;
+import de.anycook.db.mysql.DBTag;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.newrecipe.NewRecipe;
 import de.anycook.news.life.Lifes;
@@ -106,6 +107,21 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
+
+    @GET
+    @Path("tag")
+    public List<Tag> getRecipeTags(@QueryParam("active") Boolean active){
+        try {
+            if(active != null) return Tag.getRecipeTags(active);
+            return Tag.getRecipeTags();
+        } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
 	
 	@GET
 	@Path("{recipeName}")
@@ -159,15 +175,72 @@ public class RecipeApi {
     @Path("{recipeName}/tags")
     @Consumes(MediaType.APPLICATION_JSON)
     public void suggestTags(@PathParam("recipeName") String recipeName,
-                            List<String> tags) {
+                            List<Tag> tags) {
         int userId = session.getUser().getId();
 
         try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()){
-            for(String tag : tags)
-                dbSaveRecipe.suggestTag(recipeName, tag, userId);
+            for(Tag tag : tags) {
+                dbSaveRecipe.suggestTag(recipeName, tag.getName(), userId);
+            }
+
+            //send notification to admin
+            Map<String, String> data = new HashMap<>(3);
+            data.put("userName", session.getUser().getName());
+            data.put("recipeName", recipeName);
+            data.put("numTags", Integer.toString(tags.size()));
+            Notification.sendAdminNotification(NotificationType.ADMIN_SUGGESTED_TAGS, data);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PUT
+    @Path("{recipeName}/tags/{tagName}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateRecipeTag(@PathParam("recipeName") String recipeName,
+                                @PathParam("tagName") String tagName,
+                                Tag tag) {
+        session.checkAdminLogin();
+        try {
+            Tag oldTag = Tag.getRecipeTag(recipeName, tagName);
+            if(oldTag.getActive() != tag.getActive() && tag.getActive()) {
+                Tag.activateRecipeTag(recipeName, tagName);
+
+                Map<String, String> data = new HashMap<>(3);
+                data.put("tagName", tag.getName());
+                data.put("recipeName", recipeName);
+                Notification.sendNotification(oldTag.getSuggester().getId(), NotificationType.TAG_ACCEPTED, data);
+            }
+        } catch (DBUser.UserNotFoundException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBTag.TagNotFoundException e) {
+            logger.warn(e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
+
+    @DELETE
+    @Path("{recipeName}/tags/{tagName}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void deleteRecipeTag(@PathParam("recipeName") String recipeName,
+                                @PathParam("tagName") String tagName){
+        session.checkAdminLogin();
+        try {
+            Tag oldTag = Tag.getRecipeTag(recipeName, tagName);
+            Tag.deleteRecipeTag(recipeName, tagName);
+
+            Map<String, String> data = new HashMap<>(4);
+            data.put("tagName", tagName);
+            data.put("recipeName", recipeName);
+            Notification.sendNotification(oldTag.getSuggester().getId(), NotificationType.TAG_DENIED, data);
+        } catch (DBUser.UserNotFoundException | SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBTag.TagNotFoundException e) {
+            logger.warn(e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
 	

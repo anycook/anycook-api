@@ -19,6 +19,7 @@
 package de.anycook.db.mysql;
 
 import de.anycook.recipe.tag.Tag;
+import de.anycook.user.User;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -126,9 +127,82 @@ public class DBTag extends DBHandler {
         pStatement.executeUpdate();
     }
 
+    public List<Tag> getRecipeTags() throws SQLException {
+        PreparedStatement preparedStatement =
+                connection.prepareStatement("SELECT tags_name AS name, gerichte_name AS recipeName, users.id AS userId, " +
+                        "users.nickname AS userName, users.image AS userImage, active FROM gerichte_has_tags " +
+                        "LEFT JOIN users ON users_id = users.id;");
+        ResultSet data = preparedStatement.executeQuery();
+
+        return loadRecipeTags(data);
+    }
+
+    private static List<Tag> loadRecipeTags(ResultSet data) throws SQLException {
+        List<Tag> tags = new LinkedList<>();
+        while (data.next()){ tags.add(loadRecipeTag(data)); }
+        return tags;
+    }
+
+    private static Tag loadRecipeTag(ResultSet data) throws SQLException {
+        Tag tag = new Tag();
+        tag.setName(data.getString("name"));
+        tag.setRecipeName(data.getString("recipeName"));
+        User suggester = new User(data.getInt("userId"), data.getString("userName"), data.getString("userImage"));
+        tag.setSuggester(suggester);
+        tag.setActive(data.getBoolean("active"));
+
+        return tag;
+    }
+
+    public List<Tag> getRecipeTags(boolean active) throws SQLException {
+        PreparedStatement preparedStatement =
+                connection.prepareStatement("SELECT tags_name AS name, gerichte_name AS recipeName, users.id AS userId, " +
+                        "users.nickname AS userName, users.image AS userImage, active FROM gerichte_has_tags " +
+                        "LEFT JOIN users ON users_id = users.id " +
+                        "WHERE active = ?");
+        preparedStatement.setBoolean(1, active);
+        ResultSet data = preparedStatement.executeQuery();
+
+        return loadRecipeTags(data);
+    }
+
+    public Tag getRecipeTag(String recipeName, String tagName) throws SQLException, TagNotFoundException {
+        PreparedStatement preparedStatement =
+                connection.prepareStatement("SELECT tags_name AS name, gerichte_name AS recipeName, users.id AS userId, " +
+                        "users.nickname AS userName, users.image AS userImage, active FROM gerichte_has_tags " +
+                        "LEFT JOIN users ON users_id = users.id " +
+                        "WHERE tags_name = ? AND gerichte_name = ?");
+        preparedStatement.setString(1, tagName);
+        preparedStatement.setString(2, recipeName);
+        ResultSet data = preparedStatement.executeQuery();
+
+        if(data.next())
+            return loadRecipeTag(data);
+        throw new TagNotFoundException(tagName, recipeName);
+    }
+
+    public void activate(String recipeName, String tagName) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE gerichte_has_tags SET active = 1 WHERE gerichte_name = ? AND tags_name = ?");
+        preparedStatement.setString(1, recipeName);
+        preparedStatement.setString(2, tagName);
+
+        preparedStatement.executeUpdate();
+    }
+
+    public void deleteRecipeTag(String recipeName, String tagName) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM gerichte_has_tags WHERE gerichte_name = ? AND tags_name = ?");
+        preparedStatement.setString(1, recipeName);
+        preparedStatement.setString(2, tagName);
+
+        preparedStatement.executeUpdate();
+    }
+
     public static class TagNotFoundException extends Exception {
         public TagNotFoundException(String queryTag) {
             super("tag does not exist: " + queryTag);
+        }
+        public TagNotFoundException(String tag, String recipe) {
+            super(String.format("tag %s does not exist for recipe %s", tag, recipe));
         }
     }
 }

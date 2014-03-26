@@ -30,7 +30,8 @@ public enum NotificationType {
     ACCOUNT_ACTIVATION,
     NEW_MESSAGE,
     NEW_MAIL,
-    ADMIN_NEW_VERSION;
+    ADMIN_NEW_VERSION,
+    ADMIN_SUGGESTED_TAGS;
 
     @Override
     public String toString() {
@@ -59,6 +60,8 @@ public enum NotificationType {
                 return "newMail";
             case ADMIN_NEW_VERSION:
                 return "adminNewVersion";
+            case ADMIN_SUGGESTED_TAGS:
+                return "adminSuggestedTags";
         }
         return null;
     }
