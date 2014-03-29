@@ -21,6 +21,7 @@ package de.anycook.discussion;
 import de.anycook.db.mysql.DBDiscussion;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.notifications.Notification;
+import de.anycook.user.User;
 import de.anycook.utils.enumerations.NotificationType;
 
 import java.sql.SQLException;
@@ -86,11 +87,12 @@ public class Discussion {
             dbdiscussion.discuss(userId, recipeName, text);
         }
 
-		Set<Integer> mailTos = getMailTos(recipeName, userId);
-        Map<String, String> data = new HashMap<>();
-        data.put("recipeName", recipeName);
-        data.put("content", text);
         try {
+            Set<Integer> mailTos = getMailTos(recipeName, userId);
+            Map<String, String> data = new HashMap<>();
+            data.put("userName", User.getUsername(userId));
+            data.put("recipeName", recipeName);
+            data.put("content", text);
             Notification.sendNotifications(mailTos, NotificationType.DISCUSSION, data);
         } catch (DBUser.UserNotFoundException e) {
             //Nope
@@ -102,11 +104,13 @@ public class Discussion {
             dbdiscussion.answer(userId, recipeName, pid, text);
         }
 
-		Set<Integer> mailTos = getAnswerMailTos(recipeName, userId, pid);
-        Map<String, String> data = new HashMap<>();
-        data.put("recipeName", recipeName);
-        data.put("content", text);
+
         try {
+            Set<Integer> mailTos = getAnswerMailTos(recipeName, userId, pid);
+            Map<String, String> data = new HashMap<>();
+            data.put("userName", User.getUsername(userId));
+            data.put("recipeName", recipeName);
+            data.put("content", text);
             Notification.sendNotifications(mailTos, NotificationType.DISCUSSION_ANSWER, data);
         } catch (DBUser.UserNotFoundException e) {
             //nope
