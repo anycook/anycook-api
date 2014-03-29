@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class Notification {
 
     }
 
-    public static void sendNotifications(List<Integer> recipientIds, NotificationType type, Map<String, String> data)
+    public static void sendNotifications(Collection<Integer> recipientIds, NotificationType type, Map<String, String> data)
             throws SQLException, DBUser.UserNotFoundException {
         for(int recipientId : recipientIds)
             sendNotification(recipientId, type, data);

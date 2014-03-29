@@ -238,7 +238,7 @@ public class UserApi {
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public int getDiscussionNum(@PathParam("userId") int userId){
         try {
-            return Discussion.getDiscussionNumforUser(userId);
+            return Discussion.getDiscussionNumForUser(userId);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

@@ -19,11 +19,12 @@
 package de.anycook.discussion;
 
 import de.anycook.db.mysql.DBDiscussion;
+import de.anycook.db.mysql.DBUser;
+import de.anycook.notifications.Notification;
+import de.anycook.utils.enumerations.NotificationType;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class Discussion {
@@ -39,9 +40,9 @@ public class Discussion {
         this(recipeName, new LinkedList<DiscussionElement>());
     }
 
-    public Discussion(String recipeName, List<DiscussionElement> discElems) {
+    public Discussion(String recipeName, List<DiscussionElement> discussionElements) {
         this.recipeName = recipeName;
-        this.elements = discElems;
+        this.elements = discussionElements;
     }
 
     public String getRecipeName() {
@@ -80,32 +81,36 @@ public class Discussion {
         }
     }
 
-    public static void discuss(String text, int userid, String gerichtname) throws SQLException {
+    public static void discuss(String text, int userId, String recipeName) throws SQLException {
         try(DBDiscussion dbdiscussion = new DBDiscussion()) {
-            dbdiscussion.discuss(userid, gerichtname, text);
-
+            dbdiscussion.discuss(userId, recipeName, text);
         }
-//		Set<Integer> mailtos = getMailtos(gerichtname, userId);
-//		for(Integer mailto : mailtos){
-//			User user = User.init(mailto);
-//			Map<String, String> data = new HashMap<String, String>();
-//			data.put("gericht", gerichtname);
-//			user.sendMail(NotificationSettings.RECIPEDISCUSSION, data);
-//		}
+
+		Set<Integer> mailTos = getMailTos(recipeName, userId);
+        Map<String, String> data = new HashMap<>();
+        data.put("recipeName", recipeName);
+        data.put("content", text);
+        try {
+            Notification.sendNotifications(mailTos, NotificationType.DISCUSSION, data);
+        } catch (DBUser.UserNotFoundException e) {
+            //Nope
+        }
     }
 
-    public static void answer(String text, int pid, int userid, String gerichtname) throws SQLException {
+    public static void answer(String text, int pid, int userId, String recipeName) throws SQLException {
         try(DBDiscussion dbdiscussion = new DBDiscussion()){
-            dbdiscussion.answer(userid, gerichtname, pid, text);
+            dbdiscussion.answer(userId, recipeName, pid, text);
         }
 
-//		Set<Integer> mailtos = getAnswerMailtos(gerichtname, userId, pid);
-//		for(Integer mailto : mailtos){
-//			User user = User.init(mailto);
-//			Map<String, String> data = new HashMap<String, String>();
-//			data.put("gericht", gerichtname);
-//			user.sendMail(NotificationSettings.DISCUSSIONANWSER, data);
-//		}
+		Set<Integer> mailTos = getAnswerMailTos(recipeName, userId, pid);
+        Map<String, String> data = new HashMap<>();
+        data.put("recipeName", recipeName);
+        data.put("content", text);
+        try {
+            Notification.sendNotifications(mailTos, NotificationType.DISCUSSION_ANSWER, data);
+        } catch (DBUser.UserNotFoundException e) {
+            //nope
+        }
     }
 
     public static boolean checkforNew(String recipeName, String maxId) throws SQLException {
@@ -134,7 +139,7 @@ public class Discussion {
         }
     }
 
-    public static Set<Integer> getMailtos(String recipeName, int excludedId) throws SQLException {
+    public static Set<Integer> getMailTos(String recipeName, int excludedId) throws SQLException {
         try(DBDiscussion dbdiscussion = new DBDiscussion()) {
             Set<Integer> mailTos = dbdiscussion.getDiscussionsMembers(recipeName);
             mailTos.remove(excludedId);
@@ -142,7 +147,7 @@ public class Discussion {
         }
     }
 
-    public static Set<Integer> getAnswerMailtos(String recipeName, int excludedId, int parentId) throws SQLException {
+    public static Set<Integer> getAnswerMailTos(String recipeName, int excludedId, int parentId) throws SQLException {
         try(DBDiscussion dbdiscussion = new DBDiscussion()) {
             Set<Integer> mailTos = dbdiscussion.getDiscussionsAnswerMembers(recipeName, parentId);
             mailTos.remove(excludedId);
@@ -150,15 +155,15 @@ public class Discussion {
         }
     }
 
-    public static int getDiscussionNumforUser(int userid) throws SQLException {
+    public static int getDiscussionNumForUser(int userId) throws SQLException {
         try(DBDiscussion dbDiscussion = new DBDiscussion()) {
-            return dbDiscussion.getDiscussionCountFromUser(userid);
+            return dbDiscussion.getDiscussionCountFromUser(userId);
         }
     }
 
-    public static void addNewRecipeEvent(String recipeName, int userid, String comment, int versionId) throws SQLException {
+    public static void addNewRecipeEvent(String recipeName, int userId, String comment, int versionId) throws SQLException {
         try(DBDiscussion db = new DBDiscussion()) {
-            db.discussRecipeEvent(userid, recipeName, comment, "newrecipe", versionId);
+            db.discussRecipeEvent(userId, recipeName, comment, "newrecipe", versionId);
         }
     }
 
