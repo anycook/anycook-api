@@ -63,13 +63,14 @@ public class RecipeApi {
 	@GET
 	public Response getAll(@QueryParam("userId") Integer userId, @QueryParam("detailed") final boolean detailed){
         try{
+            final int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
             Annotation[] annotations = detailed ?
                     new Annotation[]{PublicView.Factory.get()} : new Annotation[]{};
 
             if(userId != null)
-                return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getRecipesFromUser(userId)){},
+                return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getRecipesFromUser(userId, loginId)){},
                         annotations).build();
-            return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getAll()){}, annotations).build();
+            return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getAll(loginId)){}, annotations).build();
         } catch (Exception e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -128,7 +129,8 @@ public class RecipeApi {
     @PublicView
 	public Recipe getRecipe(@PathParam("recipeName") String recipeName){
         try {
-            return Recipe.init(recipeName);
+            int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            return Recipe.init(recipeName, loginId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -262,7 +264,8 @@ public class RecipeApi {
     @Path("{recipeName}/version")
     public List<Recipe> getAllVersion(@PathParam("recipeName") String recipeName){
         try {
-            return Recipes.getAllVersions(recipeName);
+            int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            return Recipes.getAllVersions(recipeName, loginId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -275,7 +278,8 @@ public class RecipeApi {
 	public Recipe getVersion(@PathParam("recipeName") String recipeName,
 			@PathParam("versionId") int versionId){
         try {
-            return Recipe.init(recipeName, versionId);
+            int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            return Recipe.init(recipeName, versionId, loginId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

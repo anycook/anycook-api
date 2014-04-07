@@ -24,9 +24,11 @@ import de.anycook.api.views.TasteNumView;
 import de.anycook.search.Query;
 import de.anycook.search.Search;
 import de.anycook.search.SearchResult;
+import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -41,9 +43,10 @@ public class SearchApi {
     @TasteNumView
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public SearchResult search(Query query){
+	public SearchResult search(Query query, @Context Session session){
         try {
-            return Search.search(query);
+            int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            return Search.search(query, loginId);
         } catch (SQLException | IOException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

@@ -38,11 +38,12 @@ public class DBDiscover extends DBRecipe {
         super();
     }
 
-    public List<Recipe> getTastyRecipes(int num) throws SQLException {
-        CallableStatement call = connection.prepareCall("{call tasty_recipes(?)}");
-        call.setInt(1, num);
+    public List<Recipe> getTastyRecipes(int num, int loginId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{call tasty_recipes(?, ?)}");
+        callableStatement.setInt(1, num);
+        callableStatement.setInt(2, loginId);
 
-        ResultSet data = call.executeQuery();
+        ResultSet data = callableStatement.executeQuery();
         return getRecipes(data);
     }
 
@@ -51,9 +52,10 @@ public class DBDiscover extends DBRecipe {
      *
      * @return List mit den neusten Gerichten
      */
-    public List<Recipe> getNewestRecipes(int num) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call newest_recipes(?)}");
+    public List<Recipe> getNewestRecipes(int num, int loginId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{call newest_recipes(?, ?)}");
         callableStatement.setInt(1, num);
+        callableStatement.setInt(2, loginId);
 
         ResultSet data = callableStatement.executeQuery();
         return getRecipes(data);
@@ -64,9 +66,10 @@ public class DBDiscover extends DBRecipe {
      *
      * @return List mit den beliebtesten Gerichten
      */
-    public List<Recipe> getPopularRecipes(int num) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call popular_recipes(?)}");
+    public List<Recipe> getPopularRecipes(int num, int loginId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{call popular_recipes(?, ?)}");
         callableStatement.setInt(1, num);
+        callableStatement.setInt(2, loginId);
 
         ResultSet data = callableStatement.executeQuery();
         return getRecipes(data);

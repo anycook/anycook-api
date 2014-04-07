@@ -46,14 +46,18 @@ import java.util.Map;
 public class Recipe implements Comparable<Recipe> {
 
     public static Recipe init(String recipeName) throws SQLException, DBRecipe.RecipeNotFoundException {
+        return init(recipeName, -1);
+    }
+
+    public static Recipe init(String recipeName, int loginId) throws SQLException, DBRecipe.RecipeNotFoundException {
         try (DBGetRecipe db = new DBGetRecipe()) {
-            return db.get(recipeName);
+            return db.get(recipeName, loginId);
         }
     }
 
-    public static Recipe init(String recipeName, int versionId) throws SQLException, DBRecipe.RecipeNotFoundException {
+    public static Recipe init(String recipeName, int versionId, int loginId) throws SQLException, DBRecipe.RecipeNotFoundException {
         try (DBGetRecipe db = new DBGetRecipe()) {
-            return db.getVersionData(recipeName, versionId);
+            return db.getVersionData(recipeName, versionId, loginId);
         }
     }
 
@@ -61,6 +65,7 @@ public class Recipe implements Comparable<Recipe> {
     private Image image;
     private String description;
     private Time time;
+    private boolean tasty;
 
     @PublicView
     private int id;
@@ -92,11 +97,12 @@ public class Recipe implements Comparable<Recipe> {
     @PublicView
     private long lastChange;
 
+
     public Recipe() {
     }
 
     public Recipe(int id, String name, String description, String image, int person, Date created, Date lastChange,
-                  String category, int skill, int calorie, Time time, int activeId, int views, User author) {
+                  String category, int skill, int calorie, Time time, int activeId, int views, User author, boolean tasty) {
         this.name = name;
         this.description = description;
         this.image = new RecipeImage(image);
@@ -111,6 +117,7 @@ public class Recipe implements Comparable<Recipe> {
         this.author = author;
         this.active = id == activeId;
         this.views = views;
+        this.tasty = tasty;
     }
 
     //getter
@@ -243,6 +250,14 @@ public class Recipe implements Comparable<Recipe> {
         return Recipes.getAuthor(name, id);
     }
 
+    public boolean isTasty() {
+        return tasty;
+    }
+
+    public void setTasty(boolean tasty) {
+        this.tasty = tasty;
+    }
+
     @Override
     public int compareTo(Recipe o) {
         return name.compareTo(o.name);
@@ -268,6 +283,4 @@ public class Recipe implements Comparable<Recipe> {
 
         return builder.build();
     }
-
-
 }

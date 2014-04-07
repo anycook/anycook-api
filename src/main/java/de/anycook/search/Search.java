@@ -32,7 +32,7 @@ import java.util.*;
 
 public class Search {
 
-    public static SearchResult search(Query query) throws SQLException, IOException {
+    public static SearchResult search(Query query, int loginId) throws SQLException, IOException {
         Set<String> recipes = new LinkedHashSet<>();
 
         try (DBSearch dbsearch = new DBSearch()) {
@@ -116,7 +116,7 @@ public class Search {
 
 
 
-        return new SearchResult(resultLength, Recipes.load(results));
+        return new SearchResult(resultLength, Recipes.load(results, loginId));
 
 
     }

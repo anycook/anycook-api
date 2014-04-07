@@ -64,12 +64,12 @@ public class Recipes {
         }
     }
 
-    public static List<Recipe> load(List<String> results) {
+    public static List<Recipe> load(List<String> results, int loginId) {
         List<Recipe> recipes = new ArrayList<>();
 
         for(String recipe : results) {
             try {
-                recipes.add(Recipe.init(recipe));
+                recipes.add(Recipe.init(recipe, loginId));
             } catch (SQLException | DBRecipe.RecipeNotFoundException e) {
                 Logger.getLogger(Recipe.class).error(e, e);
             }
@@ -83,9 +83,9 @@ public class Recipes {
         }
     }
 
-    public static List<Recipe> getTastingRecipesForUser(int userId) throws SQLException {
+    public static List<Recipe> getTastingRecipesForUser(int userId, int loginId) throws SQLException {
         try (DBGetRecipe db = new DBGetRecipe()) {
-            return db.getTastingRecipes(userId);
+            return db.getTastingRecipes(userId, loginId);
         }
     }
 
@@ -95,9 +95,9 @@ public class Recipes {
         }
     }
 
-    public static List<Recipe> getRecipesFromUser(int userId) throws SQLException {
+    public static List<Recipe> getRecipesFromUser(int userId, int loginId) throws SQLException {
         try (DBGetRecipe db = new DBGetRecipe()) {
-            return db.getRecipesForUserId(userId);
+            return db.getRecipesForUserId(userId, loginId);
         }
     }
 
@@ -207,15 +207,15 @@ public class Recipes {
         }
     }
 
-    public static List<Recipe> getAll() throws SQLException {
+    public static List<Recipe> getAll(int loginId) throws SQLException {
         try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
-            return dbGetRecipe.getAllRecipes();
+            return dbGetRecipe.getAllRecipes(loginId);
         }
     }
 
-    public static List<Recipe> getAllVersions(String recipeName) throws SQLException {
+    public static List<Recipe> getAllVersions(String recipeName, int loginId) throws SQLException {
         try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
-            return dbGetRecipe.getVersions(recipeName);
+            return dbGetRecipe.getVersions(recipeName, loginId);
         }
     }
 

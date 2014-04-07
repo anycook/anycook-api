@@ -226,7 +226,8 @@ public class UserApi {
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
 	public List<Recipe> schmeckt(@PathParam("userId") int userId){
         try {
-            return Recipes.getTastingRecipesForUser(userId);
+            int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            return Recipes.getTastingRecipesForUser(userId, loginId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

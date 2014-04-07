@@ -38,9 +38,11 @@ public class DiscoverApi {
 
     private final Logger logger = Logger.getLogger(getClass());
 
+    @Context
+    private Session session;
+
     @GET
-    public Discover.Recipes get(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber,
-                                @Context Session session){
+    public Discover.Recipes get(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
             try {
                 User user = session.getUser();
@@ -63,7 +65,7 @@ public class DiscoverApi {
                 User user = session.getUser();
                 return Discover.getRecommendedRecipes(recipeNumber, user.getId());
             } catch (WebApplicationException e) {
-                return Discover.getPopularRecipes(recipeNumber);
+                return Discover.getPopularRecipes(recipeNumber, -1);
             }
         } catch (SQLException e){
             logger.error(e, e);
@@ -76,7 +78,8 @@ public class DiscoverApi {
     public List<Recipe> getDiscoverTasty(
 			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
-            return Discover.getTastyRecipes(recipeNumber);
+            int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            return Discover.getTastyRecipes(recipeNumber, loginId);
         } catch (SQLException e) {
             logger.error(e ,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -88,7 +91,8 @@ public class DiscoverApi {
     public List<Recipe> getDiscoverNew(
 			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
-            return Discover.getNewestRecipes(recipeNumber);
+            int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            return Discover.getNewestRecipes(recipeNumber, loginId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

@@ -240,9 +240,10 @@ public class DBRecipe extends DBHandler {
         User user = new User(userId, username, userImage);
         String category = data.getString("kategorien_name");
         int views = data.getInt("viewed");
+        boolean tasty = data.getBoolean("tastes");
 
         return new Recipe(id, name, description, image, person, created, lastChange, category,
-                skill, calorie, time, activeId, views, user);
+                skill, calorie, time, activeId, views, user, tasty);
     }
 
 

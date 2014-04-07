@@ -37,6 +37,10 @@ public class DBGetRecipe extends DBRecipe {
         super();
     }
 
+
+    public Recipe get(String name) throws SQLException, RecipeNotFoundException {
+        return get(name, -1);
+    }
     /**
      * Gibt alle Daten eines Gerichts zurueck. Sucht das Gericht per Gerichtenamen und schreibt den Namen, die Wertung,
      * die Beschreibung, die Dauer, den Schwierigkeitsgrad, die Kalorien, den Bildlink und
@@ -45,36 +49,40 @@ public class DBGetRecipe extends DBRecipe {
      * @param name {@link String} mit dem Gerichtenamen
      * @return {@link java.util.Map} mit den Daten des Gerichts.
      */
-    public Recipe get(String name) throws RecipeNotFoundException, SQLException {
-        CallableStatement call = connection.prepareCall("{call get_recipe(?)}");
+    public Recipe get(String name, int loginId) throws RecipeNotFoundException, SQLException {
+        CallableStatement call = connection.prepareCall("{call get_recipe(?, ?)}");
         call.setString(1, name);
+        call.setInt(2, loginId);
         ResultSet data = call.executeQuery();
 
         if (!data.next()) throw new RecipeNotFoundException(name);
         return getRecipe(data);
     }
 
-    public List<Recipe> getAllRecipes() throws SQLException {
-        CallableStatement call = connection.prepareCall("{call get_all_recipes()}");
+    public List<Recipe> getAllRecipes(int loginId) throws SQLException {
+        CallableStatement call = connection.prepareCall("{call get_all_recipes(?)}");
+        call.setInt(1, loginId);
         ResultSet data = call.executeQuery();
 
         return getRecipes(data);
     }
 
 
-    public List<Recipe> getVersions(String recipeName) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call get_all_versions(?)}");
+    public List<Recipe> getVersions(String recipeName, int loginId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{call get_all_versions(?, ?)}");
         callableStatement.setString(1, recipeName);
+        callableStatement.setInt(2, loginId);
 
         try(ResultSet data = callableStatement.executeQuery()){
             return getRecipes(data);
         }
     }
 
-    public Recipe getVersionData(String recipeName, int versionId) throws RecipeNotFoundException, SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call get_version(?, ?)}");
+    public Recipe getVersionData(String recipeName, int versionId, int loginId) throws RecipeNotFoundException, SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{call get_version(?, ?, ?)}");
         callableStatement.setString(1, recipeName);
         callableStatement.setInt(2, versionId);
+        callableStatement.setInt(3, loginId);
         ResultSet data = callableStatement.executeQuery();
 
         if (!data.next()) throw new RecipeNotFoundException(recipeName);
@@ -325,9 +333,10 @@ public class DBGetRecipe extends DBRecipe {
         return 0;
     }
 
-    public List<Recipe> getTastingRecipes(int userId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call tasting_recipes(?)}");
+    public List<Recipe> getTastingRecipes(int userId, int loginId) throws SQLException {
+        CallableStatement callableStatement = connection.prepareCall("{call tasting_recipes(?, ?)}");
         callableStatement.setInt(1, userId);
+        callableStatement.setInt(2, loginId);
         ResultSet data = callableStatement.executeQuery();
         return getRecipes(data);
     }
@@ -346,9 +355,10 @@ public class DBGetRecipe extends DBRecipe {
         return result;
     }
 
-    public List<Recipe> getRecipesForUserId(int userId) throws SQLException {
-        CallableStatement statement = connection.prepareCall("{call user_recipes(?)}");
+    public List<Recipe> getRecipesForUserId(int userId, int loginId) throws SQLException {
+        CallableStatement statement = connection.prepareCall("{call user_recipes(?, ?)}");
         statement.setInt(1, userId);
+        statement.setInt(2, loginId);
         ResultSet data = statement.executeQuery();
         return getRecipes(data);
     }
