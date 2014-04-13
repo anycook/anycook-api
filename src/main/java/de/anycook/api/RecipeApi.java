@@ -93,7 +93,6 @@ public class RecipeApi {
 	
 	/**
 	 * returns the recipe of the day
-	 * @return
 	 */
 	@GET
 	@Path("oftheday")

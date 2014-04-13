@@ -92,29 +92,32 @@ public class MessageSession extends News {
     }
 
     public static List<MessageSession> getSessionsFromUser(int userId, Date lastChange) throws SQLException, DBMessage.SessionNotFoundException {
-        DBMessage db = new DBMessage();
-        Set<Integer> sessionIds = db.getSessionIDsFromUser(userId, lastChange);
-        db.close();
-        List<MessageSession> sessions = new LinkedList<>();
-        for (Integer sessionId : sessionIds) {
-            sessions.add(getSession(sessionId, userId));
+        try(DBMessage db = new DBMessage()) {
+            Set<Integer> sessionIds = db.getSessionIDsFromUser(userId, lastChange);
+            List<MessageSession> sessions = new LinkedList<>();
+            for (Integer sessionId : sessionIds) {
+                sessions.add(getSession(sessionId, userId));
+            }
+            Collections.sort(sessions);
+            return sessions;
         }
-        return sessions;
     }
 
     public static List<MessageSession> getSessionsFromUser(int userId) throws SQLException {
-        DBMessage db = new DBMessage();
-        Set<Integer> sessionIds = db.getSessionIDsFromUser(userId);
-        db.close();
-        List<MessageSession> sessions = new LinkedList<>();
-        for (Integer sessionId : sessionIds) {
-            try {
-                sessions.add(getSession(sessionId, userId));
-            } catch (DBMessage.SessionNotFoundException e) {
-                //nope
+        try(DBMessage db = new DBMessage()) {
+            Set<Integer> sessionIds = db.getSessionIDsFromUser(userId);
+            List<MessageSession> sessions = new LinkedList<>();
+            for (Integer sessionId : sessionIds) {
+                try {
+                    sessions.add(getSession(sessionId, userId));
+                } catch (DBMessage.SessionNotFoundException e) {
+                    //nope
+                }
             }
+
+            Collections.sort(sessions);
+            return sessions;
         }
-        return sessions;
     }
 
     private final Logger logger;
