@@ -18,6 +18,7 @@
 
 package de.anycook.db.mysql;
 
+import de.anycook.location.Location;
 import de.anycook.recipe.Recipe;
 
 import java.sql.CallableStatement;
@@ -73,5 +74,9 @@ public class DBDiscover extends DBRecipe {
 
         ResultSet data = callableStatement.executeQuery();
         return getRecipes(data);
+    }
+
+    public List<Recipe> getNearRecipes(Location location, double maxRadius, int recipeNumber) {
+        return null;
     }
 }

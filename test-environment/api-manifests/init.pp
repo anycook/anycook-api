@@ -2,7 +2,7 @@
 	path => "/usr/bin",
 } */
 
-$manifests = '/tmp/vagrant-puppet-1/manifests'
+$manifests_path = '/tmp/vagrant-puppet-2/manifests'
 
 class { 'apt':
   always_apt_update    => true,
@@ -15,7 +15,7 @@ class anycook {
 
   file { '/etc/anycook/anycook.properties' :
       ensure => present,
-      source => "${manifests}/anycook.properties",
+      source => "${manifests_path}/anycook.properties",
       #onlyif => 'test -f /etc/anycook/anycook.properties',
       require => File['/etc/anycook'],
       #before => Class['tomcat7'],
@@ -35,14 +35,14 @@ class  apache2 {
 		ensure => file,
 		path => "/etc/apache2/conf.d/sendfile",
 		require => Package["apache2"],
-		source => "${manifests}/apache-conf/sendfile",
+		source => "${manifests_path}/apache-conf/sendfile",
 	}
 
 	file { "charset":
 		ensure => file,
 		path => "/etc/apache2/conf.d/charset",
 		require => Package["apache2"],
-		source => "${manifests}/apache-conf/charset",
+		source => "${manifests_path}/apache-conf/charset",
 	}
 
 
@@ -56,14 +56,14 @@ class  apache2 {
 		ensure => file,
 		path => "/etc/apache2/mods-enabled/jk.conf",
 		require => Package["libapache2-mod-jk"],
-		source => "${manifests}/apache-conf/jk.conf",
+		source => "${manifests_path}/apache-conf/jk.conf",
 	}
 
 	file { "worker.properties":
 		ensure => file,
 		path => "/etc/apache2/workers.properties",
 		require => Package["libapache2-mod-jk"],
-		source => "${manifests}/apache-conf/workers.properties",
+		source => "${manifests_path}/apache-conf/workers.properties",
 	}
 
 	file { "000-default":
@@ -71,7 +71,7 @@ class  apache2 {
         force => true,
 		path => "/etc/apache2/sites-enabled/000-default",
 		require => Package["apache2"],
-		target => "${manifests}/apache-conf/000-default",
+		target => "${manifests_path}/apache-conf/000-default",
 
 	}
 
@@ -121,7 +121,7 @@ class tomcat7 {
 		force => true,
 		path => "/etc/tomcat7/server.xml",
 		require => Package["tomcat7"],
-		target => "${manifests}/tomcat-conf/server.xml",
+		target => "${manifests_path}/tomcat-conf/server.xml",
 	}
 
 	file { "setenv.sh":
@@ -129,7 +129,7 @@ class tomcat7 {
         force => true,
         path => "/usr/share/tomcat7/bin/setenv.sh",
         require => Package["tomcat7"],
-        target => "${manifests}/tomcat-conf/setenv.sh",
+        target => "${manifests_path}/tomcat-conf/setenv.sh",
     }
 
 	file { "/var/lib/tomcat7/webapps/ROOT":
