@@ -54,7 +54,7 @@ public class User implements Comparable<User> {
 
     static {
         logger = Logger.getLogger(User.class);
-        adminMail = Configuration.getPropertyAdminMail();
+        adminMail = Configuration.getInstance().getAdminMail();
     }
 
     public static User init(String nameOrMail) throws SQLException, DBUser.UserNotFoundException, IOException {
@@ -176,7 +176,7 @@ public class User implements Comparable<User> {
             if (newUserId != null) {
                 if (!active)
                     try {
-                        User.sendAccountActivationMail(newUserId, username, mail, activationID);
+                        User.sendAccountActivationMail(newUserId, username, activationID);
                     } catch (DBUser.UserNotFoundException e) {
                         logger.error(e, e);
                     }
@@ -254,11 +254,11 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static void sendAccountActivationMail(int id, String name, String mail, String activationKey)
+    public static void sendAccountActivationMail(int id, String name, String activationKey)
             throws SQLException, DBUser.UserNotFoundException {
         Map<String, String> data = new HashMap<>();
         data.put("userName", name);
-        data.put("baseUrl", Configuration.getPropertyRedirectDomain());
+        data.put("baseUrl", Configuration.getInstance().getRedirectDomain());
         data.put("activationKey", activationKey);
         Notification.sendNotification(id, NotificationType.ACCOUNT_ACTIVATION, data);
     }
@@ -301,7 +301,7 @@ public class User implements Comparable<User> {
     }
 
     public static String getUserImage(int userId, ImageType type) throws SQLException, IOException, DBUser.UserNotFoundException {
-        StringBuilder imagePath = new StringBuilder(Configuration.getPropertyImageBasePath()).append("user/");
+        StringBuilder imagePath = new StringBuilder(Configuration.getInstance().getImageBasePath()).append("user/");
         try (DBUser dbuser = new DBUser()) {
             String userImage = dbuser.getUserImage(userId);
 
@@ -575,7 +575,7 @@ public class User implements Comparable<User> {
     //Mails
     public void sendAccountActivationMail(String activationKey) throws SQLException {
         try {
-            sendAccountActivationMail(id, name, mail, activationKey);
+            sendAccountActivationMail(id, name, activationKey);
         } catch (DBUser.UserNotFoundException e) {
             logger.error(e, e);
         }

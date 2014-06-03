@@ -45,8 +45,8 @@ import java.util.Map;
 public class FacebookHandler {
 
     private final static Logger LOGGER = Logger.getLogger(FacebookHandler.class);
-    public final static String APP_ID = Configuration.getPropertyFacebookAppId();
-    private final static String APP_SECRET = Configuration.getPropertyFacebookAppSecret();
+    public final static String APP_ID = Configuration.getInstance().getFacebookAppId();
+    private final static String APP_SECRET = Configuration.getInstance().getFacebookAppSecret();
 
     private OAuthService service;
 

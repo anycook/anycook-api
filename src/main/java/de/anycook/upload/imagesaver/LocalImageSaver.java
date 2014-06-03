@@ -12,7 +12,7 @@ import java.io.IOException;
  * @author Jan Graßegger<jan@anycook.de>
  */
 public class LocalImageSaver extends ImageSaver {
-    private final static String imageRoot = Configuration.getPropertyImageRoot();
+    private final static String imageRoot = Configuration.getInstance().getImageRoot();
     protected final File imagePath;
 
     public LocalImageSaver(String subPath){

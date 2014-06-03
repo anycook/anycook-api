@@ -38,7 +38,7 @@ public class Api extends ResourceConfig{
 
         packages("de.anycook.api");
 
-        property("sessionCookieDomain", Configuration.getPropertyCookieDomain());
+        property("sessionCookieDomain", Configuration.getInstance().getCookieDomain());
         register(MultiPartFeature.class);
         register(EntityFilteringFeature.class);
         register(ExceptionListener.class);

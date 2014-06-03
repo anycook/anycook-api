@@ -11,7 +11,7 @@ public  class Image{
     public Image(){}
 
     public Image(String image, String path){
-        String imageRoot = Configuration.getPropertyImageBasePath();
+        String imageRoot = Configuration.getInstance().getImageBasePath();
         imageRoot += path;
         this.small = imageRoot+"/small/"+image;
         this.big =  imageRoot+"/big/"+image;

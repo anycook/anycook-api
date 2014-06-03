@@ -33,41 +33,51 @@ public class Configuration {
 
     private static final String
         PROPERTIES = "anycook.properties",
-        PROPERTY_ADMIN_MAIL = "ADMIN_MAIL",
-        PROPERTY_ADMIN_PASSWORD = "ADMIN_PASSWORD",
-        PROPERTY_COOKIE_DOMAIN = "COOKIE_DOMAIN",
-        PROPERTY_DEVELOPMENT_MODE = "DEVELOPMENT_MODE",
-        PROPERTY_FACEBOOK_APP_ID = "FACEBOOK_APP_ID",
-        PROPERTY_FACEBOOK_APP_SECRET = "FACEBOOK_APP_SECRET",
-        PROPERTY_FULL_TEXT_INDEX_PATH = "FULL_TEXT_INDEX_PATH",
-        PROPERTY_IMAGE_ROOT = "IMAGE_ROOT",
-        PROPERTY_IMAGE_BASE_PATH = "IMAGE_BASE_PATH",
-        PROPERTY_IMAGE_S3_UPLOAD = "IMAGE_S3_UPLOAD",
-        PROPERTY_IMAGE_S3_ACCESS_KEY = "IMAGE_S3_ACCESS_KEY",
-        PROPERTY_IMAGE_S3_ACCESS_SECRET = "IMAGE_S3_ACCESS_SECRET",
-        PROPERTY_IMAGE_S3_BUCKET = "IMAGE_S3_BUCKET",
-        PROPERTY_LOGIN_ATTEMPTS_MAX = "LOGIN_ATTEMPTS_MAX",
-        PROPERTY_LOGIN_ATTEMPTS_TIME = "LOGIN_ATTEMPTS_TIME",
-        PROPERTY_MAIL_ADDRESS = "MAIL_ADDRESS",
-        PROPERTY_MAIL_SENDER = "MAIL_SENDER",
-        PROPERTY_MYSQL_ADDRESS = "MYSQL_ADDRESS",
-        PROPERTY_MYSQL_DB = "MYSQL_DB",
-        PROPERTY_MYSQL_MAX_ACTIVE = "MYSQL_MAX_ACTIVE",
-        PROPERTY_MYSQL_MAX_IDLE = "MYSQL_MAX_IDLE",
-        PROPERTY_MYSQL_PORT = "MYSQL_PORT",
-        PROPERTY_MYSQL_USER = "MYSQL_USER",
-        PROPERTY_MYSQL_PASSWORD = "MYSQL_PASSWORD",
-        PROPERTY_REDIRECT_DOMAIN = "REDIRECT_DOMAIN",
-        PROPERTY_SMTP_HOST = "SMTP_HOST",
-        PROPERTY_SMTP_PORT = "SMTP_PORT",
-        PROPERTY_SMTP_USER = "SMTP_USER",
-        PROPERTY_SMTP_PASSWORD = "SMTP_PASSWORD",
-        PROPERTY_TUMBLR_APP_ID = "TUMBLR_APP_ID",
-        PROPERTY_TUMBLR_APP_SECRET = "TUMBLR_APP_SECRET";
+        ADMIN_MAIL = "ADMIN_MAIL",
+        ADMIN_PASSWORD = "ADMIN_PASSWORD",
+        COOKIE_DOMAIN = "COOKIE_DOMAIN",
+        DEVELOPMENT_MODE = "DEVELOPMENT_MODE",
+        FACEBOOK_APP_ID = "FACEBOOK_APP_ID",
+        FACEBOOK_APP_SECRET = "FACEBOOK_APP_SECRET",
+        FULL_TEXT_INDEX_PATH = "FULL_TEXT_INDEX_PATH",
+        IMAGE_ROOT = "IMAGE_ROOT",
+        IMAGE_BASE_PATH = "IMAGE_BASE_PATH",
+        IMAGE_S3_UPLOAD = "IMAGE_S3_UPLOAD",
+        IMAGE_S3_ACCESS_KEY = "IMAGE_S3_ACCESS_KEY",
+        IMAGE_S3_ACCESS_SECRET = "IMAGE_S3_ACCESS_SECRET",
+        IMAGE_S3_BUCKET = "IMAGE_S3_BUCKET",
+        LOGIN_ATTEMPTS_MAX = "LOGIN_ATTEMPTS_MAX",
+        LOGIN_ATTEMPTS_TIME = "LOGIN_ATTEMPTS_TIME",
+        MAIL_ADDRESS = "MAIL_ADDRESS",
+        MAIL_SENDER = "MAIL_SENDER",
+        MYSQL_ADDRESS = "MYSQL_ADDRESS",
+        MYSQL_DB = "MYSQL_DB",
+        MYSQL_MAX_ACTIVE = "MYSQL_MAX_ACTIVE",
+        MYSQL_MAX_IDLE = "MYSQL_MAX_IDLE",
+        MYSQL_PORT = "MYSQL_PORT",
+        MYSQL_USER = "MYSQL_USER",
+        MYSQL_PASSWORD = "MYSQL_PASSWORD",
+        REDIRECT_DOMAIN = "REDIRECT_DOMAIN",
+        SMTP_HOST = "SMTP_HOST",
+        SMTP_PORT = "SMTP_PORT",
+        SMTP_USER = "SMTP_USER",
+        SMTP_PASSWORD = "SMTP_PASSWORD",
+        TUMBLR_APP_ID = "TUMBLR_APP_ID",
+        TUMBLR_APP_SECRET = "TUMBLR_APP_SECRET";
+
+    private static Configuration instance;
+
+    public static Configuration getInstance() {
+        if(instance == null) instance = new Configuration();
+        return instance;
+    }
 
 
-    private static Properties properties;
+    private Properties properties;
 
+    public Configuration() {
+        properties = initProperties();
+    }
 
     /**
      * Loads property file anycook-api.properties and returns parsed properties.
@@ -76,169 +86,164 @@ public class Configuration {
      *
      * @throws Error If no conf file has been found or failed to parse the file
      */
-    public static Properties init() {
-        if(properties == null) {
+    public Properties initProperties() {
+        Properties p = new Properties();
 
-            Properties p = new Properties();
+        File globalConf = new File("/etc/anycook", PROPERTIES);
+        InputStream in = null;
 
-            File globalConf = new File("/etc/anycook", PROPERTIES);
-            InputStream in = null;
-
-            if (globalConf.exists()) {
-                logger.info("loading global properties");
-                try {
-                    in = new FileInputStream(globalConf);
-                } catch (FileNotFoundException e) {
-                    //nope. checked it before!
-                }
-            } else {
-                logger.info("loading properties from classpath");
-                ClassLoader cl = Configuration.class.getClassLoader();
-                in = cl.getResourceAsStream(PROPERTIES);
+        if (globalConf.exists()) {
+            logger.info("loading global properties");
+            try {
+                in = new FileInputStream(globalConf);
+            } catch (FileNotFoundException e) {
+                //nope. checked it before!
             }
-
-            if (in == null) logger.error("failed to load property file");
-            else {
-
-                try {
-                    p.load(in);
-                    in.close();
-                } catch (IOException e) {
-                    logger.error(e,e);
-                }
-            }
-
-            properties = p;
+        } else {
+            logger.info("loading properties from classpath");
+            ClassLoader cl = Configuration.class.getClassLoader();
+            in = cl.getResourceAsStream(PROPERTIES);
         }
-        return properties;
+
+        if (in == null) logger.error("failed to load property file");
+        else {
+
+            try {
+                p.load(in);
+                in.close();
+            } catch (IOException e) {
+                logger.error(e,e);
+            }
+        }
+        return p;
     }
 
-    public static boolean isInDeveloperMode() {
-        String developmentMode = init().getProperty(PROPERTY_DEVELOPMENT_MODE, "OFF");
+    public boolean isInDeveloperMode() {
+        String developmentMode = properties.getProperty(DEVELOPMENT_MODE, "OFF");
         return developmentMode.equals("ON");
     }
 
-    public static String getPropertyAdminMail() {
-        return init().getProperty(PROPERTY_ADMIN_MAIL, "admin@anycook.de");
+    public String getAdminMail() {
+        return properties.getProperty(ADMIN_MAIL, "admin@anycook.de");
     }
 
-    public static String getPropertyAdminPassword() {
-        return init().getProperty(PROPERTY_ADMIN_PASSWORD);
+    public String getAdminPassword() {
+        return properties.getProperty(ADMIN_PASSWORD);
     }
 
-    public static String getPropertyCookieDomain() {
-        return init().getProperty(PROPERTY_COOKIE_DOMAIN, ".anycook.de");
+    public String getCookieDomain() {
+        return properties.getProperty(COOKIE_DOMAIN, ".anycook.de");
     }
 
-    public static String getPropertyFacebookAppId() {
-        return init().getProperty(PROPERTY_FACEBOOK_APP_ID);
+    public String getFacebookAppId() {
+        return properties.getProperty(FACEBOOK_APP_ID);
     }
 
-    public static String getPropertyFacebookAppSecret() {
-        return init().getProperty(PROPERTY_FACEBOOK_APP_SECRET);
+    public String getFacebookAppSecret() {
+        return properties.getProperty(FACEBOOK_APP_SECRET);
     }
 
-    public static String getPropertyFullTextIndexPath(){
-        return init().getProperty(PROPERTY_FULL_TEXT_INDEX_PATH, "/tmp/full_text_index");
+    public String getFullTextIndexPath(){
+        return properties.getProperty(FULL_TEXT_INDEX_PATH, "/tmp/full_text_index");
     }
 
-    public static String getPropertyImageRoot() {
-        return init().getProperty(PROPERTY_IMAGE_ROOT);
+    public String getImageRoot() {
+        return properties.getProperty(IMAGE_ROOT);
     }
 
-    public static String getPropertyImageBasePath() {
-        String path = init().getProperty(PROPERTY_IMAGE_BASE_PATH, "/images/");
+    public String getImageBasePath() {
+        String path = properties.getProperty(IMAGE_BASE_PATH, "/images/");
         if(!path.endsWith("/")) path += '/';
         return path;
     }
 
-    public static boolean imageS3Upload(){
-        String uploadToS3 = init().getProperty(PROPERTY_IMAGE_S3_UPLOAD, "OFF");
+    public boolean isImageS3Upload(){
+        String uploadToS3 = properties.getProperty(IMAGE_S3_UPLOAD, "OFF");
         return uploadToS3.equals("ON");
     }
 
-    public static String getPropertyImageS3AccessKey() {
-        return init().getProperty(PROPERTY_IMAGE_S3_ACCESS_KEY);
+    public String getImageS3AccessKey() {
+        return properties.getProperty(IMAGE_S3_ACCESS_KEY);
     }
 
-    public static String getPropertyImageS3AccessSecret() {
-        return init().getProperty(PROPERTY_IMAGE_S3_ACCESS_SECRET);
+    public String getImageS3AccessSecret() {
+        return properties.getProperty(IMAGE_S3_ACCESS_SECRET);
     }
 
-    public static String getPropertyImageS3Bucket() {
-        return init().getProperty(PROPERTY_IMAGE_S3_BUCKET, "images.anycook.de");
+    public String getImageS3Bucket() {
+        return properties.getProperty(IMAGE_S3_BUCKET, "images.anycook.de");
     }
 
-    public static int getPropertyLoginAttemptsMax() {
-        return Integer.parseInt(init().getProperty(PROPERTY_LOGIN_ATTEMPTS_MAX, "5"));
+    public int getLoginAttemptsMax() {
+        return Integer.parseInt(properties.getProperty(LOGIN_ATTEMPTS_MAX, "5"));
     }
 
-    public static int getPropertyLoginAttemptsTime() {
-        return Integer.parseInt(init().getProperty(PROPERTY_LOGIN_ATTEMPTS_TIME, "600"));
+    public int getLoginAttemptsTime() {
+        return Integer.parseInt(properties.getProperty(LOGIN_ATTEMPTS_TIME, "600"));
     }
 
-    public static String getPropertyMailAddress() {
-        return init().getProperty(PROPERTY_MAIL_ADDRESS, "no-reply@anycook.de");
+    public String getMailAddress() {
+        return properties.getProperty(MAIL_ADDRESS, "no-reply@anycook.de");
     }
 
-    public static String getPropertyMailSender() {
-        return init().getProperty(PROPERTY_MAIL_SENDER, "anycook");
+    public String getMailSender() {
+        return properties.getProperty(MAIL_SENDER, "anycook");
     }
 
-    public static String getPropertyMysqlAddress() {
-        return init().getProperty(PROPERTY_MYSQL_ADDRESS);
+    public String getMysqlAddress() {
+        return properties.getProperty(MYSQL_ADDRESS);
     }
 
-    public static int getPropertyMysqlMaxActive() {
-        return Integer.parseInt(init().getProperty(PROPERTY_MYSQL_MAX_ACTIVE, "24"));
+    public int getMysqlMaxActive() {
+        return Integer.parseInt(properties.getProperty(MYSQL_MAX_ACTIVE, "24"));
     }
 
-    public static int getPropertyMysqlMaxIdle() {
-        return Integer.parseInt(init().getProperty(PROPERTY_MYSQL_MAX_IDLE, "24"));
+    public int getMysqlMaxIdle() {
+        return Integer.parseInt(properties.getProperty(MYSQL_MAX_IDLE, "24"));
     }
 
-    public static String getPropertyMysqlDb() {
-        return init().getProperty(PROPERTY_MYSQL_DB, "anycook_db");
+    public String getMysqlDb() {
+        return properties.getProperty(MYSQL_DB, "anycook_db");
     }
 
-    public static int getPropertyMysqlDPort() {
-        return Integer.parseInt(init().getProperty(PROPERTY_MYSQL_PORT, "3306"));
+    public int getPropertyMysqlDPort() {
+        return Integer.parseInt(properties.getProperty(MYSQL_PORT, "3306"));
     }
 
-    public static String getPropertyMysqlUser() {
-        return init().getProperty(PROPERTY_MYSQL_USER, "anycook");
+    public String getMysqlUser() {
+        return properties.getProperty(MYSQL_USER, "anycook");
     }
 
-    public static String getPropertyMysqlPassword() {
-        return init().getProperty(PROPERTY_MYSQL_PASSWORD, "");
+    public String getMysqlPassword() {
+        return properties.getProperty(MYSQL_PASSWORD, "");
     }
 
-    public static String getPropertyRedirectDomain() {
-        return init().getProperty(PROPERTY_REDIRECT_DOMAIN, "anycook.de");
+    public String getRedirectDomain() {
+        return properties.getProperty(REDIRECT_DOMAIN, "anycook.de");
     }
 
-    public static String getPropertySmtpHost() {
-        return init().getProperty(PROPERTY_SMTP_HOST);
+    public String getSMTPHost() {
+        return properties.getProperty(SMTP_HOST);
     }
 
-    public static String getPropertySmtpPort() {
-        return init().getProperty(PROPERTY_SMTP_PORT, "465");
+    public String getSMTPPort() {
+        return properties.getProperty(SMTP_PORT, "465");
     }
 
-    public static String getPropertySmtpUser() {
-        return init().getProperty(PROPERTY_SMTP_USER);
+    public String getSMTPUser() {
+        return properties.getProperty(SMTP_USER);
     }
 
-    public static String getPropertySmtpPassword() {
-        return init().getProperty(PROPERTY_SMTP_PASSWORD);
+    public String getSMTPPassword() {
+        return properties.getProperty(SMTP_PASSWORD);
     }
 
-    public static String getPropertyTumblrAppId() {
-        return init().getProperty(PROPERTY_TUMBLR_APP_ID);
+    public String getTumblrAppId() {
+        return properties.getProperty(TUMBLR_APP_ID);
     }
 
-    public static String getPropertyTumblrAppSecret() {
-        return init().getProperty(PROPERTY_TUMBLR_APP_SECRET);
+    public String getTumblrAppSecret() {
+        return properties.getProperty(TUMBLR_APP_SECRET);
     }
 
 

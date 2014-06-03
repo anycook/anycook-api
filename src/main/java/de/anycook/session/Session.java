@@ -41,12 +41,10 @@ import java.sql.SQLException;
  * @author Jan Grassegger
  */
 public class Session {
-    private static final String adminMail;
     private static final String adminPwd;
 
     static {
-        adminMail = Configuration.getPropertyAdminMail();
-        adminPwd = Configuration.getPropertyAdminPassword();
+        adminPwd = Configuration.getInstance().getAdminPassword();
     }
 
     private User login;

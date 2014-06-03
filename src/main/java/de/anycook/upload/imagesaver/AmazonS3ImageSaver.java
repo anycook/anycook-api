@@ -32,10 +32,10 @@ public class AmazonS3ImageSaver extends ImageSaver {
     public AmazonS3ImageSaver(String subPath){
         logger = Logger.getLogger(getClass());
 
-        AWSCredentials awsCredentials = new BasicAWSCredentials(Configuration.getPropertyImageS3AccessKey(),
-                Configuration.getPropertyImageS3AccessSecret());
+        AWSCredentials awsCredentials = new BasicAWSCredentials(Configuration.getInstance().getImageS3AccessKey(),
+                Configuration.getInstance().getImageS3AccessSecret());
         s3Client = new AmazonS3Client(awsCredentials);
-        bucketName = Configuration.getPropertyImageS3Bucket();
+        bucketName = Configuration.getInstance().getImageS3Bucket();
         this.subPath = subPath;
     }
 

@@ -285,7 +285,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
-        String uri = String.format("http://%s/#fbregistration?response=%s", Configuration.getPropertyRedirectDomain(),
+        String uri = String.format("http://%s/#fbregistration?response=%s", Configuration.getInstance().getRedirectDomain(),
                 responseText);
 
         String content = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n<HTML><HEAD><META HTTP-EQUIV=\"REFRESH\" content=\"0; url="+uri+"\"></HEAD>\n<BODY></BODY></HTML>";

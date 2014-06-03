@@ -131,7 +131,7 @@ public class Recipes {
     }
 
     public static URI getRecipeImage(String recipeName, ImageType type) throws URISyntaxException, SQLException {
-        StringBuilder imagePath = new StringBuilder(Configuration.getPropertyImageBasePath()).append("recipe/");
+        StringBuilder imagePath = new StringBuilder(Configuration.getInstance().getImageBasePath()).append("recipe/");
         switch (type) {
             case ORIGINAL:
                 imagePath.append("original/");

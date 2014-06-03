@@ -69,8 +69,8 @@ public class MailHandler {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.socketFactory.class",
                 "javax.net.ssl.SSLSocketFactory");
-        props.put("mail.smtp.host", Configuration.getPropertySmtpHost());
-        props.put("mail.smtp.socketFactory.port", Configuration.getPropertySmtpPort());
+        props.put("mail.smtp.host", Configuration.getInstance().getSMTPHost());
+        props.put("mail.smtp.socketFactory.port", Configuration.getInstance().getSMTPPort());
 
 
         Authenticator auth = new SMTPAuthenticator();
@@ -84,8 +84,8 @@ public class MailHandler {
             Transport transport = session.getTransport("smtps");
             Preconditions.checkNotNull(session, mailTo, subject, message);
 
-            InternetAddress addressFrom = new InternetAddress(Configuration.getPropertyMailAddress(),
-                    MimeUtility.encodeText(Configuration.getPropertyMailSender()));
+            InternetAddress addressFrom = new InternetAddress(Configuration.getInstance().getMailAddress(),
+                    MimeUtility.encodeText(Configuration.getInstance().getMailSender()));
             Preconditions.checkNotNull(transport, addressFrom);
 
             MimeMessage msg = new MimeMessage(session);
@@ -119,8 +119,8 @@ public class MailHandler {
      */
     private static class SMTPAuthenticator extends Authenticator {
         public PasswordAuthentication getPasswordAuthentication() {
-            String username = Configuration.getPropertySmtpUser();
-            String password = Configuration.getPropertySmtpPassword();
+            String username = Configuration.getInstance().getSMTPUser();
+            String password = Configuration.getInstance().getSMTPPassword();
             return new PasswordAuthentication(username, password);
         }
     }

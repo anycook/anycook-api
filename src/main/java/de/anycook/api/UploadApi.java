@@ -96,7 +96,7 @@ public class UploadApi {
             if(type.equals("user"))
                 session.getUser().setImage(newFilename);
 
-            String basePath = Configuration.getPropertyImageBasePath();
+            String basePath = Configuration.getInstance().getImageBasePath();
             String path = String.format("%s%s/big/%s", basePath, type, newFilename);
             return  Response.created(new URI(path)).build();
         } catch (SQLException | IOException | URISyntaxException e) {

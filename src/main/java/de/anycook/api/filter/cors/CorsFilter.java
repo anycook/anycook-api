@@ -109,7 +109,7 @@ public class CorsFilter implements ContainerResponseFilter {
 
 
 	public static boolean checkOrigin(String origin){
-        if(Configuration.isInDeveloperMode()) return true;
+        if(Configuration.getInstance().isInDeveloperMode()) return true;
 
 		if(origin == null)
 			return false;

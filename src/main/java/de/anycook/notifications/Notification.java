@@ -97,7 +97,7 @@ public class Notification {
         this.recipientId = recipientId;
         this.type = type;
 
-        data.put("baseUrl", Configuration.getPropertyRedirectDomain());
+        data.put("baseUrl", Configuration.getInstance().getRedirectDomain());
         data.put("recipientName", User.getUsername(recipientId));
         this.data = data;
     }
@@ -106,7 +106,7 @@ public class Notification {
 
         boolean sendMail;
 
-        if (Configuration.isInDeveloperMode()) {
+        if (Configuration.getInstance().isInDeveloperMode()) {
             try {
                 sendMail = type == NotificationType.ACCOUNT_ACTIVATION || type == NotificationType.RESET_PASSWORD ||
                         type == NotificationType.NEW_MAIL ||

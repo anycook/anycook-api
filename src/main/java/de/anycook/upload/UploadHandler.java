@@ -69,7 +69,8 @@ public abstract class UploadHandler {
         this.bigHeight = bigHeight;
 
 
-        this.imageSaver = Configuration.imageS3Upload() ? new AmazonS3ImageSaver(imagePath) : new LocalImageSaver(imagePath);
+        this.imageSaver = Configuration.getInstance().isImageS3Upload() ? new AmazonS3ImageSaver(imagePath) :
+                new LocalImageSaver(imagePath);
     }
 
     /**

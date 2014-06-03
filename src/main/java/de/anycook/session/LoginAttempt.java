@@ -78,8 +78,8 @@ public class LoginAttempt {
     }
 
     public static boolean isLoginAllowed(int userId) throws SQLException {
-        int maxAttempts = Configuration.getPropertyLoginAttemptsMax();
-        int inTime = Configuration.getPropertyLoginAttemptsTime();
+        int maxAttempts = Configuration.getInstance().getLoginAttemptsMax();
+        int inTime = Configuration.getInstance().getLoginAttemptsTime();
 
         try (DBLoginAttempt dbLoginAttempt = new DBLoginAttempt()) {
             return dbLoginAttempt.isLoginAllowed(userId, maxAttempts, inTime);

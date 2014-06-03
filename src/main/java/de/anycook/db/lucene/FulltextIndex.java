@@ -55,7 +55,7 @@ public class FulltextIndex {
 
 	private FulltextIndex() throws IOException {
 		logger = Logger.getLogger(getClass());
-        String indexPath = Configuration.getPropertyFullTextIndexPath();
+        String indexPath = Configuration.getInstance().getFullTextIndexPath();
         index = new NIOFSDirectory(new File(indexPath));
 	}
 

@@ -46,13 +46,13 @@ public class DBHandler implements AutoCloseable {
     protected static BasicDataSource dataSource;
 
     public static void init() {
-        String server = Configuration.getPropertyMysqlAddress();
-        String db = Configuration.getPropertyMysqlDb();
-        int port = Configuration.getPropertyMysqlDPort();
-        String user = Configuration.getPropertyMysqlUser();
-        String password = Configuration.getPropertyMysqlPassword();
-        int maxActive = Configuration.getPropertyMysqlMaxActive();
-        int maxIdle = Configuration.getPropertyMysqlMaxIdle();
+        String server = Configuration.getInstance().getMysqlAddress();
+        String db = Configuration.getInstance().getMysqlDb();
+        int port = Configuration.getInstance().getPropertyMysqlDPort();
+        String user = Configuration.getInstance().getMysqlUser();
+        String password = Configuration.getInstance().getMysqlPassword();
+        int maxActive = Configuration.getInstance().getMysqlMaxActive();
+        int maxIdle = Configuration.getInstance().getMysqlMaxIdle();
 
         dataSource = setupDataSource(server, port, db, user, password, maxActive, maxIdle);
     }
@@ -109,7 +109,7 @@ public class DBHandler implements AutoCloseable {
         ds.setRemoveAbandoned(true);
         ds.setRemoveAbandonedTimeout(60);
 
-        if(Configuration.isInDeveloperMode())
+        if(Configuration.getInstance().isInDeveloperMode())
             ds.setLogAbandoned(true);
 
         sLogger.info("created new Connectionpool");

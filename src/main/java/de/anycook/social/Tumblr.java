@@ -38,8 +38,8 @@ import java.util.List;
 public class Tumblr extends Social {
 
     static {
-        consumer_key = Configuration.getPropertyTumblrAppId();
-        secret_key = Configuration.getPropertyTumblrAppSecret();
+        consumer_key = Configuration.getInstance().getTumblrAppId();
+        secret_key = Configuration.getInstance().getTumblrAppSecret();
     }
 
     private final static String POST_URL = "http://api.tumblr.com/v2/blog/%s/post";
