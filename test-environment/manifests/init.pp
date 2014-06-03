@@ -3,8 +3,7 @@
 } */
 
 class { 'apt':
-  always_apt_update    => true,
-  before => [Class['postgresql::client'], Class['postgresql::server']]
+  always_apt_update    => true
 }
 
 class anycook {
@@ -205,35 +204,11 @@ class mongodb {
   }
 }
 
-# postgresql
-class { 'postgresql::server':
-  ip_mask_deny_postgres_user => '0.0.0.0/32',
-  ip_mask_allow_all_users    => '0.0.0.0/0',
-  listen_addresses           => '*',
-  manage_firewall            => true,
-  postgres_password          => 'TPSrep0rt!'
-}
-
-postgresql::server::db { 'anycook_db':
-  user     => 'anycook',
-  password => postgresql_password('anycook', 'password'),
-}
-
-postgresql::server::role { 'vagrant':
-  password_hash => postgresql_password('vagrant', ''),
-}
-
-postgresql::server::database_grant { 'vagrant@anycook_db':
-  privilege => 'ALL',
-  db        => 'anycook_db',
-  role      => 'vagrant',
-}
-
 
 
 class install_mysql {
   $user = 'anycook'
-  $mysql_schema = "/mysql/anycook_db.2014-05-30.sql"
+  $mysql_schema = "/mysql/anycook_db.sql"
 
 #include '::mysql::server'
 
