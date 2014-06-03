@@ -23,10 +23,6 @@ import de.anycook.db.mysql.DBUser;
 import de.anycook.location.Location;
 import de.anycook.recipe.Recipe;
 import de.anycook.recommendation.Recommendation;
-import de.anycook.user.User;
-import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
-import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
-import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -84,21 +80,14 @@ public class Discover {
     }
 
     public static List<Recipe> getNearRecipes(Location location, double maxRadius, int recipeNumber) throws SQLException {
-        Set<Recipe> recipeSet = new TreeSet<>(new Comparator<Recipe>() {
-            @Override
-            public int compare(Recipe o1, Recipe o2) {
-                return -Long.compare(o1.getLastChange(), o2.getLastChange());
-            }
-        });
+        Set<Recipe> recipeSet = new TreeSet<>((o1, o2) -> -Long.compare(o1.getLastChange(), o2.getLastChange()));
 
         try(DBUser dbUser = new DBUser()) {
             Map<Integer, Location> locations = dbUser.getUserLocations();
             for(Map.Entry<Integer, Location> entry : locations.entrySet()) {
                 if(location.isInRadius(maxRadius, entry.getValue())) {
                     List<Recipe> recipes = de.anycook.recipe.Recipes.getRecipesFromUser(entry.getKey(), -1);
-                    for(Recipe recipe : recipes) {
-                        recipeSet.add(recipe);
-                    }
+                    recipeSet.addAll(recipes);
                 }
             }
         }
