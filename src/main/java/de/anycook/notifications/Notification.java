@@ -106,7 +106,7 @@ public class Notification {
 
         boolean sendMail;
 
-        if (Configuration.getInstance().isInDeveloperMode()) {
+        if (Configuration.getInstance().isDeveloperMode()) {
             try {
                 sendMail = type == NotificationType.ACCOUNT_ACTIVATION || type == NotificationType.RESET_PASSWORD ||
                         type == NotificationType.NEW_MAIL ||

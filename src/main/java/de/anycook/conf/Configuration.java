@@ -20,6 +20,7 @@ package de.anycook.conf;
 
 import org.apache.log4j.Logger;
 
+import javax.xml.bind.annotation.XmlElement;
 import java.io.*;
 import java.util.Properties;
 
@@ -118,11 +119,13 @@ public class Configuration {
         return p;
     }
 
-    public boolean isInDeveloperMode() {
+    @XmlElement
+    public boolean isDeveloperMode() {
         String developmentMode = properties.getProperty(DEVELOPMENT_MODE, "OFF");
         return developmentMode.equals("ON");
     }
 
+    @XmlElement
     public String getAdminMail() {
         return properties.getProperty(ADMIN_MAIL, "admin@anycook.de");
     }
@@ -131,10 +134,12 @@ public class Configuration {
         return properties.getProperty(ADMIN_PASSWORD);
     }
 
+    @XmlElement
     public String getCookieDomain() {
         return properties.getProperty(COOKIE_DOMAIN, ".anycook.de");
     }
 
+    @XmlElement
     public String getFacebookAppId() {
         return properties.getProperty(FACEBOOK_APP_ID);
     }
@@ -143,25 +148,30 @@ public class Configuration {
         return properties.getProperty(FACEBOOK_APP_SECRET);
     }
 
+    @XmlElement
     public String getFullTextIndexPath(){
         return properties.getProperty(FULL_TEXT_INDEX_PATH, "/tmp/full_text_index");
     }
 
+    @XmlElement
     public String getImageRoot() {
         return properties.getProperty(IMAGE_ROOT);
     }
 
+    @XmlElement
     public String getImageBasePath() {
         String path = properties.getProperty(IMAGE_BASE_PATH, "/images/");
         if(!path.endsWith("/")) path += '/';
         return path;
     }
 
+    @XmlElement
     public boolean isImageS3Upload(){
         String uploadToS3 = properties.getProperty(IMAGE_S3_UPLOAD, "OFF");
         return uploadToS3.equals("ON");
     }
 
+    @XmlElement
     public String getImageS3AccessKey() {
         return properties.getProperty(IMAGE_S3_ACCESS_KEY);
     }
@@ -170,46 +180,57 @@ public class Configuration {
         return properties.getProperty(IMAGE_S3_ACCESS_SECRET);
     }
 
+    @XmlElement
     public String getImageS3Bucket() {
         return properties.getProperty(IMAGE_S3_BUCKET, "images.anycook.de");
     }
 
+    @XmlElement
     public int getLoginAttemptsMax() {
         return Integer.parseInt(properties.getProperty(LOGIN_ATTEMPTS_MAX, "5"));
     }
 
+    @XmlElement
     public int getLoginAttemptsTime() {
         return Integer.parseInt(properties.getProperty(LOGIN_ATTEMPTS_TIME, "600"));
     }
 
+    @XmlElement
     public String getMailAddress() {
         return properties.getProperty(MAIL_ADDRESS, "no-reply@anycook.de");
     }
 
+    @XmlElement
     public String getMailSender() {
         return properties.getProperty(MAIL_SENDER, "anycook");
     }
 
+    @XmlElement
     public String getMysqlAddress() {
-        return properties.getProperty(MYSQL_ADDRESS);
+        return properties.getProperty(MYSQL_ADDRESS, "localhost");
     }
 
+    @XmlElement
     public int getMysqlMaxActive() {
         return Integer.parseInt(properties.getProperty(MYSQL_MAX_ACTIVE, "24"));
     }
 
+    @XmlElement
     public int getMysqlMaxIdle() {
         return Integer.parseInt(properties.getProperty(MYSQL_MAX_IDLE, "24"));
     }
 
+    @XmlElement
     public String getMysqlDb() {
         return properties.getProperty(MYSQL_DB, "anycook_db");
     }
 
-    public int getPropertyMysqlDPort() {
+    @XmlElement
+    public int getPropertyMysqlPort() {
         return Integer.parseInt(properties.getProperty(MYSQL_PORT, "3306"));
     }
 
+    @XmlElement
     public String getMysqlUser() {
         return properties.getProperty(MYSQL_USER, "anycook");
     }
@@ -218,18 +239,22 @@ public class Configuration {
         return properties.getProperty(MYSQL_PASSWORD, "");
     }
 
+    @XmlElement
     public String getRedirectDomain() {
         return properties.getProperty(REDIRECT_DOMAIN, "anycook.de");
     }
 
+    @XmlElement
     public String getSMTPHost() {
         return properties.getProperty(SMTP_HOST);
     }
 
+    @XmlElement
     public String getSMTPPort() {
         return properties.getProperty(SMTP_PORT, "465");
     }
 
+    @XmlElement
     public String getSMTPUser() {
         return properties.getProperty(SMTP_USER);
     }
@@ -238,6 +263,7 @@ public class Configuration {
         return properties.getProperty(SMTP_PASSWORD);
     }
 
+    @XmlElement
     public String getTumblrAppId() {
         return properties.getProperty(TUMBLR_APP_ID);
     }

@@ -51,7 +51,7 @@ public class SessionApi {
 	public SessionApi() {
 		logger = Logger.getLogger(getClass());
         cookieDomain = de.anycook.conf.Configuration.getInstance().getCookieDomain();
-        cookieSecure = !de.anycook.conf.Configuration.getInstance().isInDeveloperMode();
+        cookieSecure = !de.anycook.conf.Configuration.getInstance().isDeveloperMode();
 	}
 	
 	@GET
