@@ -23,6 +23,8 @@ import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.image.Image;
 import de.anycook.image.UserImage;
+import de.anycook.location.GeoCode;
+import de.anycook.location.Location;
 import de.anycook.news.life.Lifes;
 import de.anycook.notifications.Notification;
 import de.anycook.social.facebook.FacebookHandler;
@@ -69,7 +71,8 @@ public class User implements Comparable<User> {
     }
 
     public static User initAdmin() {
-        return new User(99999, "admin", "admin@anycook.de", -1, null, 2, null, null, null, null, null, null, null);
+        return new User(99999, "admin", "admin@anycook.de", -1, null, 2, null, null, null, null, -1, -1,
+                null, null, null);
 
     }
 
@@ -395,6 +398,11 @@ public class User implements Comparable<User> {
     @PrivateView
     private String place;
 
+
+    @PublicView
+    @PrivateView
+    private Location location;
+
     @PublicView
     @PrivateView
     private List<Integer> following;
@@ -425,6 +433,8 @@ public class User implements Comparable<User> {
                 Date createDate,
                 Date lastLogin,
                 String place,
+                double placeLatitude,
+                double placeLongitude,
                 List<Integer> following,
                 List<Integer> followers,
                 String emailCandidate) {
@@ -438,6 +448,7 @@ public class User implements Comparable<User> {
         this.createDate = createDate.getTime();
         this.lastLogin = lastLogin != null ? lastLogin.getTime() : -1;
         this.place = place;
+        this.location = new Location(placeLatitude, placeLongitude);
         this.following = following;
         this.followers = followers;
         this.emailCandidate = emailCandidate;
@@ -532,6 +543,10 @@ public class User implements Comparable<User> {
         this.emailCandidate = emailCandidate;
     }
 
+    public Location getLocation() {
+        return location;
+    }
+
     //@JsonIgnore
     public boolean isAdmin() {
         return level == 2;
@@ -617,6 +632,11 @@ public class User implements Comparable<User> {
 
         try(DBUser db = new DBUser()){
             db.changePlace(id, place);
+
+            GeoCode geoCode = new GeoCode();
+            setLocation(geoCode.getLocation(place));
+        } catch (GeoCode.LocationNotFoundException|IOException e) {
+            logger.debug(e, e);
         }
 
         this.place = place;
@@ -637,6 +657,17 @@ public class User implements Comparable<User> {
         logger.info(mail + " changed text to " + text);
 
         return true;
+    }
+
+    public void setLocation(Location location) throws SQLException {
+        if(location == null) return;
+        try(DBUser dbUser = new DBUser()) {
+            dbUser.changeLocation(id, location);
+        }
+
+        this.location = location;
+
+        logger.info(mail + " changed location to " + location);
     }
 
     public void setMailCandidate(String newMail) throws SQLException {

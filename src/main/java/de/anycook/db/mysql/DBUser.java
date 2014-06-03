@@ -18,6 +18,7 @@
 
 package de.anycook.db.mysql;
 
+import de.anycook.location.Location;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
 
@@ -492,9 +493,11 @@ public class DBUser extends DBHandler {
         String mail = data.getString("email");
         Date lastLogin = data.getDate("lastlogin");
         int level = data.getInt("userlevels_id");
-        Date createdate = data.getDate("createdate");
+        Date createDate = data.getDate("createdate");
         String text = data.getString("text");
         String place = data.getString("place");
+        double placeLat = data.getDouble("place_lat");
+        double placeLng = data.getDouble("place_lng");
         String image = data.getString("image");
         long facebookId = data.getLong("facebook_id");
         String emailCandidate = data.getString("email_candidate");
@@ -503,7 +506,7 @@ public class DBUser extends DBHandler {
         List<Integer> followers = getFollowers(id);
 
         User user = new User(id, name, mail, facebookId, image, level, text,
-                createdate, lastLogin, place, following, followers, emailCandidate);
+                createDate, lastLogin, place, placeLat, placeLng, following, followers, emailCandidate);
 
         if (image == null && facebookId != 0) {
             try {
@@ -518,13 +521,14 @@ public class DBUser extends DBHandler {
     }
 
     public List<User> getAllUsers() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call get_all_users}");
-        ResultSet data = callableStatement.executeQuery();
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT id, nickname, facebook_id, email, " +
+                "lastlogin, createdate, image, userlevels_id, text, place, place_lat, place_lng, email_candidate FROM users");
+        ResultSet data = preparedStatement.executeQuery();
         return loadUsers(data);
     }
 
     public User getUser(int id) throws SQLException, UserNotFoundException, IOException {
-        PreparedStatement pStatement = connection.prepareStatement("SELECT id, nickname, facebook_id, email, lastlogin, createdate, image, userlevels_id, text, place, email_candidate FROM users WHERE id = ?");
+        PreparedStatement pStatement = connection.prepareStatement("SELECT id, nickname, facebook_id, email, lastlogin, createdate, image, userlevels_id, text, place, place_lat, place_lng, email_candidate FROM users WHERE id = ?");
         pStatement.setInt(1, id);
         ResultSet data = pStatement.executeQuery();
         if (!data.next()) throw new UserNotFoundException(id);
@@ -573,6 +577,30 @@ public class DBUser extends DBHandler {
             }
         }
         return adminIds;
+    }
+
+    public void changeLocation(int id, Location location) throws SQLException {
+        PreparedStatement statement =
+                connection.prepareStatement("UPDATE users SET place_lat = ?, place_lng = ? WHERE id = ?");
+        statement.setDouble(1, location.getLatitude());
+        statement.setDouble(2, location.getLongitude());
+        statement.setInt(3, id);
+
+        statement.executeUpdate();
+    }
+
+    public Map<Integer, Location> getUserLocations() throws SQLException {
+        Map<Integer, Location> locationMap = new HashMap<>();
+
+        PreparedStatement statement = connection.prepareStatement("SELECT id, place_lat, place_lng FROM users " +
+                "WHERE place_lat != -1 OR place_lng != -1");
+        ResultSet data = statement.executeQuery();
+        while (data.next()) {
+            Location location = new Location(data.getDouble("place_lat"), data.getDouble("place_lng"));
+            locationMap.put(data.getInt("id"), location);
+        }
+
+        return locationMap;
     }
 
     public static class UserNotFoundException extends Exception {

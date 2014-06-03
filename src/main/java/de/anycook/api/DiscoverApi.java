@@ -20,6 +20,7 @@ package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
 import de.anycook.discover.Discover;
+import de.anycook.location.Location;
 import de.anycook.recipe.Recipe;
 import de.anycook.session.Session;
 import de.anycook.user.User;
@@ -98,4 +99,21 @@ public class DiscoverApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GET
+    @Path("near")
+    public List<Recipe> getNearRecipes(
+            @QueryParam("latitude") double latitude,
+            @QueryParam("longitude") double longitude,
+            @DefaultValue("10") @QueryParam("maxRadius") double maxRadius,
+            @DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber) {
+        try {
+            return Discover.getNearRecipes(new Location(latitude, longitude), maxRadius, recipeNumber);
+        } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 }

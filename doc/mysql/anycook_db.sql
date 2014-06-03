@@ -63,6 +63,8 @@ CREATE TABLE IF NOT EXISTS `anycook_db`.`users` (
   `facebook_id` VARCHAR(15) NULL DEFAULT 0,
   `text` TEXT NULL DEFAULT NULL,
   `place` VARCHAR(45) NULL DEFAULT NULL,
+  `place_lat` DOUBLE NULL DEFAULT NULL,
+  `place_lng` DOUBLE NULL DEFAULT NULL,
   `notification_recipe_activation` TINYINT(1) NOT NULL DEFAULT 1,
   `notification_recipe_discussion` TINYINT(1) NOT NULL DEFAULT 1,
   `notification_tag_accepted` TINYINT(1) NOT NULL DEFAULT 1,
@@ -662,12 +664,15 @@ DROP procedure IF EXISTS `anycook_db`.`get_recipe`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `anycook_db`.`get_recipe` (IN recipe_name VARCHAR(45))
+CREATE PROCEDURE `anycook_db`.`get_recipe` (IN recipe_name VARCHAR(45), IN login_id INT)
 BEGIN
 
-SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
+SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
+	min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange,
+	(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = recipe_name AND schmeckt.users_id = login_id) AS tastes
 FROM gerichte
-INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
+INNER JOIN versions ON IF(active_id > 0, gerichte.name = gerichte_name AND active_id = versions.id, gerichte.name = gerichte_name) 
 INNER JOIN users ON users_id = users.id
 INNER JOIN kategorien ON kategorien_name = kategorien.name 
 WHERE gerichte.name = recipe_name;
@@ -888,11 +893,13 @@ DROP procedure IF EXISTS `anycook_db`.`tasty_recipes`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `tasty_recipes` (IN length INT)
+CREATE PROCEDURE `tasty_recipes` (IN length INT, IN login_id INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, viewed 
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, viewed,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange,
+	(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = login_id) AS tastes 
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -912,11 +919,13 @@ DROP procedure IF EXISTS `anycook_db`.`popular_recipes`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `popular_recipes` (IN length INT)
+CREATE PROCEDURE `popular_recipes` (IN length INT, IN login_id INT)
 BEGIN
 
 SELECT beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
+	min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange,
+	(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = login_id) AS tastes
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -936,11 +945,13 @@ DROP procedure IF EXISTS `anycook_db`.`newest_recipes`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `newest_recipes` (IN length INT)
+CREATE PROCEDURE `newest_recipes` (IN length INT, IN login_id INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange,
+	(SELECT IF(COUNT(users_id) = 1, true, false) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = login_id) AS tastes
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -960,13 +971,15 @@ DROP procedure IF EXISTS `anycook_db`.`user_recipes`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `user_recipes` (IN userId INT)
+CREATE PROCEDURE `user_recipes` (IN userId INT, IN login_id INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, viewed
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, viewed,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange,
+	(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = login_id) AS tastes
 	FROM gerichte
-	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
+	INNER JOIN versions ON gerichte.name = gerichte_name 
 	INNER JOIN users ON users_id = users.id
 	INNER JOIN kategorien ON kategorien_name = kategorien.name 
 	WHERE versions.users_id = userId AND active_id > -1 
@@ -988,7 +1001,9 @@ USE `anycook_db`$$
 CREATE PROCEDURE `active_recipes` ()
 BEGIN
 
-SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, users.image, nickname 
+SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
+	min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, users.image, nickname,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON users_id = users.id
@@ -1008,11 +1023,13 @@ DROP procedure IF EXISTS `anycook_db`.`tasting_recipes`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `tasting_recipes` (IN user_id INT)
+CREATE PROCEDURE `tasting_recipes` (IN user_id INT, IN login_id INT)
 BEGIN
 
 SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
-	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users.id AS users_id, nickname, users.image, viewed 
+	min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users.id AS users_id, nickname, users.image, viewed,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange,
+	(SELECT IF(COUNT(users_id) = 1, true, false) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = login_id) AS tastes
 	FROM gerichte
 	INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id 
 	INNER JOIN users ON versions.users_id = users.id
@@ -1033,10 +1050,12 @@ DROP procedure IF EXISTS `anycook_db`.`get_version`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `anycook_db`.`get_version` (IN recipe_name VARCHAR(45), IN version_id INT)
+CREATE PROCEDURE `anycook_db`.`get_version` (IN recipe_name VARCHAR(45), IN version_id INT, IN login_id INT)
 BEGIN
 
-SELECT beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed 
+SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, versions.eingefuegt AS lastChange, 
+min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed,
+(SELECT IF(COUNT(users_id) = 1, true, false) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = login_id) AS tastes
 FROM gerichte
 INNER JOIN versions ON gerichte.name = gerichte_name
 INNER JOIN users ON users_id = users.id
@@ -1056,15 +1075,17 @@ DROP procedure IF EXISTS `anycook_db`.`get_all_versions`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `anycook_db`.`get_all_versions` (IN recipe_name VARCHAR(45))
+CREATE PROCEDURE `anycook_db`.`get_all_versions` (IN recipe_name VARCHAR(45), IN login_id INT)
 BEGIN
 
-SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, versions.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, personen, kategorien_name, active_id, users_id, nickname, users.image 
-FROM versions
-LEFT JOIN gerichte ON gerichte.name = versions.gerichte_name
+SELECT versions.id AS id, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
+	min, std, skill, kalorien, gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed, versions.eingefuegt AS lastChange,
+	(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = recipe_name AND schmeckt.users_id = login_id) AS tastes
+FROM gerichte
+INNER JOIN versions ON gerichte.name = gerichte_name
 INNER JOIN users ON users_id = users.id
-INNER JOIN kategorien ON kategorien_name = kategorien.name
-WHERE versions.gerichte_name = recipe_name;
+INNER JOIN kategorien ON kategorien_name = kategorien.name 
+WHERE gerichte.name = recipe_name;
 
 END$$
 
@@ -1079,12 +1100,15 @@ DROP procedure IF EXISTS `anycook_db`.`get_all_recipes`;
 
 DELIMITER $$
 USE `anycook_db`$$
-CREATE PROCEDURE `anycook_db`.`get_all_recipes` ()
+CREATE PROCEDURE `anycook_db`.`get_all_recipes` (IN login_id INT)
 BEGIN
 
-SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, users.image, nickname, viewed 
+SELECT versions.id AS id, gerichte.name AS name, beschreibung, IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, 
+	min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, users.image, nickname, viewed,
+	(SELECT MAX(eingefuegt) FROM versions WHERE gerichte_name = gerichte.name) AS lastChange,
+	(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = login_id) AS tastes  
 FROM gerichte
-INNER JOIN versions ON gerichte.name = gerichte_name 
+INNER JOIN versions ON IF(active_id > 0, gerichte.name = gerichte_name AND active_id = versions.id, gerichte.name = gerichte_name) 
 INNER JOIN users ON users_id = users.id
 INNER JOIN kategorien ON kategorien_name = kategorien.name
 GROUP BY name;
@@ -1105,7 +1129,7 @@ USE `anycook_db`$$
 CREATE PROCEDURE `get_all_users` ()
 BEGIN
 
-SELECT nickname, facebook_id, email, lastlogin, createdate, image, userlevels_id, text, place, email_candidate FROM users;
+SELECT id, nickname, facebook_id, email, lastlogin, createdate, image, userlevels_id, text, place, email_candidate FROM users;
 
 END$$
 
