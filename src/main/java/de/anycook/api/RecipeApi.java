@@ -50,6 +50,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Path("/recipe")
@@ -71,7 +72,10 @@ public class RecipeApi {
             List<Recipe> recipes = userId != null ?
                     Recipes.getRecipesFromUser(userId, loginId) : Recipes.getAll(loginId);
 
-            if(prefix!= null) recipes.parallelStream().filter(r -> r.getName().startsWith(prefix));
+            if(prefix!= null) {
+                recipes = recipes.parallelStream().filter(r -> r.getName().startsWith(prefix))
+                        .collect(Collectors.toList());
+            }
 
             return Response.ok().entity(new GenericEntity<List<Recipe>>(recipes){}, annotations).build();
         } catch (Exception e){
