@@ -93,7 +93,6 @@ Autocompletes only user names
                 {"id":60,"name":"Johänni"}
             ]
 
-
 # Group Category
 Ressources that represent the recipe categories
 
@@ -246,6 +245,64 @@ Returns all discover types
                 } 
             ]
         }
+
+
+## Near [/discover/near?latitude={latitude}&longitude={longitude}&maxRadius={maxRadius}&recipeNumber={recipeNumber}]
+Returns the latest recipes inside the radius of the given location
+
+### Get near [GET]
+
++ Parameters
+    + latitude (double, required, `50.9794934`) ... Latitude
+    + longitude (double, required, `11.323543900000004`) ... Longitude
+    + maxRadius = `10` (double, optional) ... Maximum radius to include sources
+    + recipeNumber = `30` (number, optional) ... Maximum number of returned recipes
+    
++ Response 200 (application/json)
+    
+        [ {
+           "description" : "Okonomiyaki ist ein japanisches Gericht und bedeutet etwa: \"Was du willst, gebraten\" und lässt sich ungefähr als japanisches Omelett beschreiben. Du kannst dieses Grundrezept variieren und belegen wie es dir gefällt. So kannst du anstatt der Garnelen  auch Fleisch oder Pilze verwenden.",
+           "image" : {
+              "big" : "http://images.anycook.de/recipe/big/W3HIBaSkUSAaoxJ3dSfu.png",
+              "original" : "http://images.anycook.de/recipe/original/W3HIBaSkUSAaoxJ3dSfu.png",
+              "small" : "http://images.anycook.de/recipe/small/W3HIBaSkUSAaoxJ3dSfu.png"
+           },
+           "name" : "Okonomiyaki",
+           "tasteNum" : 0,
+           "tasty" : false,
+           "time" : {
+              "std" : 0,
+              "min" : 20
+           }
+        }, {
+           "description" : "Die Kombination aus dem klassischen Spinat und den exotischen Kichererbsen macht dieses Gericht zu etwas Besonderem.",
+           "image" : {
+              "big" : "http://images.anycook.de/recipe/big/WdqY7fRliJFiRcAGrfjx.png",
+              "original" : "http://images.anycook.de/recipe/original/WdqY7fRliJFiRcAGrfjx.png",
+              "small" : "http://images.anycook.de/recipe/small/WdqY7fRliJFiRcAGrfjx.png"
+           },
+           "name" : "Putenpfanne mit Spinat und Kichererbsen",
+           "tasteNum" : 0,
+           "tasty" : false,
+           "time" : {
+              "std" : 0,
+              "min" : 30
+           }
+        }, {
+           "description" : "Nicht nur Garfields Lieblings-Essen.",
+           "image" : {
+              "big" : "http://images.anycook.de/recipe/big/h73OctHIAsoVFBjr6v9w.png",
+              "original" : "http://images.anycook.de/recipe/original/h73OctHIAsoVFBjr6v9w.png",
+              "small" : "http://images.anycook.de/recipe/small/h73OctHIAsoVFBjr6v9w.png"
+           },
+           "name" : "Lasagne",
+           "tasteNum" : 0,
+           "tasty" : false,
+           "time" : {
+              "std" : 0,
+              "min" : 50
+           }
+        } ]
 
 ## New [/discover/new?recipeNumber={recipeNumber}]
 Returns the newest recipes
