@@ -61,16 +61,19 @@ public class RecipeApi {
     private Session session;
 
 	@GET
-	public Response getAll(@QueryParam("userId") Integer userId, @QueryParam("detailed") final boolean detailed){
+	public Response getAll(@QueryParam("userId") Integer userId, @QueryParam("startsWith") String prefix,
+                           @QueryParam("detailed") final boolean detailed){
         try{
             final int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
             Annotation[] annotations = detailed ?
                     new Annotation[]{PublicView.Factory.get()} : new Annotation[]{};
 
-            if(userId != null)
-                return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getRecipesFromUser(userId, loginId)){},
-                        annotations).build();
-            return Response.ok().entity(new GenericEntity<List<Recipe>>(Recipes.getAll(loginId)){}, annotations).build();
+            List<Recipe> recipes = userId != null ?
+                    Recipes.getRecipesFromUser(userId, loginId) : Recipes.getAll(loginId);
+
+            if(prefix!= null) recipes.parallelStream().filter(r -> r.getName().startsWith(prefix));
+
+            return Response.ok().entity(new GenericEntity<List<Recipe>>(recipes){}, annotations).build();
         } catch (Exception e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
