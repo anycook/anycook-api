@@ -73,7 +73,8 @@ public class RecipeApi {
                     Recipes.getRecipesFromUser(userId, loginId) : Recipes.getAll(loginId);
 
             if(prefix!= null) {
-                recipes = recipes.parallelStream().filter(r -> r.getName().startsWith(prefix))
+                recipes = recipes.parallelStream()
+                        .filter(r -> r.getName().toLowerCase().startsWith(prefix.toLowerCase()))
                         .collect(Collectors.toList());
             }
 
