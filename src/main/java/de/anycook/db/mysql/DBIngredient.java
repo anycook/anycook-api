@@ -23,6 +23,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 
 import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -144,7 +145,7 @@ public class DBIngredient extends DBHandler {
     }
 
     public List<Ingredient> getAllIngredients() {
-        List<Ingredient> ingredients = new LinkedList<>();
+        List<Ingredient> ingredients = new ArrayList<>();
         try {
             PreparedStatement pStatement = connection.prepareStatement("SELECT name FROM zutaten");
             ResultSet data = pStatement.executeQuery();
@@ -160,7 +161,7 @@ public class DBIngredient extends DBHandler {
     }
 
     public List<Ingredient> getParent() throws SQLException {
-        List<Ingredient> ingredients = new LinkedList<>();
+        List<Ingredient> ingredients = new ArrayList<>();
         PreparedStatement pStatement = connection.prepareStatement("SELECT name FROM zutaten " +
                 "WHERE parent_zutaten_name IS NULL GROUP BY name ORDER BY name");
 
