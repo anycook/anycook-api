@@ -24,8 +24,11 @@ import de.anycook.recipe.ingredient.Ingredient;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -37,10 +40,17 @@ public class IngredientApi {
 	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Ingredient> getAll(@QueryParam("parent") boolean parent){
+	public Response getAll(@QueryParam("parent") boolean parent,
+                                   @Context Request request){
 		 try {
-             if(!parent) return Ingredient.getAll();
-            return Ingredient.loadParents();
+
+             List<Ingredient> ingredients = parent ? Ingredient.loadParents() : Ingredient.getAll();
+             Date lastModified = Ingredient.lastModified();
+
+             Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(lastModified);
+             if (responseBuilder != null) return responseBuilder.build();
+
+             return Response.ok(ingredients).lastModified(lastModified).build();
         } catch (SQLException e) {
             logger.error(e);
              throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

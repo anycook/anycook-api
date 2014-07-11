@@ -32,14 +32,11 @@ import java.sql.SQLException;
 import java.util.*;
 
 public class Ingredient{
-    static final long serialVersionUID = 41L;
-
     public String name = null;
     public String singular = null;
     public String menge = null;
     public Integer recipecounter = null;
     public List<String> recipes = null;
-
 
     public Ingredient() {
     }
@@ -157,6 +154,12 @@ public class Ingredient{
 
         try (DBSearch db = new DBSearch()) {
             return new LinkedList<>(db.getRecipesByIngredients(children));
+        }
+    }
+
+    public static Date lastModified() throws SQLException {
+        try(DBIngredient db = new DBIngredient()) {
+            return new Date(db.getLastModified());
         }
     }
 

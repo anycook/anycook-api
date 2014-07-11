@@ -148,8 +148,10 @@ public class DBIngredient extends DBHandler {
         try {
             PreparedStatement pStatement = connection.prepareStatement("SELECT name FROM zutaten");
             ResultSet data = pStatement.executeQuery();
-            while (data.next())
+            while (data.next()) {
                 ingredients.add(new Ingredient(data.getString("name")));
+            }
+
 
         } catch (SQLException e) {
             logger.error("execute MySQL-query failed at setParentZutat.", e);
@@ -224,6 +226,17 @@ public class DBIngredient extends DBHandler {
         }
 
         return ingredients;
+    }
+
+    public long getLastModified() throws SQLException {
+        CallableStatement statement = connection.prepareCall("SELECT UPDATE_TIME FROM information_schema.tables " +
+               "WHERE  TABLE_SCHEMA = 'anycook_db' AND TABLE_NAME = 'zutaten'");
+        ResultSet data = statement.executeQuery();
+        if(data.next()) {
+            return data.getLong("UPDATE_TIME");
+        }
+        return 0;
+
     }
 
     public static class IngredientNotFoundException extends Exception {
