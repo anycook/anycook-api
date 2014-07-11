@@ -32,7 +32,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
 import java.util.*;
 
-@XmlRootElement
 public class Ingredient{
     public String name = null;
     public String singular = null;

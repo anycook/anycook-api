@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
@@ -50,7 +51,7 @@ public class IngredientApi {
              Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(lastModified);
              if (responseBuilder != null) return responseBuilder.build();
 
-             return Response.ok(ingredients).lastModified(lastModified).build();
+             return Response.ok(new GenericEntity<List<Ingredient>>(ingredients) {}).lastModified(lastModified).build();
         } catch (SQLException e) {
             logger.error(e);
              throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
