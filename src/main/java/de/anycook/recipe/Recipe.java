@@ -66,6 +66,7 @@ public class Recipe implements Comparable<Recipe> {
     private String description;
     private Time time;
     private boolean tasty;
+    private int persons;
 
     @PublicView
     private int id;
@@ -81,9 +82,6 @@ public class Recipe implements Comparable<Recipe> {
 
     @PublicView
     private int calorie;
-
-    @PublicView
-    private int persons;
 
     @PublicView
     private User author;

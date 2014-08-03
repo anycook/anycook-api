@@ -229,17 +229,6 @@ public class DBIngredient extends DBHandler {
         return ingredients;
     }
 
-    public long getLastModified() throws SQLException {
-        CallableStatement statement = connection.prepareCall("SELECT UPDATE_TIME FROM information_schema.tables " +
-               "WHERE  TABLE_SCHEMA = 'anycook_db' AND TABLE_NAME = 'zutaten'");
-        ResultSet data = statement.executeQuery();
-        if(data.next()) {
-            return data.getLong("UPDATE_TIME");
-        }
-        return 0;
-
-    }
-
     public static class IngredientNotFoundException extends Exception {
         public IngredientNotFoundException(String queryIngredient) {
             super("ingredient does not exist: " + queryIngredient);
