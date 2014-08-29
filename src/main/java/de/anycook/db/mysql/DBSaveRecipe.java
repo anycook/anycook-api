@@ -273,4 +273,11 @@ public class DBSaveRecipe extends DBRecipe {
         preparedStatement.setString(2, recipeName);
         preparedStatement.executeUpdate();
     }
+
+    public void increaseViewCount(String recipeName) throws SQLException {
+        PreparedStatement preparedStatement =
+                connection.prepareStatement("UPDATE gerichte SET viewed = viewed +1 WHERE name = ?");
+        preparedStatement.setString(1, recipeName);
+        preparedStatement.executeUpdate();
+    }
 }

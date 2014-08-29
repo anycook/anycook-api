@@ -137,6 +137,7 @@ public class RecipeApi {
 	public Recipe getRecipe(@PathParam("recipeName") String recipeName){
         try {
             int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
+            Recipes.increaseViewCount(recipeName);
             return Recipe.init(recipeName, loginId);
         } catch (SQLException e) {
             logger.error(e, e);

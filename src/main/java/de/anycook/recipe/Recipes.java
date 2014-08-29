@@ -230,4 +230,10 @@ public class Recipes {
             return dbGetRecipe.getAuthors(recipeName);
         }
     }
+
+    public static void increaseViewCount(String recipeName) throws SQLException {
+        try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()) {
+            dbSaveRecipe.increaseViewCount(recipeName);
+        }
+    }
 }
