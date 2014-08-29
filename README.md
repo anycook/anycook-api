@@ -12,7 +12,7 @@ A detailed API documentation can be found [here](http://docs.anycook.apiary.io/)
 To use the full test stack you will also need to clone and start the [anycook-page](https://github.com/anycook/anycook-page) project.
 
 ### Required dependencies
-- Install [Java7 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html)
+- Install [Java8 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 - Install [Gradle](http://www.gradle.org/). To install it via brew execute ```brew install gradle```.
 - Install [Virtual Box](https://www.virtualbox.org/)
 - Install [Vagrant](http://www.vagrantup.com/) (Having problems with vagrant in OSX Mavericks? Execute ```sudo /Library/StartupItems/VirtualBox/VirtualBox restart``` and try again ([source](http://www.asquera.de/development/2013/06/20/vagrant-on-mavericks/)))
@@ -33,7 +33,6 @@ If you want to set your own global conf in the test environment place it in the 
 - The anycook API can be accessed on [http://localhost:8080](http://localhost:8080). The MySQL server via port 3333
 
 ### Adding database data
-- The puppet scripts create two MySQL databases. 'anycook_db' is the main database. 'zombiecooking_db' is only created to import old db data.
 - You can import a db schema by 
   - using a terminal command: ```$ mysql -P 3333 -u root anycook_db < sql-file.sql```
   - using MySQL Workbench (can be downloaded [here](https://www.mysql.com/products/workbench/))
