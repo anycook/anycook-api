@@ -6,7 +6,6 @@ import com.mongodb.DBObject;
 import de.anycook.recipe.Time;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
-import de.anycook.recipe.tag.Tag;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -28,7 +27,7 @@ public class DraftRecipe{
     private String category;
     private int skill;
     private int calorie;
-    private List<Tag> tags;
+    private List<String> tags;
     private Time time;
     private double percentage;
 
@@ -126,11 +125,11 @@ public class DraftRecipe{
         this.calorie = calorie;
     }
 
-    public List<Tag> getTags() {
+    public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(List<Tag> tags) {
+    public void setTags(List<String> tags) {
         this.tags = tags;
     }
 
@@ -194,7 +193,7 @@ public class DraftRecipe{
         if(dbObject.containsField("calorie")) this.calorie = (int)dbObject.get("calorie");
         if(dbObject.containsField("tags")){
             this.tags = mapper.convertValue(dbObject.get("tags"),
-                    new TypeReference<List<Tag>>(){});
+                    new TypeReference<List<String>>(){});
         }
         if(dbObject.containsField("time")) this.time =  mapper.convertValue(dbObject.get("time"), Time.class);
         if(dbObject.containsField("percentage")) this.percentage = (double)dbObject.get("percentage");
@@ -234,10 +233,7 @@ public class DraftRecipe{
         if(category != null) updateObj.put("category", category);
         if(skill > 0) updateObj.put("skill", skill);
         if(calorie > 0) updateObj.put("calorie", calorie);
-        if(tags != null) {
-            List<Map<String, Object>> tagList = mapper.convertValue(ingredients, new TypeReference<List<Map<String, Object>>>(){});
-            updateObj.put("tags", tagList);
-        }
+        if(tags != null) updateObj.put("tags", tags);
         if(time != null) {
             Map<String, Integer> timeObject = mapper.convertValue(time, new TypeReference<Map<String, Integer>>(){});
             updateObj.put("time", timeObject);
