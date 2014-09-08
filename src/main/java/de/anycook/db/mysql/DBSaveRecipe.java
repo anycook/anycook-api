@@ -141,8 +141,9 @@ public class DBSaveRecipe extends DBRecipe {
 
     private void addIngredients(String recipeName, int versionId, List<Ingredient> ingredients)
             throws SQLException, IOException, ParseException {
-        for (Ingredient ingredient : ingredients)
-            addIngredient(recipeName, versionId, ingredient);
+        for (int i = 0; i < ingredients.size(); i++) {
+            addIngredient(recipeName, versionId, ingredients.get(i), i);
+        }
     }
 
     /**
@@ -150,7 +151,7 @@ public class DBSaveRecipe extends DBRecipe {
      *
      * @throws java.sql.SQLException
      */
-    public void addIngredient(String recipeName, int versionId, Ingredient ingredient)
+    public void addIngredient(String recipeName, int versionId, Ingredient ingredient, int position)
             throws SQLException, IOException, ParseException {
 
 
@@ -159,12 +160,13 @@ public class DBSaveRecipe extends DBRecipe {
         }
 
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO versions_has_zutaten" +
-                "(versions_gerichte_name, versions_id, zutaten_name, menge) VALUES (?,?,?,?)");
+                "(versions_gerichte_name, versions_id, zutaten_name, menge, position) VALUES (?,?,?,?,?)");
 
         pStatement.setString(1, recipeName);
         pStatement.setInt(2, versionId);
         pStatement.setString(3, ingredient.name);
         pStatement.setString(4, ingredient.menge);
+        pStatement.setInt(5, position);
         pStatement.executeUpdate();
         logger.info("added ingredient '" + ingredient.name + "' to " + recipeName);
     }

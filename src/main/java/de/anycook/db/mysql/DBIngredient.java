@@ -189,9 +189,13 @@ public class DBIngredient extends DBHandler {
      */
     public List<Ingredient> getRecipeIngredients(String recipeName) throws SQLException {
         List<Ingredient> ingredients = new LinkedList<>();
-        CallableStatement cStatement = connection.prepareCall("{call recipe_ingredients(?)}");
-        cStatement.setString(1, recipeName);
-        ResultSet data = cStatement.executeQuery();
+        PreparedStatement pStatement = connection.prepareStatement("SELECT zutaten_name, singular, menge FROM gerichte " +
+                "INNER JOIN versions_has_zutaten ON gerichte.active_id = versions_id " +
+                "AND gerichte.name = versions_gerichte_name " +
+                "INNER JOIN zutaten ON zutaten_name = zutaten.name " +
+                "WHERE versions_gerichte_name = ? ORDER BY position ASC");
+        pStatement.setString(1, recipeName);
+        ResultSet data = pStatement.executeQuery();
         while (data.next()) {
             String name = data.getString("zutaten_name");
             String singular = data.getString("singular");
@@ -215,7 +219,7 @@ public class DBIngredient extends DBHandler {
         PreparedStatement pStatement = connection.prepareStatement(
                 "SELECT zutaten_name, singular, menge FROM versions_has_zutaten " +
                         "INNER JOIN zutaten ON zutaten_name = name " +
-                        "WHERE versions_gerichte_name = ? AND versions_id = ? ");
+                        "WHERE versions_gerichte_name = ? AND versions_id = ? ORDER BY position ASC");
         pStatement.setString(1, recipeName);
         pStatement.setInt(2, versionId);
         ResultSet data = pStatement.executeQuery();
