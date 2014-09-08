@@ -95,8 +95,7 @@ public class NewRecipe {
         }
 
 
-        for (String tag : tags)
-            Recipes.suggestTag(name, tag, userId);
+        Recipes.suggestTags(name, tags, userId);
 
         if (mongoid != null) {
             RecipeDrafts drafts = new RecipeDrafts();
@@ -137,8 +136,7 @@ public class NewRecipe {
         }
 
 
-        for (String tag : tags)
-            Recipes.suggestTag(name, tag);
+        Recipes.suggestTags(name, tags);
 
         if (id == 0) Discussion.addNewRecipeEvent(name, comment, id);
         else Discussion.addNewVersionEvent(name, comment, id);

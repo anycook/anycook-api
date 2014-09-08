@@ -430,6 +430,7 @@ public class RecipeApi {
             if(session.checkLoginWithoutException()) {
                 User user = session.getUser();
                 newId = newRecipe.save(user.getId());
+
             }
             else {
                 logger.debug("user is not authentificated");

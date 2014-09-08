@@ -8,17 +8,25 @@ import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.db.mysql.DBTag;
+import de.anycook.db.mysql.DBUser;
+import de.anycook.notifications.Notification;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
 import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
+import de.anycook.utils.enumerations.NotificationType;
 import org.apache.log4j.Logger;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
@@ -185,10 +193,6 @@ public class Recipes {
         }
     }
 
-    public static void suggestTag(String name, String tag) throws SQLException {
-        suggestTag(name, tag, -1);
-    }
-
     public static void suggestTag(String recipeName, String tag, int userId) throws SQLException {
         tag = tag.toLowerCase(Locale.GERMAN);
 
@@ -199,10 +203,6 @@ public class Recipes {
                 }
 
                 dbSaveRecipe.suggestTag(recipeName, tag, userId);
-                //			MailHandler mail = new MailHandler();
-                //			String username = User.getUsername(user.id);
-                //			mail.sendSuggestTagMail(username, recipeName, tag);
-
             }
         }
     }
@@ -235,5 +235,23 @@ public class Recipes {
         try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()) {
             dbSaveRecipe.increaseViewCount(recipeName);
         }
+    }
+
+    public static void suggestTags(String name, List<String> tags) throws SQLException {
+        suggestTags(name, tags, -1);
+    }
+
+    public static void suggestTags(String name, List<String> tags, int userId) throws SQLException {
+        for (String tag : tags) suggestTag(name, tag, userId);
+
+        Map<String, String> data = new HashMap<>(3);
+        try {
+            data.put("userName", User.getUsername(userId));
+        } catch (DBUser.UserNotFoundException e) {
+            data.put("userName", "anonymous");
+        }
+        data.put("recipeName", name);
+        data.put("numTags", Integer.toString(tags.size()));
+        Notification.sendAdminNotification(NotificationType.ADMIN_SUGGESTED_TAGS, data);
     }
 }
