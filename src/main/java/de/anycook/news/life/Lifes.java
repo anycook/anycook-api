@@ -26,7 +26,9 @@ import java.util.List;
 
 
 public class Lifes {
+
     public static enum CaseType {
+        ACTIVATED,
         NEW_RECIPE,
         NEW_USER,
         NEW_VERSION,
@@ -36,11 +38,13 @@ public class Lifes {
         public String toString() {
             switch (this){
                 case NEW_RECIPE:
-                    return "erstellt";
+                    return "new_recipe";
                 case NEW_VERSION:
-                    return "newversion";
+                    return "new_version";
                 case NEW_USER:
-                    return "newuser";
+                    return "new_user";
+                case ACTIVATED:
+                    return "activated";
                 case TASTES:
                     return "schmeckt";
             }
@@ -63,10 +67,6 @@ public class Lifes {
         }
     }
 
-    public static void addNewVersion(int userId, String recipeName, int versionId) {
-
-    }
-
     public static void addLife(CaseType lifeCaseType, int userId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
             if (!dbLive.checkLife(userId, lifeCaseType)) {
@@ -81,6 +81,12 @@ public class Lifes {
                 dbLive.newLife(userId, recipeName, lifeCaseType);
                 LifeProvider.wakeUpSuspended();
             }
+        }
+    }
+
+    public static void addLife(CaseType caseType, int userId, String recipeName, int recipeId) throws SQLException {
+        try (DBLive dbLive = new DBLive()) {
+            dbLive.newLife(userId, recipeName, recipeId, caseType);
         }
     }
 

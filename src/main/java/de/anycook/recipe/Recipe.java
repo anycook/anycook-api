@@ -62,14 +62,12 @@ public class Recipe implements Comparable<Recipe> {
     }
 
     private String name;
+    private int id;
     private Image image;
     private String description;
     private Time time;
     private boolean tasty;
     private int persons;
-
-    @PublicView
-    private int id;
 
     @PublicView
     private boolean active;

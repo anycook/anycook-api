@@ -61,7 +61,7 @@ public class DBLive extends DBHandler {
     }
 
     public List<Case> getCases() throws SQLException {
-        List<Case> cases = new ArrayList<>();
+        List<Case> cases = new ArrayList<Case>();
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT name, syntax FROM cases");
         ResultSet data = preparedStatement.executeQuery();
         while (data.next()) {
@@ -115,12 +115,14 @@ public class DBLive extends DBHandler {
     }
 
     public void newLife(int userId, String recipeName, int versionId, Lifes.CaseType lifeCaseType) throws SQLException {
-        PreparedStatement pStatement = connection.prepareStatement("INSERT INTO life (users_id, gerichte_name, cases_name, lifetime) VALUES (?,?,?, NOW())");
+        PreparedStatement pStatement = connection.prepareStatement("INSERT INTO life (users_id, gerichte_name, cases_name, versions_id, lifetime) VALUES (?,?,?,?, NOW())");
         pStatement.setInt(1, userId);
         pStatement.setString(2, recipeName);
         pStatement.setString(3, lifeCaseType.toString());
+        pStatement.setInt(4, versionId);
         pStatement.executeUpdate();
-        logger.info("new life entry " + lifeCaseType + " from " + userId + " for " + recipeName + " added to DB");
+        logger.info(String.format("new life entry %s from %d for %s versionId %d added to DB",
+                lifeCaseType, userId, recipeName, versionId));
     }
 
     public void newLife(int userId, Lifes.CaseType lifeCaseType) throws SQLException {
@@ -134,12 +136,11 @@ public class DBLive extends DBHandler {
     public List<Life> getLastLives(int lastId, int limit) throws SQLException {
         PreparedStatement pStatement =
                 connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
-                        "life.gerichte_name AS recipeName, lifetime, " +
+                        "life.gerichte_name AS recipeName, life.versions_id AS versionsId,  lifetime, " +
                         "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS recipeImage FROM life " +
                         "LEFT JOIN cases ON life.cases_name = cases.name " +
                         "LEFT JOIN users ON life.users_id = users.id " +
-                        "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
-                        "LEFT JOIN versions ON gerichte.active_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
+                        "LEFT JOIN versions ON life.versions_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
                         "WHERE idlife > ? " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
@@ -155,12 +156,11 @@ public class DBLive extends DBHandler {
     public Life getLastLive() throws SQLException {
         PreparedStatement pStatement =
                 connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
-                        "life.gerichte_name AS recipeName, lifetime, " +
+                        "life.gerichte_name AS recipeName, life.versions_id AS versionsId, lifetime, " +
                         "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS recipeImage FROM life " +
                         "LEFT JOIN cases ON life.cases_name = cases.name " +
                         "LEFT JOIN users ON life.users_id = users.id " +
-                        "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
-                        "LEFT JOIN versions ON gerichte.active_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
+                        "LEFT JOIN versions ON life.versions_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT 1");
         try (ResultSet data = pStatement.executeQuery()) {
@@ -200,12 +200,11 @@ public class DBLive extends DBHandler {
     public List<Life> getOlderLives(int oldestId, int limit) throws SQLException {
         PreparedStatement pStatement =
                 connection.prepareStatement("SELECT idlife, nickname, life.users_id AS userId, users.image, syntax, " +
-                        "life.gerichte_name AS recipeName, lifetime, " +
+                        "life.gerichte_name AS recipeName, life.versions_id AS versionsId, lifetime, " +
                         "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS recipeImage FROM life " +
                         "LEFT JOIN cases ON life.cases_name = cases.name " +
                         "LEFT JOIN users ON life.users_id = users.id " +
-                        "LEFT JOIN gerichte ON life.gerichte_name = gerichte.name " +
-                        "LEFT JOIN versions ON gerichte.active_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
+                        "LEFT JOIN versions ON life.versions_id = versions.id AND life.gerichte_name = versions.gerichte_name " +
                         "LEFT JOIN kategorien ON kategorien_name = kategorien.name " +
                         "WHERE idlife < ? " +
                         "GROUP BY idlife ORDER BY idlife DESC LIMIT ?");
@@ -255,10 +254,13 @@ public class DBLive extends DBHandler {
 
         String recipeName = data.getString("recipeName");
         String recipeImage = data.getString("recipeImage");
+        Integer versionsId = data.getInt("versionsId");
         Recipe recipe = recipeName == null ? null : new Recipe();
         if(recipe != null){
             recipe.setName(recipeName);
             recipe.setImage(new RecipeImage(recipeImage));
+            recipe.setId(versionsId);
+
         }
 
         return new Life(id, user, syntax, recipe, datetime);

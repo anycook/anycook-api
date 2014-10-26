@@ -104,8 +104,14 @@ public class NewRecipe {
             drafts.close();
         }
 
-        if (id == 0) Discussion.addNewRecipeEvent(name, userId, comment, id);
-        else Discussion.addNewVersionEvent(name, userId, comment, id);
+        if (id == 0) {
+            Discussion.addNewRecipeEvent(name, userId, comment, id);
+            Lifes.addLife(Lifes.CaseType.NEW_RECIPE, userId, name, id);
+        }
+        else {
+            Discussion.addNewVersionEvent(name, userId, comment, id);
+            Lifes.addLife(Lifes.CaseType.NEW_VERSION, userId, name, id);
+        }
 
 
         return id;
@@ -144,7 +150,6 @@ public class NewRecipe {
         }
         else {
             Discussion.addNewVersionEvent(name, comment, id);
-            Lifes.addLife(Lifes.CaseType.NEW_RECIPE, id);
         }
 
 
