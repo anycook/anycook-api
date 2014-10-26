@@ -26,16 +26,19 @@ import java.util.List;
 
 
 public class Lifes {
-    public static enum Case{
-        NEW_VERSION,
+    public static enum CaseType {
+        NEW_RECIPE,
         NEW_USER,
+        NEW_VERSION,
         TASTES;
 
         @Override
         public String toString() {
             switch (this){
-                case NEW_VERSION:
+                case NEW_RECIPE:
                     return "erstellt";
+                case NEW_VERSION:
+                    return "newversion";
                 case NEW_USER:
                     return "newuser";
                 case TASTES:
@@ -47,7 +50,6 @@ public class Lifes {
 
 
     }
-
 
     public static List<Life> getLastLives(int lastId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
@@ -61,18 +63,22 @@ public class Lifes {
         }
     }
 
-    public static void addLife(Case lifeCase, int userId) throws SQLException {
+    public static void addNewVersion(int userId, String recipeName, int versionId) {
+
+    }
+
+    public static void addLife(CaseType lifeCaseType, int userId) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
-            if (!dbLive.checkLife(userId, lifeCase)) {
-                dbLive.newLife(userId, lifeCase);
+            if (!dbLive.checkLife(userId, lifeCaseType)) {
+                dbLive.newLife(userId, lifeCaseType);
             }
         }
     }
 
-    public static void addLife(Case lifeCase, int userId, String recipeName) throws SQLException {
+    public static void addLife(CaseType lifeCaseType, int userId, String recipeName) throws SQLException {
         try (DBLive dbLive = new DBLive()) {
-            if (!dbLive.checkLife(userId, lifeCase, recipeName)) {
-                dbLive.newLife(userId, recipeName, lifeCase);
+            if (!dbLive.checkLife(userId, lifeCaseType, recipeName)) {
+                dbLive.newLife(userId, recipeName, lifeCaseType);
                 LifeProvider.wakeUpSuspended();
             }
         }

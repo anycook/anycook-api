@@ -208,7 +208,7 @@ class mongodb {
 
 class install_mysql {
   $user = 'anycook'
-  $mysql_schema = "/mysql/anycook_db.sql"
+  $mysql_schema = "/mysql/anycook_procedures.sql"
 
 #include '::mysql::server'
 

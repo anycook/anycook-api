@@ -19,6 +19,7 @@
 package de.anycook.db.mysql;
 
 import de.anycook.image.RecipeImage;
+import de.anycook.news.Case;
 import de.anycook.news.life.Life;
 import de.anycook.news.life.Lifes;
 import de.anycook.recipe.Recipe;
@@ -28,7 +29,11 @@ import de.anycook.utils.DateParser;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * All about saving user actions in DB and retrieving the latest
@@ -55,21 +60,75 @@ public class DBLive extends DBHandler {
         logger.info("new case " + caseName + " added");
     }
 
-    public void newLife(int userId, String recipeName, Lifes.Case lifeCase) throws SQLException {
+    public List<Case> getCases() throws SQLException {
+        List<Case> cases = new ArrayList<>();
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT name, syntax FROM cases");
+        ResultSet data = preparedStatement.executeQuery();
+        while (data.next()) {
+            Case cAse = new Case(data.getString("name"), data.getString("syntax"));
+            cases.add(cAse);
+        }
+        return cases;
+    }
+
+    public boolean checkCase(String name) throws SQLException {
+        try {
+            getCase(name);
+            return true;
+        } catch (CaseNotFoundException e) {
+            return false;
+        }
+    }
+
+    public Case getCase(String name) throws SQLException, CaseNotFoundException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT name, syntax FROM cases WHERE name = ?");
+        preparedStatement.setString(1, name);
+        ResultSet data = preparedStatement.executeQuery();
+
+        if (data.next()) {
+            return new Case(data.getString("name"), data.getString("syntax"));
+        }
+
+        throw new CaseNotFoundException(name);
+    }
+
+    public void updateCase(String name, String syntax) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("UPDATE cases SET syntax = ? WHERE name = ?");
+        preparedStatement.setString(1, syntax);
+        preparedStatement.setString(2, name);
+        preparedStatement.executeUpdate();
+    }
+
+    public void deleteCase(String name) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM cases WHERE name = ?");
+        preparedStatement.setString(1, name);
+        preparedStatement.executeUpdate();
+    }
+
+    public void newLife(int userId, String recipeName, Lifes.CaseType lifeCaseType) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO life (users_id, gerichte_name, cases_name, lifetime) VALUES (?,?,?, NOW())");
         pStatement.setInt(1, userId);
         pStatement.setString(2, recipeName);
-        pStatement.setString(3, lifeCase.toString());
+        pStatement.setString(3, lifeCaseType.toString());
         pStatement.executeUpdate();
-        logger.info("new life entry " + lifeCase + " from " + userId + " for " + recipeName + " added to DB");
+        logger.info("new life entry " + lifeCaseType + " from " + userId + " for " + recipeName + " added to DB");
     }
 
-    public void newLife(int userId, Lifes.Case lifeCase) throws SQLException {
+    public void newLife(int userId, String recipeName, int versionId, Lifes.CaseType lifeCaseType) throws SQLException {
+        PreparedStatement pStatement = connection.prepareStatement("INSERT INTO life (users_id, gerichte_name, cases_name, lifetime) VALUES (?,?,?, NOW())");
+        pStatement.setInt(1, userId);
+        pStatement.setString(2, recipeName);
+        pStatement.setString(3, lifeCaseType.toString());
+        pStatement.executeUpdate();
+        logger.info("new life entry " + lifeCaseType + " from " + userId + " for " + recipeName + " added to DB");
+    }
+
+    public void newLife(int userId, Lifes.CaseType lifeCaseType) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO life (users_id, cases_name, lifetime) VALUES (?,?, NOW())");
         pStatement.setInt(1, userId);
-        pStatement.setString(2, lifeCase.toString());
+        pStatement.setString(2, lifeCaseType.toString());
         pStatement.executeUpdate();
-        logger.info("new life entry " + lifeCase + " from " + userId + " added to DB");
+        logger.info("new life entry " + lifeCaseType + " from " + userId + " added to DB");
     }
 
     public List<Life> getLastLives(int lastId, int limit) throws SQLException {
@@ -111,21 +170,21 @@ public class DBLive extends DBHandler {
         throw new RuntimeException("no new life found");
     }
 
-    public boolean checkLife(int userId, Lifes.Case lifeCase) throws SQLException {
+    public boolean checkLife(int userId, Lifes.CaseType lifeCaseType) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("SELECT * FROM life WHERE users_id = ? AND cases_name = ?");
         pStatement.setInt(1, userId);
-        pStatement.setString(2, lifeCase.toString());
+        pStatement.setString(2, lifeCaseType.toString());
         try (ResultSet data = pStatement.executeQuery()) {
             return data.next();
         }
 
     }
 
-    public boolean checkLife(int userId, Lifes.Case lifeCase, String recipeName) throws SQLException {
+    public boolean checkLife(int userId, Lifes.CaseType lifeCaseType, String recipeName) throws SQLException {
         PreparedStatement pStatement = connection.prepareStatement("SELECT * FROM life WHERE users_id = ? " +
                 "AND cases_name = ? AND gerichte_name = ?");
         pStatement.setInt(1, userId);
-        pStatement.setString(2, lifeCase.toString());
+        pStatement.setString(2, lifeCaseType.toString());
         pStatement.setString(3, recipeName);
         try (ResultSet data = pStatement.executeQuery()) {
             return data.next();
@@ -203,5 +262,11 @@ public class DBLive extends DBHandler {
         }
 
         return new Life(id, user, syntax, recipe, datetime);
+    }
+
+    public static class CaseNotFoundException extends Exception {
+        public CaseNotFoundException(String name) {
+            super(String.format("Case name %s does not exist", name));
+        }
     }
 }

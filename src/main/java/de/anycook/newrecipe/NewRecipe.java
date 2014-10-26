@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.anycook.db.mongo.RecipeDrafts;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.discussion.Discussion;
+import de.anycook.news.life.Lifes;
 import de.anycook.recipe.Recipes;
 import de.anycook.recipe.Time;
 import de.anycook.recipe.ingredient.Ingredient;
@@ -138,8 +139,13 @@ public class NewRecipe {
 
         Recipes.suggestTags(name, tags);
 
-        if (id == 0) Discussion.addNewRecipeEvent(name, comment, id);
-        else Discussion.addNewVersionEvent(name, comment, id);
+        if (id == 0) {
+            Discussion.addNewRecipeEvent(name, comment, id);
+        }
+        else {
+            Discussion.addNewVersionEvent(name, comment, id);
+            Lifes.addLife(Lifes.CaseType.NEW_RECIPE, id);
+        }
 
 
         return id;

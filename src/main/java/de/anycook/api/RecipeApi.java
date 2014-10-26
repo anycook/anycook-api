@@ -318,7 +318,7 @@ public class RecipeApi {
                     if(oldVersion.getActiveAuthor() >= 0) {
                         Notification.sendNotification(oldVersion.getActiveAuthor(),
                                 NotificationType.RECIPE_ACTIVATION, data);
-                        Lifes.addLife(Lifes.Case.NEW_VERSION, newVersion.getActiveAuthor(), recipeName);
+                        Lifes.addLife(Lifes.CaseType.NEW_RECIPE, newVersion.getActiveAuthor(), recipeName);
                     }
                 }
             }

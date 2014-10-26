@@ -28,10 +28,14 @@ import de.anycook.news.life.Lifes;
 import org.apache.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
 
-import javax.ws.rs.*;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
@@ -54,12 +58,9 @@ public class LifeApi {
                          @DefaultValue("0") @QueryParam("newestid") final int newestId,
                          @QueryParam("oldestid") final Integer oldestId) {
 
-        asyncResponse.setTimeoutHandler(new TimeoutHandler() {
-            @Override
-            public void handleTimeout(AsyncResponse asyncResponse) {
-                logger.info("reached timeout");
-                asyncResponse.resume(Response.ok().build());
-            }
+        asyncResponse.setTimeoutHandler(asyncResponse1 -> {
+            logger.info("reached timeout");
+            asyncResponse1.resume(Response.ok().build());
         });
 
         asyncResponse.setTimeout(5, TimeUnit.MINUTES);
