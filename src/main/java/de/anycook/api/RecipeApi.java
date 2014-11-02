@@ -306,7 +306,8 @@ public class RecipeApi {
 
         try {
             session.checkAdminLogin();
-            Recipe oldVersion = Recipe.init(recipeName, versionId);
+            int userId = session.getUser().getId();
+            Recipe oldVersion = Recipe.init(recipeName, versionId, userId);
             if(oldVersion.isActive() != newVersion.isActive()){
                 Recipes.setActiveId(recipeName, newVersion.isActive() ? newVersion.getId() : -1);
 
@@ -320,7 +321,10 @@ public class RecipeApi {
                                 NotificationType.RECIPE_ACTIVATION, data);
                         Lifes.addLife(Lifes.CaseType.ACTIVATED, newVersion.getActiveAuthor(), recipeName);
                     }
+                    logger.debug(String.format("activated version #%d of %s", versionId, recipeName));
                 }
+
+
             }
         } catch (SQLException | DBUser.UserNotFoundException e) {
             logger.error(e, e);
