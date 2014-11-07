@@ -59,6 +59,10 @@ public class Configuration {
         MYSQL_USER = "MYSQL_USER",
         MYSQL_PASSWORD = "MYSQL_PASSWORD",
         REDIRECT_DOMAIN = "REDIRECT_DOMAIN",
+        SITE_MAP_S3_UPLOAD = "SITE_MAP_S3_UPLOAD",
+        SITE_MAP_S3_ACCESS_KEY = "SITE_MAP_S3_ACCESS_KEY",
+        SITE_MAP_S3_ACCESS_SECRET = "SITE_MAP_S3_ACCESS_SECRET",
+        SITE_MAP_S3_BUCKET = "SITE_MAP_S3_BUCKET",
         SMTP_HOST = "SMTP_HOST",
         SMTP_PORT = "SMTP_PORT",
         SMTP_USER = "SMTP_USER",
@@ -242,6 +246,26 @@ public class Configuration {
     @XmlElement
     public String getRedirectDomain() {
         return properties.getProperty(REDIRECT_DOMAIN, "anycook.de");
+    }
+
+    @XmlElement
+    public boolean isSiteMapS3Upload() {
+        String uploadToS3 =  properties.getProperty(SITE_MAP_S3_UPLOAD, isImageS3Upload() ? "ON" : "OFF");
+        return uploadToS3.equals("ON");
+    }
+
+    @XmlElement
+    public String getSiteMapS3AccessKey() {
+        return properties.getProperty(SITE_MAP_S3_ACCESS_KEY, getImageS3AccessKey());
+    }
+
+    public String getSiteMapS3AccessSecret() {
+        return properties.getProperty(SITE_MAP_S3_ACCESS_SECRET, getSiteMapS3AccessSecret());
+    }
+
+    @XmlElement
+    public String getSiteMapS3Bucket() {
+        return properties.getProperty(SITE_MAP_S3_BUCKET, "anycook.de");
     }
 
     @XmlElement

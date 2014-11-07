@@ -353,7 +353,6 @@ public class DBUser extends DBHandler {
 
     // favorites
 
-    @Deprecated
     public List<String> getActiveUsers() throws SQLException {
         List<String> users = new LinkedList<>();
         PreparedStatement pStatement = connection.prepareStatement("SELECT nickname from users WHERE userlevels_id >= 0");

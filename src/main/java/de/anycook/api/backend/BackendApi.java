@@ -2,10 +2,12 @@ package de.anycook.api.backend;
 
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBRecipe;
+import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.status.Status;
 import org.apache.log4j.Logger;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -41,4 +43,16 @@ public class BackendApi {
     public Configuration getConfiguration(){
         return Configuration.getInstance();
     }
+
+    @POST
+    @Path("site_map")
+    public void generateSiteMap(){
+        try {
+            SiteMapGenerator.generateAllSiteMaps();
+        } catch (SQLException e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
