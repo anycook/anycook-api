@@ -33,6 +33,7 @@ import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
 import de.anycook.recipe.tag.Tag;
 import de.anycook.session.Session;
+import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
@@ -84,7 +85,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
-	
+
 	/**
 	 * Number of recipes
 	 */
@@ -98,7 +99,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	/**
 	 * returns the recipe of the day
 	 */
@@ -130,7 +131,7 @@ public class RecipeApi {
 
 
 
-	
+
 	@GET
 	@Path("{recipeName}")
     @PublicView
@@ -158,7 +159,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("{recipeName}/ingredients")
 	public List<Ingredient> getRecipeIngredients(@PathParam("recipeName") String recipeName){
@@ -169,7 +170,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("{recipeName}/tags")
 	public List<Tag> getRecipeTags(@PathParam("recipeName") String recipeName){
@@ -221,6 +222,7 @@ public class RecipeApi {
                 data.put("tagName", tag.getName());
                 data.put("recipeName", recipeName);
                 Notification.sendNotification(oldTag.getSuggester().getId(), NotificationType.TAG_ACCEPTED, data);
+                SiteMapGenerator.generateTagSitemap();
             }
         } catch (DBUser.UserNotFoundException | SQLException e) {
             logger.error(e, e);
@@ -253,7 +255,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
-	
+
 	@GET
 	@Path("{recipeName}/steps")
 	public List<Step> getRecipeSteps(@PathParam("recipeName") String recipeName){
@@ -264,7 +266,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 
     //version
     @GET
@@ -322,6 +324,7 @@ public class RecipeApi {
                         Lifes.addLife(Lifes.CaseType.ACTIVATED, newVersion.getActiveAuthor(), recipeName);
                     }
                     logger.debug(String.format("activated version #%d of %s", versionId, recipeName));
+                    SiteMapGenerator.generateRecipeSiteMap();
                 }
 
 
@@ -358,7 +361,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("{recipeName}/image")
 	@Produces("image/png")
@@ -375,7 +378,7 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("{recipeName}/schmeckt")
 	public Boolean checkSchmeckt(@PathParam("recipeName") String recipeName){
@@ -387,11 +390,11 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@PUT
 	@Path("{recipeName}/schmeckt")
 	public void schmeckt(@PathParam("recipeName") String recipeName){
-		
+
         try {
             session.checkLogin();
             boolean schmeckt = session.checkSchmeckt(recipeName);
@@ -402,9 +405,9 @@ public class RecipeApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
-		
+
 	}
-	
+
 	@DELETE
 	@Path("{recipeName}/schmeckt")
 	public void schmecktNicht(@PathParam("recipeName") String recipeName){
@@ -420,7 +423,7 @@ public class RecipeApi {
 
 
 	}
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void saveRecipe(NewRecipe newRecipe){

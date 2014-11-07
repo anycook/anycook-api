@@ -25,6 +25,7 @@ import de.anycook.db.mysql.DBUser;
 import de.anycook.mailprovider.MailProvider;
 import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
+import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.user.User;
 import org.apache.log4j.Logger;
 
@@ -39,7 +40,7 @@ import java.util.Map;
 
 @Path("session")
 public class SessionApi {
-	
+
 	private final Logger logger;
     private final String cookieDomain;
     private final boolean cookieSecure;
@@ -47,26 +48,26 @@ public class SessionApi {
     @Context
     private Session session;
 
-	
+
 	public SessionApi() {
 		logger = Logger.getLogger(getClass());
         cookieDomain = de.anycook.conf.Configuration.getInstance().getCookieDomain();
         cookieSecure = !de.anycook.conf.Configuration.getInstance().isDeveloperMode();
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
     @PrivateView
 	public User getSession(){
         return session.getUser();
     }
-	
+
 	@POST
     @Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response login(@Context HttpServletRequest request,
 			Session.UserAuth auth){
-		
+
         LoginAttempt loginAttempt = null;
 
         try{
@@ -121,7 +122,7 @@ public class SessionApi {
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
     }
-	
+
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response logout(@Context HttpHeaders hh){
@@ -143,13 +144,14 @@ public class SessionApi {
 		session.logout();
 		return response.entity("true").build();
 	}
-	
+
 	@POST
 	@Path("activate")
 	@Produces(MediaType.APPLICATION_JSON)
 	public void activateAccount(@FormParam("activationkey") String activationKey){
         try {
             User.activateById(activationKey);
+            SiteMapGenerator.generateProfileSiteMap();
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -158,13 +160,13 @@ public class SessionApi {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
     }
-	
+
     //mail provider
 	@GET
 	@Path("mailprovider")
 	@Produces(MediaType.APPLICATION_JSON)
 	public MailProvider checkMailAnbieter(@QueryParam("domain") String domain){
-		if(domain == null) 
+		if(domain == null)
 			throw new WebApplicationException(401);
         try {
             return MailProvider.getMailanbieterfromDomain(domain);
