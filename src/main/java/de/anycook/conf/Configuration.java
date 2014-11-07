@@ -260,7 +260,7 @@ public class Configuration {
     }
 
     public String getSiteMapS3AccessSecret() {
-        return properties.getProperty(SITE_MAP_S3_ACCESS_SECRET, getSiteMapS3AccessSecret());
+        return properties.getProperty(SITE_MAP_S3_ACCESS_SECRET, getImageS3AccessSecret());
     }
 
     @XmlElement
