@@ -210,7 +210,7 @@ public class SiteMapGenerator {
         //setting max-age to 15 days
         //metadata.setCacheControl("max-age=1296000");
         metadata.setContentMD5(new String(Base64.encodeBase64(md5)));
-        PutObjectRequest request = new PutObjectRequest(bucketName, siteMap.getName(), is, metadata);
+        PutObjectRequest request = new PutObjectRequest(bucketName, "sitemaps/" + siteMap.getName(), is, metadata);
         request.setCannedAcl(CannedAccessControlList.PublicRead);
         PutObjectResult result = s3Client.putObject(request);
         logger.debug("Etag:" + result.getETag() + "-->" + result);

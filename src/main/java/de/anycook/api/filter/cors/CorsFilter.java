@@ -38,32 +38,29 @@ import java.util.regex.Pattern;
  */
 @Provider
 public class CorsFilter implements ContainerResponseFilter {
-	public final static Pattern hostPattern = Pattern.compile("http://(.*)anycook\\.de");
+	public final static Pattern hostPattern = Pattern.compile("http(s)*://(.*)anycook\\.de");
 	private final Logger logger;
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public CorsFilter() {
 		logger = Logger.getLogger(getClass());
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.sun.jersey.spi.container.ContainerResponseFilter#filter(com.sun.jersey.spi.container.ContainerRequest, com.sun.jersey.spi.container.ContainerResponse)
-	 */
+
 	@Override
 	public void filter(ContainerRequestContext requestContext,
 			ContainerResponseContext responseContext) {
         String method = requestContext.getMethod();
         String path = requestContext.getUriInfo().getPath();
 		logger.debug(String.format("filtering: %s:%s", method, path));
-		
+
 		CORSRequestType corsType = CORSRequestType.detect(requestContext);
-		
+
 		switch(corsType){
 		case PREFLIGHT:
 			filterPreFlight(requestContext, responseContext);
-			
+
 		case ACTUAL:
 			filterActualRequest(requestContext, responseContext);
 		}
@@ -91,7 +88,7 @@ public class CorsFilter implements ContainerResponseFilter {
         headers.putSingle("Access-Control-Allow-Headers", "x-requested-with," +
                (requestHeaders == null ? "" : requestHeaders));
     }
-	
+
 	private void filterActualRequest(ContainerRequestContext requestContext,
                                      ContainerResponseContext responseContext) {
 		String origin = requestContext.getHeaderString("Origin");
@@ -124,15 +121,15 @@ public class CorsFilter implements ContainerResponseFilter {
 //	public static Response buildResponse(String origin) {
 ////		if(!checkOrigin(origin))
 ////			throw new WebApplicationException(401);
-//		
+//
 //		ResponseBuilder resp = Response.ok();
 //		resp.header("Access-Control-Allow-Origin", origin);
 //		resp.header("Access-Control-Allow-Credentials", "true");
 //		return resp.build();
 //	}
 
-	
-	
-	
+
+
+
 
 }
