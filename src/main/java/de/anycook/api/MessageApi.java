@@ -30,10 +30,17 @@ import de.anycook.user.User;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
@@ -44,14 +51,14 @@ import java.util.concurrent.TimeUnit;
 
 @Path("/message")
 public class MessageApi {
-	
+
 	private final Logger logger;
 
     @Context
     private Session session;
 
 	/**
-	 * 
+	 *
 	 */
 	public MessageApi() {
 		logger = Logger.getLogger(getClass());
@@ -60,12 +67,7 @@ public class MessageApi {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public void get(@Suspended final AsyncResponse asyncResponse, @QueryParam("lastChange") Long lastChange){
-        asyncResponse.setTimeoutHandler(new TimeoutHandler() {
-            @Override
-            public void handleTimeout(AsyncResponse asyncResponse) {
-                asyncResponse.resume(Response.ok().build());
-            }
-        });
+        asyncResponse.setTimeoutHandler(asyncResponse1 -> asyncResponse1.resume(Response.ok().build()));
 
         asyncResponse.setTimeout(5, TimeUnit.MINUTES);
 
@@ -96,7 +98,7 @@ public class MessageApi {
         }
 
     }
-	
+
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
     public void newMessage(NewMessage message){
@@ -159,7 +161,7 @@ public class MessageApi {
 
 
     }
-	
+
 	@POST
 	@Path("{sessionId}")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -168,7 +170,7 @@ public class MessageApi {
 			logger.info("text was null");
 			throw new WebApplicationException(400);
 		}
-		
+
         try {
             int userId = session.getUser().getId();
             MessageSession.getSession(sessionId, userId).newMessage(userId, message);
@@ -177,7 +179,7 @@ public class MessageApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@PUT
 	@Path("{sessionId}/{messageId}")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
