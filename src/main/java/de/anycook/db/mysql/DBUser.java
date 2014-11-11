@@ -602,6 +602,15 @@ public class DBUser extends DBHandler {
         return locationMap;
     }
 
+    public String getActivationId(int userId) throws SQLException {
+        PreparedStatement statement =
+            connection.prepareStatement("SELECT activationid FROM activationids WHERE users_id = ?");
+        statement.setInt(1, userId);
+        ResultSet data = statement.executeQuery();
+        if (data.next()) return data.getString("activationid");
+        return null;
+    }
+
     public static class UserNotFoundException extends Exception {
         public UserNotFoundException(String username) {
             super("user does not exist: " + username);

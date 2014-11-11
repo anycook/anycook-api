@@ -27,6 +27,7 @@ import de.anycook.location.GeoCode;
 import de.anycook.location.Location;
 import de.anycook.news.life.Lifes;
 import de.anycook.notifications.Notification;
+import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
@@ -230,7 +231,7 @@ public class User implements Comparable<User> {
         try (DBUser dbuser = new DBUser()) {
             int userid = dbuser.activateById(activationId);
             Lifes.addLife(Lifes.CaseType.NEW_USER, userid);
-//			TODO SitemapGenerator.generateProfileSitemap();
+            SiteMapGenerator.generateProfileSiteMap();
         }
 
     }
@@ -239,7 +240,7 @@ public class User implements Comparable<User> {
         try (DBUser dbuser = new DBUser()) {
             dbuser.activateUser(userId);
             Lifes.addLife(Lifes.CaseType.NEW_USER, userId);
-//			TODO SitemapGenerator.generateProfileSitemap();
+            SiteMapGenerator.generateProfileSiteMap();
         }
     }
 
@@ -359,6 +360,23 @@ public class User implements Comparable<User> {
         }
         user.sendResetPasswordMail(resetPWID);
         logger.info(mail + " wants to reset password");
+    }
+
+    public static String generateAndSaveActivationId(int userId) throws SQLException {
+        String activationId = RandomStringUtils.randomAlphanumeric(20);
+        try(DBUser dbUser = new DBUser()) {
+            dbUser.setActivationId(userId, activationId);
+            return activationId;
+        }
+    }
+
+    public static void resendActivationId(int userId) throws SQLException, DBUser.UserNotFoundException {
+        String username = User.getUsername(userId);
+        try (DBUser dbUser = new DBUser()) {
+            String activationId = dbUser.getActivationId(userId);
+            if (activationId == null) activationId = User.generateAndSaveActivationId(userId);
+            User.sendAccountActivationMail(userId, username, activationId);
+        }
     }
 
 

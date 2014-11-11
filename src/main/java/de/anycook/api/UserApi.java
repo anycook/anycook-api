@@ -62,7 +62,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@POST
 	public void newUser(@FormParam("mail") String mail,
 			@FormParam("username") String username,
@@ -74,7 +74,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
-	
+
 	@GET
 	@Path("mail")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -86,7 +86,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("name")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -98,7 +98,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	/**
 	 * returns the number of users
 	 * @return
@@ -127,7 +127,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("{userId}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -169,7 +169,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
     }
-	
+
 	@PUT
 	@Path("{userId}/follow")
 	public Response follow(@PathParam("userId") int userId){
@@ -184,7 +184,9 @@ public class UserApi {
 
         return Response.ok().build();
 	}
-	
+
+
+
 	@DELETE
 	@Path("{userId}/follow")
 	public Response unfollow(@PathParam("userId") int userId){
@@ -198,14 +200,14 @@ public class UserApi {
 
         return Response.ok().build();
 	}
-	
+
 	@GET
 	@Path("{userId}/image")
 	@Produces("image/png")
 	public Response getImage(@PathParam("userId") int userId,
 			@DefaultValue("small") @QueryParam("type") String typeString){
 		ImageType type = ImageType.valueOf(typeString.toUpperCase());
-		
+
 		try {
 			URI uri = new URI(User.getUserImage(userId, type));
 			return Response.temporaryRedirect(uri).build();
@@ -220,7 +222,7 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
-	
+
 	@GET
 	@Path("{userId}/schmeckt")
 	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
@@ -233,10 +235,10 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
-	
+
 	@GET
 	@Path("{userId}/discussionnum")
-	@Produces(MediaType.APPLICATION_JSON+";charset=UTF-8")
+	@Produces(MediaType.APPLICATION_JSON)
 	public int getDiscussionNum(@PathParam("userId") int userId){
         try {
             return Discussion.getDiscussionNumForUser(userId);
@@ -245,6 +247,23 @@ public class UserApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
+
+
+    @POST
+    @Path("{userId}/resendActivationId")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void resendActivationRequest(@PathParam("userId") int userId) {
+        session.checkAdminLogin();
+        try {
+            User.resendActivationId(userId);
+        } catch (SQLException e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBUser.UserNotFoundException e) {
+            logger.warn(e, e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+    }
 
     @POST
     @Path("facebook")
