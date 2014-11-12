@@ -15,8 +15,8 @@ To use the full test stack you will also need to clone and start the [anycook-pa
 - Install [Java8 JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 - Install [Gradle](http://www.gradle.org/). To install it via brew execute ```brew install gradle```.
 - Install [Virtual Box](https://www.virtualbox.org/)
-  Having problems with outdated kernel modules in Ubuntu/Linux? Try
-  $ sudo /etc/init.d/vboxdrv setup
+  Having problems with outdated kernel modules in Ubuntu/Linux?  
+Try ```sudo /etc/init.d/vboxdrv setup```
 - Install [Vagrant](http://www.vagrantup.com/) (Having problems with vagrant in OSX Mavericks? Execute ```sudo /Library/StartupItems/VirtualBox/VirtualBox restart``` and try again ([source](http://www.asquera.de/development/2013/06/20/vagrant-on-mavericks/)))
 - Execute ```git submodule init && git submodule update``` in project root to download required submodules. These are:
   - [puppetlabs/mysql](https://forge.puppetlabs.com/puppetlabs/mysql)
