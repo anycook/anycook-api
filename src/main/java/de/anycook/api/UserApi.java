@@ -51,7 +51,7 @@ public class UserApi {
 
 	@GET
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-	public Response getUsers(@QueryParam("detailed") final boolean isDetailed){
+	public Response getUsers(@QueryParam("detailed") boolean isDetailed){
         try {
             Annotation[] annotations = isDetailed ?
                     new Annotation[]{PublicView.Factory.get()} :

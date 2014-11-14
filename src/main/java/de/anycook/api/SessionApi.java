@@ -148,7 +148,7 @@ public class SessionApi {
 	@POST
 	@Path("activate")
 	@Produces(MediaType.APPLICATION_JSON)
-	public void activateAccount(@FormParam("activationkey") String activationKey){
+	public void activateAccount(@FormParam("activationkey") String activationKey) {
         try {
             User.activateById(activationKey);
             SiteMapGenerator.generateProfileSiteMap();
@@ -165,11 +165,11 @@ public class SessionApi {
 	@GET
 	@Path("mailprovider")
 	@Produces(MediaType.APPLICATION_JSON)
-	public MailProvider checkMailAnbieter(@QueryParam("domain") String domain){
+	public MailProvider checkMailProvider(@QueryParam("domain") String domain) {
 		if(domain == null)
 			throw new WebApplicationException(401);
         try {
-            return MailProvider.getMailanbieterfromDomain(domain);
+            return MailProvider.getMailProviderForDomain(domain);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

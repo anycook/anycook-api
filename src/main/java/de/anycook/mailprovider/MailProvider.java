@@ -24,10 +24,14 @@ import java.sql.SQLException;
 
 public class MailProvider {
 
-    private final String shortName;
-    private final String fullName;
-    private final String redirect;
-    private final String image;
+    private String shortName;
+    private String fullName;
+    private String redirect;
+    private String image;
+
+    public MailProvider() {
+
+    }
 
     public MailProvider(String shortName, String fullName, String redirect, String image) {
         this.shortName = shortName;
@@ -40,20 +44,35 @@ public class MailProvider {
         return shortName;
     }
 
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
     public String getFullName() {
         return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getRedirect() {
         return redirect;
     }
 
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
+    }
+
     public String getImage() {
         return image;
     }
 
+    public void setImage(String image) {
+        this.image = image;
+    }
 
-    public static MailProvider getMailanbieterfromDomain(String domain) throws SQLException,
+    public static MailProvider getMailProviderForDomain(String domain) throws SQLException,
             DBMailProvider.ProviderNotFoundException {
         try (DBMailProvider dbmailprovider = new DBMailProvider()) {
             return dbmailprovider.getMailProvider(domain);
