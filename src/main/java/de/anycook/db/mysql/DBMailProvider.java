@@ -23,6 +23,8 @@ import de.anycook.mailprovider.MailProvider;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBMailProvider extends DBHandler {
 
@@ -49,22 +51,52 @@ public class DBMailProvider extends DBHandler {
         logger.info("new domain '" + domain + "' added to mailanbieter '" + shortName + "'");
     }
 
-    public MailProvider getMailProvider(String domain) throws ProviderNotFoundException, SQLException {
-        MailProvider mailProvider = null;
+    public List<MailProvider> getMailProviders() throws SQLException {
+        List<MailProvider> mailProviders = new ArrayList<>();
+
+        PreparedStatement pStatement = connection.prepareStatement("SELECT shortname, fullname, redirect, image " +
+            "FROM mailanbieter");
+        ResultSet data = pStatement.executeQuery();
+        while (data.next()) {
+            mailProviders.add(parseMailProvider(data));
+        }
+
+        return mailProviders;
+    }
+
+    public MailProvider getMailProvider(String shortName) throws SQLException, ProviderNotFoundException {
+        PreparedStatement pStatement = connection.prepareStatement("SELECT shortname, fullname, redirect, image " +
+            "FROM mailanbieter WHERE shortname = ?");
+        pStatement.setString(1, shortName);
+
+        ResultSet data = pStatement.executeQuery();
+        if (data.next()) {
+            return parseMailProvider(data);
+        }
+
+        throw new ProviderNotFoundException(shortName);
+    }
+
+
+    public MailProvider getMailProviderByDomain(String domain) throws ProviderNotFoundException, SQLException {
         PreparedStatement pStatement = connection.prepareStatement("SELECT shortname, fullname, redirect, image " +
                 "FROM maildomains LEFT JOIN mailanbieter ON shortname = mailanbieter_shortname WHERE domain = ?");
 
         pStatement.setString(1, domain);
         try (ResultSet data = pStatement.executeQuery()) {
             if (data.next()) {
-                String shortName = data.getString("shortname");
-                String fullName = data.getString("fullname");
-                String redirect = data.getString("redirect");
-                String image = data.getString("image");
-                mailProvider = new MailProvider(shortName, fullName, redirect, image);
-            } else throw new ProviderNotFoundException(domain);
+                return parseMailProvider(data);
+            }
+            throw new ProviderNotFoundException(domain);
         }
-        return mailProvider;
+    }
+
+    private MailProvider parseMailProvider(ResultSet data) throws SQLException {
+        String shortName = data.getString("shortname");
+        String fullName = data.getString("fullname");
+        String redirect = data.getString("redirect");
+        String image = data.getString("image");
+        return new MailProvider(shortName, fullName, redirect, image);
     }
 
     public static class ProviderNotFoundException extends Exception {

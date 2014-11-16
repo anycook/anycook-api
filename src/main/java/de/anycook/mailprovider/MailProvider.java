@@ -18,9 +18,9 @@
 
 package de.anycook.mailprovider;
 
-import de.anycook.db.mysql.DBMailProvider;
+import de.anycook.conf.Configuration;
 
-import java.sql.SQLException;
+import javax.xml.bind.annotation.XmlElement;
 
 public class MailProvider {
 
@@ -68,16 +68,12 @@ public class MailProvider {
         return image;
     }
 
+    @XmlElement
+    public String getImagePath() {
+        return Configuration.getInstance().getImageBasePath() + "mailproviders/" + image;
+    }
+
     public void setImage(String image) {
         this.image = image;
     }
-
-    public static MailProvider getMailProviderForDomain(String domain) throws SQLException,
-            DBMailProvider.ProviderNotFoundException {
-        try (DBMailProvider dbmailprovider = new DBMailProvider()) {
-            return dbmailprovider.getMailProvider(domain);
-        }
-    }
-
-
 }

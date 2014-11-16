@@ -20,9 +20,7 @@ package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
 import de.anycook.api.views.PrivateView;
-import de.anycook.db.mysql.DBMailProvider;
 import de.anycook.db.mysql.DBUser;
-import de.anycook.mailprovider.MailProvider;
 import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
 import de.anycook.sitemap.SiteMapGenerator;
@@ -30,8 +28,20 @@ import de.anycook.user.User;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -160,26 +170,6 @@ public class SessionApi {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
     }
-
-    //mail provider
-	@GET
-	@Path("mailprovider")
-	@Produces(MediaType.APPLICATION_JSON)
-	public MailProvider checkMailProvider(@QueryParam("domain") String domain) {
-		if(domain == null)
-			throw new WebApplicationException(401);
-        try {
-            return MailProvider.getMailProviderForDomain(domain);
-        } catch (SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } catch (DBMailProvider.ProviderNotFoundException e) {
-            logger.debug(e);
-            throw new WebApplicationException(Response.Status.NO_CONTENT);
-        }
-
-
-	}
 
     @POST
     @Path("resetPassword")
