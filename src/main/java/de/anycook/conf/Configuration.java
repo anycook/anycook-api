@@ -36,6 +36,8 @@ public class Configuration {
         PROPERTIES = "anycook.properties",
         ADMIN_MAIL = "ADMIN_MAIL",
         ADMIN_PASSWORD = "ADMIN_PASSWORD",
+        AWS_ACCESS_KEY = "AWS_ACCESS_KEY",
+        AWS_ACCESS_SECRET = "AWS_ACCESS_SECRET",
         COOKIE_DOMAIN = "COOKIE_DOMAIN",
         DEVELOPMENT_MODE = "DEVELOPMENT_MODE",
         FACEBOOK_APP_ID = "FACEBOOK_APP_ID",
@@ -139,6 +141,15 @@ public class Configuration {
     }
 
     @XmlElement
+    public String getAwsAccessKey() {
+        return properties.getProperty(AWS_ACCESS_KEY);
+    }
+
+    public String getAwsAccessSecret() {
+        return properties.getProperty(AWS_ACCESS_SECRET);
+    }
+
+    @XmlElement
     public String getCookieDomain() {
         return properties.getProperty(COOKIE_DOMAIN, ".anycook.de");
     }
@@ -177,11 +188,11 @@ public class Configuration {
 
     @XmlElement
     public String getImageS3AccessKey() {
-        return properties.getProperty(IMAGE_S3_ACCESS_KEY);
+        return properties.getProperty(IMAGE_S3_ACCESS_KEY, getAwsAccessKey());
     }
 
     public String getImageS3AccessSecret() {
-        return properties.getProperty(IMAGE_S3_ACCESS_SECRET);
+        return properties.getProperty(IMAGE_S3_ACCESS_SECRET, getAwsAccessSecret());
     }
 
     @XmlElement
@@ -256,11 +267,11 @@ public class Configuration {
 
     @XmlElement
     public String getSiteMapS3AccessKey() {
-        return properties.getProperty(SITE_MAP_S3_ACCESS_KEY, getImageS3AccessKey());
+        return properties.getProperty(SITE_MAP_S3_ACCESS_KEY, getAwsAccessKey());
     }
 
     public String getSiteMapS3AccessSecret() {
-        return properties.getProperty(SITE_MAP_S3_ACCESS_SECRET, getImageS3AccessSecret());
+        return properties.getProperty(SITE_MAP_S3_ACCESS_SECRET, getAwsAccessSecret());
     }
 
     @XmlElement
