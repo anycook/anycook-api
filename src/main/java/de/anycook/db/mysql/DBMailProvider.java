@@ -99,6 +99,53 @@ public class DBMailProvider extends DBHandler {
         return new MailProvider(shortName, fullName, redirect, image);
     }
 
+    public boolean checkMailProvider(String shortName) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT shortname FROM mailanbieter " +
+            "WHERE shortname = ?");
+        preparedStatement.setString(1, shortName);
+        ResultSet data = preparedStatement.executeQuery();
+        return data.next();
+    }
+
+    public void addMailProvider(MailProvider mailProvider) throws SQLException {
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("INSERT INTO mailanbieter (shortname, fullname, redirect, image) " +
+                "VALUES (?,?,?,?)");
+        preparedStatement.setString(1, mailProvider.getShortName());
+        preparedStatement.setString(2, mailProvider.getFullName());
+        preparedStatement.setString(3, mailProvider.getRedirect());
+        preparedStatement.setString(4, mailProvider.getImage());
+        preparedStatement.executeUpdate();
+    }
+
+    public void updateMailProvider(String shortName, MailProvider mailProvider) throws SQLException {
+        //TODO if shortName changes, change shortname for domains
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("UPDATE mailanbieter SET shortname=?, fullname=?, redirect=?, image=? " +
+                "WHERE shortname = ?");
+        preparedStatement.setString(1, mailProvider.getShortName());
+        preparedStatement.setString(2, mailProvider.getFullName());
+        preparedStatement.setString(3, mailProvider.getRedirect());
+        preparedStatement.setString(4, mailProvider.getImage());
+        preparedStatement.setString(5, shortName);
+        preparedStatement.executeUpdate();
+    }
+
+    public void deleteMailProvider(String shortName) throws SQLException {
+        deleteDomains(shortName);
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("DELETE FROM mailanbieter WHERE shortname = ?");
+        preparedStatement.setString(1, shortName);
+        preparedStatement.executeUpdate();
+    }
+
+    public void deleteDomains(String shortName) throws SQLException {
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("DELETE FROM maildomains WHERE mailanbieter_shortname = ?");
+        preparedStatement.setString(1, shortName);
+        preparedStatement.executeUpdate();
+    }
+
     public static class ProviderNotFoundException extends Exception {
         public ProviderNotFoundException(String domain) {
             super(String.format("provider domain '%s' does not exist", domain));

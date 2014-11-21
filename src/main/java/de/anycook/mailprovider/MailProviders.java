@@ -32,4 +32,17 @@ public final class MailProviders {
             return dbMailProvider.getMailProvider(shortName);
         }
     }
+
+    public static void updateMailProvider(String shortName, MailProvider mailProvider) throws SQLException {
+        try (DBMailProvider dbMailProvider = new DBMailProvider()) {
+            if (!dbMailProvider.checkMailProvider(shortName)) dbMailProvider.addMailProvider(mailProvider);
+            else dbMailProvider.updateMailProvider(shortName, mailProvider);
+        }
+    }
+
+    public static void deleteMailProvider(String shortName) throws SQLException {
+        try (DBMailProvider dbMailProvider = new DBMailProvider()) {
+            dbMailProvider.deleteMailProvider(shortName);
+        }
+    }
 }
