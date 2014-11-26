@@ -18,10 +18,9 @@
 
 package de.anycook.db.mysql;
 
-import de.anycook.location.Location;
 import de.anycook.recipe.Recipe;
 
-import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -40,11 +39,23 @@ public class DBDiscover extends DBRecipe {
     }
 
     public List<Recipe> getTastyRecipes(int num, int loginId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call tasty_recipes(?, ?)}");
-        callableStatement.setInt(1, num);
-        callableStatement.setInt(2, loginId);
+        PreparedStatement preparedStatement =
+            connection.prepareCall("SELECT versions.id AS id, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, " +
+                "personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, " +
+                "viewed, last_change, " +
+                "(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name " +
+                "AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "GROUP BY gerichte.name ORDER BY counter DESC LIMIT ?;");
+        preparedStatement.setInt(1, loginId);
+        preparedStatement.setInt(2, num);
 
-        ResultSet data = callableStatement.executeQuery();
+        ResultSet data = preparedStatement.executeQuery();
         return getRecipes(data);
     }
 
@@ -54,11 +65,22 @@ public class DBDiscover extends DBRecipe {
      * @return List mit den neusten Gerichten
      */
     public List<Recipe> getNewestRecipes(int num, int loginId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call newest_recipes(?, ?)}");
-        callableStatement.setInt(1, num);
-        callableStatement.setInt(2, loginId);
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, personen, " +
+                "kategorien_name, active_id, users_id, nickname, users.image, viewed, last_change, " +
+                "(SELECT IF(COUNT(users_id) = 1, TRUE, FALSE) FROM schmeckt " +
+                "WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "GROUP BY gerichte.name ORDER BY gerichte.eingefuegt DESC LIMIT ?;");
+        preparedStatement.setInt(1, loginId);
+        preparedStatement.setInt(2, num);
 
-        ResultSet data = callableStatement.executeQuery();
+        ResultSet data = preparedStatement.executeQuery();
         return getRecipes(data);
     }
 
@@ -68,15 +90,22 @@ public class DBDiscover extends DBRecipe {
      * @return List mit den beliebtesten Gerichten
      */
     public List<Recipe> getPopularRecipes(int num, int loginId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call popular_recipes(?, ?)}");
-        callableStatement.setInt(1, num);
-        callableStatement.setInt(2, loginId);
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name, personen, kategorien_name, "+
+                "active_id, users_id, nickname, users.image, viewed, last_change, " +
+                "(SELECT COUNT(users_id) FROM schmeckt " +
+                "WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "GROUP BY gerichte.name ORDER BY viewed DESC LIMIT ?;");
+        preparedStatement.setInt(1, loginId);
+        preparedStatement.setInt(2, num);
 
-        ResultSet data = callableStatement.executeQuery();
+        ResultSet data = preparedStatement.executeQuery();
         return getRecipes(data);
-    }
-
-    public List<Recipe> getNearRecipes(Location location, double maxRadius, int recipeNumber) {
-        return null;
     }
 }

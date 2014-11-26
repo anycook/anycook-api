@@ -40,14 +40,27 @@ import de.anycook.utils.enumerations.NotificationType;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,15 +76,25 @@ public class RecipeApi {
     private Session session;
 
 	@GET
-	public Response getAll(@QueryParam("userId") Integer userId, @QueryParam("startsWith") String prefix,
+	public Response getAll(@HeaderParam(HttpHeaders.IF_MODIFIED_SINCE) final Date date,
+                           @QueryParam("userId") Integer userId, @QueryParam("startsWith") String prefix,
                            @QueryParam("detailed") final boolean detailed){
         try{
             final int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
             Annotation[] annotations = detailed ?
                     new Annotation[]{PublicView.Factory.get()} : new Annotation[]{};
 
-            List<Recipe> recipes = userId != null ?
+
+            List<Recipe> recipes;
+            if (date != null) {
+                recipes = Recipes.getAll(loginId, date);
+                if (recipes.size() == 0) {
+                    throw new WebApplicationException(Response.Status.NOT_MODIFIED);
+                }
+            } else {
+                recipes = userId != null ?
                     Recipes.getRecipesFromUser(userId, loginId) : Recipes.getAll(loginId);
+            }
 
             if(prefix!= null) {
                 recipes = recipes.parallelStream()
@@ -79,12 +102,14 @@ public class RecipeApi {
                         .collect(Collectors.toList());
             }
 
-            return Response.ok().entity(new GenericEntity<List<Recipe>>(recipes){}, annotations).build();
-        } catch (Exception e){
+            return Response.ok().entity(new GenericEntity<List<Recipe>>(recipes){}, annotations)
+                .lastModified(Recipes.getLastModified())
+                .build();
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-	}
+    }
 
 	/**
 	 * Number of recipes
@@ -324,6 +349,7 @@ public class RecipeApi {
                         Lifes.addLife(Lifes.CaseType.ACTIVATED, newVersion.getActiveAuthor(), recipeName);
                     }
                     logger.debug(String.format("activated version #%d of %s", versionId, recipeName));
+                    Recipes.setLastChange(recipeName);
                     SiteMapGenerator.generateRecipeSiteMap();
                 }
 

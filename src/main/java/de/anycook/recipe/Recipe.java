@@ -68,6 +68,7 @@ public class Recipe implements Comparable<Recipe> {
     private Time time;
     private boolean tasty;
     private int persons;
+    private long lastChange;
 
     @PublicView
     private boolean active;
@@ -89,10 +90,6 @@ public class Recipe implements Comparable<Recipe> {
 
     @PublicView
     private int views;
-
-    @PublicView
-    private long lastChange;
-
 
     public Recipe() {
     }

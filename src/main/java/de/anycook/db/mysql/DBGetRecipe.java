@@ -22,11 +22,9 @@ import de.anycook.recipe.Recipe;
 import de.anycook.user.User;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 
 public class DBGetRecipe extends DBRecipe {
@@ -50,40 +48,113 @@ public class DBGetRecipe extends DBRecipe {
      * @return {@link java.util.Map} mit den Daten des Gerichts.
      */
     public Recipe get(String name, int loginId) throws RecipeNotFoundException, SQLException {
-        CallableStatement call = connection.prepareCall("{call get_recipe(?, ?)}");
-        call.setString(1, name);
-        call.setInt(2, loginId);
-        ResultSet data = call.executeQuery();
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, gerichte.name AS name, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created," +
+                "min, std, skill, kalorien, personen, kategorien_name, active_id, users_id, nickname, users.image, " +
+                "viewed, last_change, " +
+                "(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = ? " +
+                "AND schmeckt.users_id = ?) AS tastes FROM gerichte " +
+                "INNER JOIN versions ON IF(active_id > 0, gerichte.name = gerichte_name " +
+                "AND active_id = versions.id, gerichte.name = gerichte_name) " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "WHERE gerichte.name = ?;");
+        preparedStatement.setString(1, name);
+        preparedStatement.setInt(2, loginId);
+        preparedStatement.setString(3, name);
+        ResultSet data = preparedStatement.executeQuery();
 
         if (!data.next()) throw new RecipeNotFoundException(name);
         return getRecipe(data);
     }
 
     public List<Recipe> getAllRecipes(int loginId) throws SQLException {
-        CallableStatement call = connection.prepareCall("{call get_all_recipes(?)}");
-        call.setInt(1, loginId);
-        ResultSet data = call.executeQuery();
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, gerichte.name AS name, beschreibung, " +
+                "IFNULL(versions.imagename, " +
+                "CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, " +
+                "min, std, skill, kalorien, personen, kategorien_name, " +
+                "active_id, users_id, users.image, nickname, viewed, last_change, " +
+            "(SELECT COUNT(users_id) FROM schmeckt " +
+                "WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = ?) AS tastes " +
+            "FROM gerichte " +
+            "INNER JOIN versions ON IF(active_id > 0, gerichte.name = gerichte_name " +
+                "AND active_id = versions.id, gerichte.name = gerichte_name) " +
+            "INNER JOIN users ON users_id = users.id " +
+            "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+            "GROUP BY name;");
+        preparedStatement.setInt(1, loginId);
+        ResultSet data = preparedStatement.executeQuery();
+
+        return getRecipes(data);
+    }
+
+    public List<Recipe> getAllRecipes(int loginId, Date lastModified) throws SQLException {
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, gerichte.name AS name, beschreibung, " +
+                "IFNULL(versions.imagename, " +
+                "CONCAT('category/', kategorien.image)) AS image, gerichte.eingefuegt AS created, " +
+                "min, std, skill, kalorien, personen, kategorien_name, " +
+                "active_id, users_id, users.image, nickname, viewed, last_change, " +
+                "(SELECT COUNT(users_id) FROM schmeckt " +
+                "WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON IF(active_id > 0, gerichte.name = gerichte_name " +
+                "AND active_id = versions.id, gerichte.name = gerichte_name) " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "WHERE last_change > ? " +
+                "GROUP BY name;");
+        preparedStatement.setInt(1, loginId);
+        preparedStatement.setTimestamp(2, new Timestamp(lastModified.getTime()));
+        ResultSet data = preparedStatement.executeQuery();
 
         return getRecipes(data);
     }
 
 
     public List<Recipe> getVersions(String recipeName, int loginId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call get_all_versions(?, ?)}");
-        callableStatement.setString(1, recipeName);
-        callableStatement.setInt(2, loginId);
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name, personen, kategorien_name, " +
+                "active_id, users_id, nickname, users.image, viewed, versions.eingefuegt AS last_change, " +
+                "(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = ? " +
+                "AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON gerichte.name = gerichte_name " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "WHERE gerichte.name = ?;");
+        preparedStatement.setString(1, recipeName);
+        preparedStatement.setInt(2, loginId);
+        preparedStatement.setString(3, recipeName);
 
-        try(ResultSet data = callableStatement.executeQuery()){
+        try(ResultSet data = preparedStatement.executeQuery()){
             return getRecipes(data);
         }
     }
 
     public Recipe getVersionData(String recipeName, int versionId, int loginId) throws RecipeNotFoundException, SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call get_version(?, ?, ?)}");
-        callableStatement.setString(1, recipeName);
-        callableStatement.setInt(2, versionId);
-        callableStatement.setInt(3, loginId);
-        ResultSet data = callableStatement.executeQuery();
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created, versions.eingefuegt AS last_change, min, std, skill, kalorien, " +
+                "gerichte.name, personen, kategorien_name, active_id, users_id, nickname, users.image, viewed, " +
+                "(SELECT IF(COUNT(users_id) = 1, TRUE, FALSE) FROM schmeckt " +
+                "WHERE schmeckt.gerichte_name = gerichte.name AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON gerichte.name = gerichte_name " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "WHERE gerichte.name = ? AND versions.id = ?;");
+        preparedStatement.setInt(1, loginId);
+        preparedStatement.setString(2, recipeName);
+        preparedStatement.setInt(3, versionId);
+
+        ResultSet data = preparedStatement.executeQuery();
 
         if (!data.next()) throw new RecipeNotFoundException(recipeName);
         return getRecipe(data);
@@ -155,12 +226,6 @@ public class DBGetRecipe extends DBRecipe {
         }
 
         return result;
-    }
-
-    public List<Recipe> getAllActiveRecipes() throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call active_recipes()}");
-        ResultSet data = callableStatement.executeQuery();
-        return getRecipes(data);
     }
 
     public int getActiveIdfromRecipe(String recipe) throws SQLException, RecipeNotFoundException {
@@ -334,10 +399,23 @@ public class DBGetRecipe extends DBRecipe {
     }
 
     public List<Recipe> getTastingRecipes(int userId, int loginId) throws SQLException {
-        CallableStatement callableStatement = connection.prepareCall("{call tasting_recipes(?, ?)}");
-        callableStatement.setInt(1, userId);
-        callableStatement.setInt(2, loginId);
-        ResultSet data = callableStatement.executeQuery();
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, personen, " +
+                "kategorien_name, active_id, users.id AS users_id, nickname, users.image, viewed, last_change, " +
+                "(SELECT IF(COUNT(users_id) = 1, TRUE, FALSE) FROM schmeckt " +
+                "WHERE schmeckt.gerichte_name = gerichte.name " +
+                "AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id " +
+                "INNER JOIN users ON versions.users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "INNER JOIN schmeckt ON gerichte.name = schmeckt.gerichte_name " +
+                "WHERE schmeckt.users_id = ? GROUP BY name ORDER BY schmeckt.eingefuegt DESC;");
+        preparedStatement.setInt(1, loginId);
+        preparedStatement.setInt(2, userId);
+        ResultSet data = preparedStatement.executeQuery();
         return getRecipes(data);
     }
 
@@ -356,10 +434,33 @@ public class DBGetRecipe extends DBRecipe {
     }
 
     public List<Recipe> getRecipesForUserId(int userId, int loginId) throws SQLException {
-        CallableStatement statement = connection.prepareCall("{call user_recipes(?, ?)}");
-        statement.setInt(1, userId);
-        statement.setInt(2, loginId);
+        PreparedStatement statement =
+            connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
+                "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
+                "gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, personen, " +
+                "kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, viewed, " +
+                "last_change, " +
+                "(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name " +
+                "AND schmeckt.users_id = ?) AS tastes " +
+                "FROM gerichte " +
+                "INNER JOIN versions ON gerichte.name = gerichte_name " +
+                "INNER JOIN users ON users_id = users.id " +
+                "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
+                "WHERE versions.users_id = ? AND active_id > -1 " +
+                "GROUP BY gerichte.name ORDER BY versions.eingefuegt DESC;");
+        statement.setInt(1, loginId);
+        statement.setInt(2, userId);
         ResultSet data = statement.executeQuery();
         return getRecipes(data);
+    }
+
+    public Date getLastModified() throws SQLException {
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("SELECT last_change FROM gerichte ORDER BY last_change DESC LIMIT 1");
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()) {
+            return resultSet.getTimestamp("last_change");
+        }
+        return new Date();
     }
 }

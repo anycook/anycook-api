@@ -27,6 +27,7 @@ import de.anycook.user.User;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -76,7 +77,9 @@ public class DBRecipe extends DBHandler {
 
     public int getTasteNum(String recipeName) throws SQLException {
         int count = 0;
-        PreparedStatement pStatement = connection.prepareStatement("SELECT name, COUNT(users_id) AS counter FROM gerichte LEFT JOIN schmeckt ON name = gerichte_name WHERE name = ? GROUP BY name");
+        PreparedStatement pStatement =
+            connection.prepareStatement("SELECT name, COUNT(users_id) AS counter FROM gerichte " +
+            "LEFT JOIN schmeckt ON name = gerichte_name WHERE name = ? GROUP BY name");
         pStatement.setString(1, recipeName);
         ResultSet data = pStatement.executeQuery();
         if (data.next())
@@ -224,7 +227,7 @@ public class DBRecipe extends DBHandler {
     protected Recipe getRecipe(ResultSet data) throws SQLException {
         String description = data.getString("beschreibung");
         Date created = data.getDate("created");
-        Date lastChange = data.getDate("lastChange");
+        Timestamp lastChange = data.getTimestamp("last_change");
         Time time = new Time(data.getInt("std"), data.getInt("min"));
         int skill = data.getInt("skill");
         int calorie = data.getInt("kalorien");

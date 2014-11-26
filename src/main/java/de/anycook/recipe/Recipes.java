@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -126,15 +127,9 @@ public class Recipes {
         }
     }
 
-    public static List<Recipe> getAllActive() throws SQLException {
+    public static String getImageName(String recipeName) throws SQLException {
         try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
-            return dbGetRecipe.getAllActiveRecipes();
-        }
-    }
-
-    public static String getImageName(String gerichtname) throws SQLException {
-        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
-            return dbGetRecipe.getImageName(gerichtname);
+            return dbGetRecipe.getImageName(recipeName);
         }
     }
 
@@ -213,6 +208,12 @@ public class Recipes {
         }
     }
 
+    public static List<Recipe> getAll(int loginId, Date lastModified) throws SQLException {
+        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+            return dbGetRecipe.getAllRecipes(loginId, lastModified);
+        }
+    }
+
     public static List<Recipe> getAllVersions(String recipeName, int loginId) throws SQLException {
         try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
             return dbGetRecipe.getVersions(recipeName, loginId);
@@ -253,5 +254,17 @@ public class Recipes {
         data.put("recipeName", name);
         data.put("numTags", Integer.toString(tags.size()));
         Notification.sendAdminNotification(NotificationType.ADMIN_SUGGESTED_TAGS, data);
+    }
+
+    public static void setLastChange(String recipeName) throws SQLException {
+        try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()) {
+            dbSaveRecipe.setLastChange(recipeName);
+        }
+    }
+
+    public static Date getLastModified() throws SQLException {
+        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
+            return dbGetRecipe.getLastModified();
+        }
     }
 }

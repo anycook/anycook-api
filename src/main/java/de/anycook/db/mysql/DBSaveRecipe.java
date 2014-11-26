@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -280,6 +281,15 @@ public class DBSaveRecipe extends DBRecipe {
         PreparedStatement preparedStatement =
                 connection.prepareStatement("UPDATE gerichte SET viewed = viewed +1 WHERE name = ?");
         preparedStatement.setString(1, recipeName);
+        preparedStatement.executeUpdate();
+    }
+
+    public void setLastChange(String recipeName) throws SQLException {
+        long currentTime = System.currentTimeMillis();
+        PreparedStatement preparedStatement =
+            connection.prepareStatement("UPDATE gerichte SET last_change = ? WHERE name = ?");
+        preparedStatement.setTimestamp(1, new Timestamp(currentTime));
+        preparedStatement.setString(2, recipeName);
         preparedStatement.executeUpdate();
     }
 }
