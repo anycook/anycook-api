@@ -35,11 +35,6 @@ public class DynamoDBRecipeDraftsStore implements RecipeDraftsStore{
         AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentials);
         dynamoDBClient.setRegion(Region.getRegion(Regions.EU_WEST_1));
 
-        String dynamoDbEndpoint = Configuration.getInstance().getDynamoDbEndpoint();
-        if (dynamoDbEndpoint != null) {
-            dynamoDBClient.setEndpoint(dynamoDbEndpoint);
-        }
-
         this.mapper = new DynamoDBMapper(dynamoDBClient,
             new DynamoDBMapperConfig(DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES));
     }

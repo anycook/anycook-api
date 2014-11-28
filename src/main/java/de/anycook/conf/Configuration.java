@@ -43,8 +43,6 @@ public class Configuration {
         DYNAMO_DB_DRAFTS = "DYNAMO_DB_DRAFTS",
         DYNAMO_DB_ACCESS_KEY = "DYNAMO_DB_ACCESS_KEY",
         DYNAMO_DB_ACCESS_SECRET = "DYNAMO_DB_ACCESS_SECRET",
-        DYNAMO_DB_ENDPOINT = "DYNAMO_DB_ENDPOINT",
-        DYNAMO_DB_TABLE_NAME = "DYNAMO_DB_TABLE_NAME",
         FACEBOOK_APP_ID = "FACEBOOK_APP_ID",
         FACEBOOK_APP_SECRET = "FACEBOOK_APP_SECRET",
         FULL_TEXT_INDEX_PATH = "FULL_TEXT_INDEX_PATH",
@@ -171,16 +169,6 @@ public class Configuration {
 
     public String getDynamoDbAccessSecret() {
         return properties.getProperty(DYNAMO_DB_ACCESS_SECRET, getAwsAccessSecret());
-    }
-
-    @XmlElement
-    public String getDynamoDbEndpoint() {
-        return properties.getProperty(DYNAMO_DB_ENDPOINT);
-    }
-
-    @XmlElement
-    public String getDynamoDbTableName() {
-        return properties.getProperty(DYNAMO_DB_TABLE_NAME, "anycook_db_drafts");
     }
 
     @XmlElement
