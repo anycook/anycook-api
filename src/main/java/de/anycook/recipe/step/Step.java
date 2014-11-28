@@ -18,11 +18,9 @@
 
 package de.anycook.recipe.step;
 
-import de.anycook.db.mysql.DBStep;
 import de.anycook.recipe.ingredient.Ingredient;
 
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.List;
 
 public class Step implements Serializable {
@@ -66,7 +64,7 @@ public class Step implements Serializable {
     }
 
     /*@Override
-	public String toJSONString() {		
+	public String toJSONString() {
 		return toJSON().toJSONString();
 	}*/
 
@@ -81,17 +79,5 @@ public class Step implements Serializable {
 		}
 		return new Step(id, text, ingredients);
 	}*/
-
-    public static List<Step> loadRecipeSteps(String recipeName) throws SQLException {
-        try (DBStep dbstep = new DBStep()) {
-            return dbstep.loadRecipeSteps(recipeName);
-        }
-    }
-
-    public static List<Step> loadRecipeSteps(String recipeName, int versionId) throws SQLException {
-        try (DBStep dbstep = new DBStep()) {
-            return dbstep.loadRecipeSteps(recipeName, versionId);
-        }
-    }
 
 }

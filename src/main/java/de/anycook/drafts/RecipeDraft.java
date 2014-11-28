@@ -1,11 +1,13 @@
 package de.anycook.drafts;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DBObject;
 import de.anycook.recipe.Time;
-import de.anycook.recipe.ingredient.Ingredient;
-import de.anycook.recipe.step.Step;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
@@ -15,48 +17,61 @@ import java.util.Map;
  * @author Jan Graßegger<jan@anycook.de>
  */
 @XmlRootElement
-public class DraftRecipe{
+@DynamoDBDocument
+@DynamoDBTable(tableName = "anycook_db_drafts")
+public class RecipeDraft {
+    private int userId;
     private String id;
-    private long timestamp;
+    private Long timestamp;
     private String image;
     private String name;
     private String description;
-    private List<Step> steps;
-    private int persons;
-    private List<Ingredient> ingredients;
+    private Integer persons;
     private String category;
-    private int skill;
-    private int calorie;
-    private List<String> tags;
+    private Integer skill;
+    private Integer calorie;
+
     private Time time;
     private double percentage;
 
-    public DraftRecipe(){}
+    private List<IngredientDraft> ingredients;
+    private List<StepDraft> steps;
+    private List<String> tags;
 
-    public DraftRecipe(DBObject dbObject) {
+
+    public RecipeDraft(){}
+
+    public RecipeDraft(DBObject dbObject) {
         read(dbObject);
     }
 
+    @DynamoDBHashKey(attributeName = "userId")
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    @DynamoDBRangeKey(attributeName = "id")
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
 
-    public long getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
-
-    public void setTimestamp(long timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 
     public String getImage() {
         return image;
     }
-
     public void setImage(String image) {
         this.image = image;
     }
@@ -64,7 +79,6 @@ public class DraftRecipe{
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -72,63 +86,55 @@ public class DraftRecipe{
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public List<Step> getSteps() {
+    public List<StepDraft> getSteps() {
         return steps;
     }
-
-    public void setSteps(List<Step> steps) {
+    public void setSteps(List<StepDraft> steps) {
         this.steps = steps;
     }
 
-    public int getPersons() {
+    public Integer getPersons() {
         return persons;
     }
-
-    public void setPersons(int persons) {
+    public void setPersons(Integer persons) {
         this.persons = persons;
     }
 
-    public List<Ingredient> getIngredients() {
+    public List<IngredientDraft> getIngredients() {
         return ingredients;
     }
-
-    public void setIngredients(List<Ingredient> ingredients) {
+    public void setIngredients(List<IngredientDraft> ingredients) {
         this.ingredients = ingredients;
     }
 
     public String getCategory() {
         return category;
     }
-
     public void setCategory(String category) {
         this.category = category;
     }
 
-    public int getSkill() {
+    public Integer getSkill() {
         return skill;
     }
-
-    public void setSkill(int skill) {
+    public void setSkill(Integer skill) {
         this.skill = skill;
     }
 
-    public int getCalorie() {
+    public Integer getCalorie() {
         return calorie;
     }
-
-    public void setCalorie(int calorie) {
+    public void setCalorie(Integer calorie) {
         this.calorie = calorie;
     }
 
     public List<String> getTags() {
         return tags;
     }
-
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
@@ -136,7 +142,6 @@ public class DraftRecipe{
     public Time getTime() {
         return time;
     }
-
     public void setTime(Time time) {
         this.time = time;
     }
@@ -144,29 +149,11 @@ public class DraftRecipe{
     public double getPercentage() {
         return percentage;
     }
-
     public void setPercentage(double percentage) {
         this.percentage = percentage;
     }
 
     public void read(DBObject dbObject){
-        /*
-        private String id;
-        private long timestamp;
-        private String image;
-        private String name;
-        private String description;
-        private List<Step> steps;
-        private int persons;
-        private List<Ingredient> ingredients;
-        private String category;
-        private int skill;
-        private int calorie;
-        private List<Tag> tags;
-        private Time time;
-        private int percentage;
-        */
-
         this.id = dbObject.get("_id").toString();
         if(dbObject.containsField("value")){
             dbObject = (DBObject)dbObject.get("value");
@@ -181,12 +168,12 @@ public class DraftRecipe{
         ObjectMapper mapper = new ObjectMapper();
         if(dbObject.containsField("steps")) {
             this.steps = mapper.convertValue(dbObject.get("steps"),
-                    new TypeReference<List<Step>>(){});
+                    new TypeReference<List<StepDraft>>(){});
         }
         if(dbObject.containsField("persons")) this.persons = (int)dbObject.get("persons");
         if(dbObject.containsField("ingredients")){
             this.ingredients = mapper.convertValue(dbObject.get("ingredients"),
-                    new TypeReference<List<Ingredient>>(){});
+                    new TypeReference<List<IngredientDraft>>(){});
         }
         if(dbObject.containsField("category")) this.category = (String)dbObject.get("category");
         if(dbObject.containsField("skill")) this.skill = (int)dbObject.get("skill");
@@ -200,22 +187,6 @@ public class DraftRecipe{
     }
 
     public void write(DBObject updateObj) {
-        /*
-        private String id;
-        private long timestamp;
-        private String image;
-        private String name;
-        private String description;
-        private List<Step> steps;
-        private int persons;
-        private List<Ingredient> ingredients;
-        private String category;
-        private int skill;
-        private int calorie;
-        private List<Tag> tags;
-        private Time time;
-        private int percentage;
-        */
         if(image != null) updateObj.put("image", image);
         if(name != null) updateObj.put("name", name);
         if(description != null) updateObj.put("description", description);
@@ -225,14 +196,14 @@ public class DraftRecipe{
             List<Map<String, Object>> stepList = mapper.convertValue(steps, new TypeReference<List<Map<String, Object>>>(){});
             updateObj.put("steps", stepList);
         }
-        if(persons > 0) updateObj.put("persons", persons);
+        if(persons != null) updateObj.put("persons", persons);
         if(ingredients != null) {
             List<Map<String, Object>> ingredientList = mapper.convertValue(ingredients, new TypeReference<List<Map<String, Object>>>(){});
             updateObj.put("ingredients", ingredientList);
         }
         if(category != null) updateObj.put("category", category);
-        if(skill > 0) updateObj.put("skill", skill);
-        if(calorie > 0) updateObj.put("calorie", calorie);
+        if(skill != null) updateObj.put("skill", skill);
+        if(calorie != null) updateObj.put("calorie", calorie);
         if(tags != null) updateObj.put("tags", tags);
         if(time != null) {
             Map<String, Integer> timeObject = mapper.convertValue(time, new TypeReference<Map<String, Integer>>(){});

@@ -19,22 +19,33 @@
 package de.anycook.recipe.ingredient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBIngredient;
-import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSearch;
 import de.anycook.search.Search;
-import org.apache.log4j.Logger;
-import org.tartarus.snowball.SnowballProgram;
-import org.tartarus.snowball.ext.GermanStemmer;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class Ingredient{
+
+    public static Ingredient init(String name) throws SQLException, DBIngredient.IngredientNotFoundException {
+        try (DBIngredient db = new DBIngredient()) {
+            return db.getIngredient(name);
+        }
+    }
+
+    public static Ingredient init(String name, String amount) throws SQLException,
+        DBIngredient.IngredientNotFoundException {
+        try (DBIngredient db = new DBIngredient()) {
+            return db.get(name, amount);
+        }
+    }
+
     public String name = null;
     public String singular = null;
-    public String menge = null;
+    public String amount = null;
     public Integer recipecounter = null;
     public List<String> recipes = null;
 
@@ -46,8 +57,8 @@ public class Ingredient{
 
     }
 
-    public Ingredient(String name, String menge) {
-        this(name, menge, -1);
+    public Ingredient(String name, String amount) {
+        this(name, amount, -1);
     }
 
     public Ingredient(String name, String singular, int gerichte) {
@@ -62,14 +73,14 @@ public class Ingredient{
 
     }
 
-    public Ingredient(String name, String singular, String menge) {
-        this(name, singular, menge, -1);
+    public Ingredient(String name, String singular, String amount) {
+        this(name, singular, amount, -1);
     }
 
-    public Ingredient(String name, String singular, String menge, int recipecounter) {
+    public Ingredient(String name, String singular, String amount, int recipecounter) {
         this.name = name;
         this.singular = singular;
-        this.menge = menge;
+        this.amount = amount;
         this.recipecounter = recipecounter;
     }
 
@@ -84,32 +95,6 @@ public class Ingredient{
         return obj instanceof Ingredient && name.equals(((Ingredient) obj).name);
     }
 
-    public static Ingredient init(String name) throws SQLException, DBIngredient.IngredientNotFoundException {
-        try (DBIngredient db = new DBIngredient()) {
-            return db.getIngredient(name);
-        }
-    }
-
-    public static Ingredient init(String name, String amount) throws SQLException,
-            DBIngredient.IngredientNotFoundException {
-        try (DBIngredient db = new DBIngredient()) {
-            return db.get(name, amount);
-        }
-    }
-
-    public static List<Ingredient> loadByRecipe(String recipeName) throws SQLException {
-        try (DBIngredient db = new DBIngredient()) {
-            return db.getRecipeIngredients(recipeName);
-        }
-    }
-
-    public static List<Ingredient> loadByRecipe(String recipeName, int versionId) throws SQLException {
-        try (DBIngredient db = new DBIngredient()) {
-            return db.getRecipeIngredients(recipeName, versionId);
-        }
-    }
-
-
     public List<Ingredient> getChildren() throws SQLException {
         try (DBIngredient db = new DBIngredient()) {
             return db.getIngredientsByParent(name);
@@ -123,30 +108,6 @@ public class Ingredient{
         }
     }
 
-
-    public static List<Ingredient> loadParents() throws SQLException {
-        try (DBIngredient db = new DBIngredient()) {
-            return db.getParent();
-        }
-    }
-
-    public static List<Ingredient> loadParentswithData() throws SQLException {
-        List<Ingredient> parents = new LinkedList<>();
-        for (Ingredient in : loadParents())
-            try {
-                parents.add(Ingredient.init(in.name));
-            } catch (DBIngredient.IngredientNotFoundException e) {
-                //nope
-            }
-        return parents;
-    }
-
-    public static List<Ingredient> getAll() throws SQLException {
-        try (DBIngredient db = new DBIngredient()) {
-            return db.getAllIngredients();
-        }
-    }
-
     @JsonIgnore
     public List<String> getChildRecipes() throws SQLException {
         Set<String> children = Search.getChildren(name);
@@ -157,74 +118,5 @@ public class Ingredient{
         }
     }
 
-    public static int getTotal() throws SQLException {
-        DBGetRecipe db = new DBGetRecipe();
-        int total = db.getTotalIngredients();
-        db.close();
-        return total;
-    }
 
-	/*public static Ingredient initWithJSON(JSONObject ingredientJSON) {
-        String name = (String) ingredientJSON.get("name");
-		String menge = (String) ingredientJSON.get("menge");
-		return new Ingredient(name, null, menge);
-	}*/
-
-    private static Set<Ingredient> searchNGram(List<String> terms, int n, DBRecipe dbRecipe) throws SQLException {
-        SnowballProgram stemmer = new GermanStemmer();
-        Set<Ingredient> ingredients = new LinkedHashSet<>();
-
-        StringBuffer sb;
-        List<Integer> indexToDelete = new LinkedList<>();
-        for (int i = 0; i <= terms.size() - n; ++i) {
-            sb = new StringBuffer();
-            try {
-                sb.append(terms.get(i));
-            } catch (IndexOutOfBoundsException e) {
-                Logger.getLogger(Ingredient.class).error("terms: " + terms + " n:" + n + " i:" + i, e);
-            }
-            int j;
-            for (j = i + 1; j < i + n; ++j)
-                sb.append(' ').append(terms.get(j));
-            String nGram = sb.toString();
-            stemmer.setCurrent(nGram);
-            stemmer.stem();
-
-            String stem = stemmer.getCurrent();
-
-            try {
-                Ingredient ingredient = dbRecipe.getIngredientForStem(stem);
-                ingredients.add(ingredient);
-                for (int k = i; k < j; ++k)
-                    indexToDelete.add(k);
-            } catch (DBIngredient.IngredientNotFoundException e) {
-                //nothing to do
-            }
-
-        }
-
-        List<String> restTerms = new ArrayList<>();
-        for (int i = 0; i < terms.size(); ++i) {
-            if (!indexToDelete.contains(i))
-                restTerms.add(terms.get(i));
-        }
-
-        if (restTerms.size() > 0 && n > 1) {
-            ingredients.addAll(searchNGram(restTerms, Math.min(--n, restTerms.size() - 1), dbRecipe));
-        }
-
-        return ingredients;
-    }
-
-    public static Set<Ingredient> searchNGram(String q, int n) throws SQLException {
-        StringTokenizer tokenizer = new StringTokenizer(q.toLowerCase(), " ,.;/-!?+(){}*^[]");
-        List<String> terms = new ArrayList<>();
-        while (tokenizer.hasMoreElements()) {
-            terms.add(tokenizer.nextToken());
-        }
-        if (terms.size() == 0) return new HashSet<>();
-        try(DBRecipe dbRecipe = new DBRecipe()){
-            return searchNGram(terms, Math.min(n, terms.size()), dbRecipe);
-        }
-    }
 }

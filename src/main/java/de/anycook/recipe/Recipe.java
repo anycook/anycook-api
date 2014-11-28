@@ -18,11 +18,11 @@
 
 package de.anycook.recipe;
 
-import com.google.common.collect.ImmutableMap;
 import de.anycook.api.views.PublicView;
 import de.anycook.api.views.TasteNumView;
 import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBRecipe;
+import de.anycook.drafts.RecipeDraft;
 import de.anycook.image.Image;
 import de.anycook.image.RecipeImage;
 import de.anycook.user.User;
@@ -34,7 +34,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.Map;
 
 
 /**
@@ -261,19 +260,16 @@ public class Recipe implements Comparable<Recipe> {
         return name.hashCode();
     }
 
-    public Map<String, Object> asMap() {
-        ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-        builder.put("name", name);
-        builder.put("description", description);
-        builder.put("created", created);
-        builder.put("calorie", calorie);
-        builder.put("skill", skill);
-        builder.put("time", ImmutableMap.of("std", time.std, "min", time.min));
-        builder.put("category", category);
-        builder.put("persons", persons);
-        builder.put("id", id);
-        builder.put("author", author.getId());
+    public RecipeDraft asDraft() {
+        RecipeDraft recipeDraft = new RecipeDraft();
+        recipeDraft.setName(name);
+        recipeDraft.setDescription(description);
+        recipeDraft.setCalorie(calorie);
+        recipeDraft.setSkill(skill);
+        recipeDraft.setTime(time);
+        recipeDraft.setCategory(category);
+        recipeDraft.setPersons(persons);
 
-        return builder.build();
+        return recipeDraft;
     }
 }

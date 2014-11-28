@@ -56,8 +56,8 @@ public class DBSaveRecipe extends DBRecipe {
         pStatement.setInt(5, newRecipe.skill);
         pStatement.setInt(6, newRecipe.calorie);
         pStatement.setString(7, newRecipe.image);
-        pStatement.setInt(8, newRecipe.time.std);
-        pStatement.setInt(9, newRecipe.time.min);
+        pStatement.setInt(8, newRecipe.time.getStd());
+        pStatement.setInt(9, newRecipe.time.getMin());
         pStatement.setInt(10, newRecipe.persons);
         pStatement.setString(11, newRecipe.category);
         pStatement.setString(12, newRecipe.comment);
@@ -135,7 +135,7 @@ public class DBSaveRecipe extends DBRecipe {
         pStatement.setInt(2, versionId);
         pStatement.setString(3, recipeName);
         pStatement.setString(4, ingredient.name);
-        pStatement.setString(5, ingredient.menge);
+        pStatement.setString(5, ingredient.amount);
         pStatement.setInt(6, i);
         pStatement.executeUpdate();
     }
@@ -166,7 +166,7 @@ public class DBSaveRecipe extends DBRecipe {
         pStatement.setString(1, recipeName);
         pStatement.setInt(2, versionId);
         pStatement.setString(3, ingredient.name);
-        pStatement.setString(4, ingredient.menge);
+        pStatement.setString(4, ingredient.amount);
         pStatement.setInt(5, position);
         pStatement.executeUpdate();
         logger.info("added ingredient '" + ingredient.name + "' to " + recipeName);

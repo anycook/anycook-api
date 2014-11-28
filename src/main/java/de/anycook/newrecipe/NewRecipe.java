@@ -19,7 +19,7 @@
 package de.anycook.newrecipe;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import de.anycook.db.mongo.RecipeDrafts;
+import de.anycook.db.drafts.RecipeDraftsStore;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.discussion.Discussion;
 import de.anycook.news.life.Lifes;
@@ -27,6 +27,7 @@ import de.anycook.recipe.Recipes;
 import de.anycook.recipe.Time;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
+import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -46,7 +47,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NewRecipe {
 
-//	private static Logger logger = Logger.getLogger(NewRecipe.class);
+    private static Logger logger = Logger.getLogger(NewRecipe.class);
 
     public String name;
     public String description;
@@ -60,7 +61,7 @@ public class NewRecipe {
     public int calorie;
     public int persons;
     public String comment;
-    public String mongoid;
+    public String mongoId;
 
 
     @Override
@@ -75,7 +76,7 @@ public class NewRecipe {
         return name != null && description != null && category != null &&
                 steps != null && steps.size() > 0 && ingredients != null &&
                 ingredients.size() > 0 && tags != null && time != null &&
-                !(time.std == 0 && time.min == 0) && skill > 0 && skill <= 5 &&
+                !(time.getStd() == 0 && time.getMin() == 0) && skill > 0 && skill <= 5 &&
                 calorie > 0 && calorie <= 5 && persons > 0;
     }
 
@@ -98,10 +99,13 @@ public class NewRecipe {
 
         Recipes.suggestTags(name, tags, userId);
 
-        if (mongoid != null) {
-            RecipeDrafts drafts = new RecipeDrafts();
-            drafts.remove(userId, mongoid);
-            drafts.close();
+        if (mongoId != null) {
+
+            try(RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
+                draftsStore.deleteDraft(mongoId, userId);
+            } catch (Exception e) {
+                logger.error(e, e);
+            }
         }
 
         if (id == 0) {

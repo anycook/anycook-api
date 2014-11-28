@@ -16,10 +16,16 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.db.mongo;
+package de.anycook.db.drafts.mongo;
 
-import com.mongodb.*;
-import de.anycook.drafts.DraftRecipe;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.MapReduceCommand;
+import com.mongodb.MapReduceOutput;
+import de.anycook.db.drafts.RecipeDraftsStore;
+import de.anycook.drafts.RecipeDraft;
 import de.anycook.newrecipe.DraftNumberProvider;
 import org.bson.types.ObjectId;
 
@@ -27,7 +33,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Manages access to mongodb recipedraft collection
@@ -44,16 +49,17 @@ import java.util.Map;
  *
  * @author Jan Graßegger <jan@anycook.de>
  */
-public class RecipeDrafts extends Mongo implements AutoCloseable {
+public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore, AutoCloseable {
 
     private DBCollection coll;
 
-    public RecipeDrafts() {
+    public MongoDBRecipeDraftsStore() {
         super();
         coll = getCollection("recipedrafts");
     }
 
-    public List<DraftRecipe> getAll(int user_id) throws IOException {
+    @Override
+    public List<RecipeDraft> getDrafts(int user_id) throws IOException {
         String map = "function(){" +
                 "var percentage = 0;" +
                 "for(var key in this){" +
@@ -79,7 +85,7 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
                 new MapReduceCommand(coll, map, reduce, null, MapReduceCommand.OutputType.INLINE, query);
 
         MapReduceOutput out = coll.mapReduce(mapReduce);
-        List<DraftRecipe> drafts = new LinkedList<>();
+        List<RecipeDraft> drafts = new LinkedList<>();
 
         for (DBObject res : out.results()) {
             String id = res.get("_id").toString();
@@ -88,19 +94,30 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
             data.put("id", id);
             data.put("data", res.get("value"));
             drafts.add(data);*/
-            drafts.add(new DraftRecipe(res));
+            drafts.add(new RecipeDraft(res));
         }
         return drafts;
     }
 
-    public int count(int user_id) {
-        DBObject query = getQuery(user_id);
-        DBCursor results = coll.find(query);
-        int draftNum = results.count();
-        results.close();
-        return draftNum;
+    @Override
+    public RecipeDraft getDraft(String draft_id, int user_id) throws DraftNotFoundException {
+        DBObject query = getQuery(user_id, draft_id);
+        DBObject draftObject = coll.findOne(query);
+        if (draftObject == null) {
+            throw new DraftNotFoundException(draft_id, user_id);
+        }
+        return new RecipeDraft(draftObject);
     }
 
+    @Override
+    public int countDrafts(int userId) {
+        DBObject query = getQuery(userId);
+        try (DBCursor results = coll.find(query)) {
+            return results.count();
+        }
+    }
+
+    @Override
     public String newDraft(int user_id) throws SQLException {
         long time = System.currentTimeMillis();
         DBObject obj = new BasicDBObject("user_id", user_id)
@@ -112,42 +129,30 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
         return id.toString();
     }
 
+    @Override
+    public void updateDraft(String id, RecipeDraft data) {
+        DBObject updateObj = new BasicDBObject();
+        data.write(updateObj);
+        update(updateObj, data.getUserId(), id);
+    }
+
     private void update(DBObject updateObj, int user_id, String draft_id) {
         DBObject query = getQuery(user_id, draft_id);
         DBObject set = new BasicDBObject("$set", updateObj);
         coll.update(query, set);
     }
 
-    public void update(DraftRecipe data, int user_id, String draft_id) {
-        DBObject updateObj = new BasicDBObject();
-        data.write(updateObj);
-        update(updateObj, user_id, draft_id);
-    }
-
-    public void update(Map<String, Object> data, int user_id, String draft_id) {
-        DBObject updateObj = new BasicDBObject(data);
-        update(updateObj, user_id, draft_id);
-    }
-
-//	public void update(String key, List<?> valueList, int user_id, String draft_id){
-//		DBObject updateObj = new BasicDBObject(key, valueList);
-//		update(updateObj, user_id, draft_id);
-//	}
-
-//	public void update(String key, String value, int user_id, String draft_id){
-//		DBObject updateObj = new BasicDBObject(key, value);
-//		update(updateObj, user_id, draft_id);
-//	}
-
-    public void update(String key, Object value, int user_id, String draft_id) {
-        DBObject updateObj = new BasicDBObject(key, value);
-        update(updateObj, user_id, draft_id);
-    }
-
-    public void remove(int user_id, String draft_id) throws SQLException {
-        DBObject query = getQuery(user_id, draft_id);
+    @Override
+    public void deleteDraft(String id, int userId) throws SQLException {
+        DBObject query = getQuery(userId, id);
         coll.remove(query);
-        DraftNumberProvider.INSTANCE.wakeUpSuspended(user_id);
+        DraftNumberProvider.INSTANCE.wakeUpSuspended(userId);
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        coll = null;
     }
 
     private static DBObject getQuery(int user_id) {
@@ -157,17 +162,4 @@ public class RecipeDrafts extends Mongo implements AutoCloseable {
     private static DBObject getQuery(int user_id, String draft_id) {
         return new BasicDBObject("_id", new ObjectId(draft_id)).append("user_id", user_id);
     }
-
-    public DraftRecipe loadDraft(String draft_id, int user_id) {
-        DBObject query = getQuery(user_id, draft_id);
-        return new DraftRecipe(coll.findOne(query));
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        coll = null;
-    }
-
-
 }

@@ -30,7 +30,9 @@ import de.anycook.notifications.Notification;
 import de.anycook.recipe.Recipe;
 import de.anycook.recipe.Recipes;
 import de.anycook.recipe.ingredient.Ingredient;
+import de.anycook.recipe.ingredient.Ingredients;
 import de.anycook.recipe.step.Step;
+import de.anycook.recipe.step.Steps;
 import de.anycook.recipe.tag.Tag;
 import de.anycook.session.Session;
 import de.anycook.sitemap.SiteMapGenerator;
@@ -189,7 +191,7 @@ public class RecipeApi {
 	@Path("{recipeName}/ingredients")
 	public List<Ingredient> getRecipeIngredients(@PathParam("recipeName") String recipeName){
         try {
-            return Ingredient.loadByRecipe(recipeName);
+            return Ingredients.loadByRecipe(recipeName);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -285,7 +287,7 @@ public class RecipeApi {
 	@Path("{recipeName}/steps")
 	public List<Step> getRecipeSteps(@PathParam("recipeName") String recipeName){
         try {
-            return Step.loadRecipeSteps(recipeName);
+            return Steps.loadRecipeSteps(recipeName);
         } catch (SQLException e) {
             logger.error(e ,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -369,7 +371,7 @@ public class RecipeApi {
     public List<Ingredient> getVersionIngredients(@PathParam("recipeName") String recipeName,
                                @PathParam("versionId") int versionId){
         try {
-            return Ingredient.loadByRecipe(recipeName, versionId);
+            return Ingredients.loadByRecipe(recipeName, versionId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -381,7 +383,7 @@ public class RecipeApi {
     public List<Step> getVersionSteps(@PathParam("recipeName") String recipeName,
                                     @PathParam("versionId") int versionId){
         try {
-            return Step.loadRecipeSteps(recipeName, versionId);
+            return Steps.loadRecipeSteps(recipeName, versionId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

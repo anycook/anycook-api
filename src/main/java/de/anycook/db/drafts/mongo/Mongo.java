@@ -16,7 +16,7 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.db.mongo;
+package de.anycook.db.drafts.mongo;
 
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
@@ -44,10 +44,6 @@ public class Mongo {
 
     public void close() {
         client.close();
-    }
-
-    protected void finalize() throws Throwable {
-        close();
     }
 
 }

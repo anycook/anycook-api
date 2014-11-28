@@ -23,6 +23,7 @@ import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.recipe.Recipe;
 import de.anycook.recipe.step.Step;
+import de.anycook.recipe.step.Steps;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.*;
@@ -85,7 +86,7 @@ public class FulltextIndex {
 
             String date = DateTools.dateToString(new Date(), Resolution.DAY);
 
-            List<Step> steps = Step.loadRecipeSteps(recipeName);
+            List<Step> steps = Steps.loadRecipeSteps(recipeName);
             StringBuilder stepText = new StringBuilder();
             for(Step step : steps)
                 stepText.append(" ").append(step.getText());
@@ -140,7 +141,7 @@ public class FulltextIndex {
         try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
             Recipe recipe = dbGetRecipe.get(recipeName);
 
-            List<Step> steps = Step.loadRecipeSteps(recipeName);
+            List<Step> steps = Steps.loadRecipeSteps(recipeName);
             StringBuilder stepText = new StringBuilder();
             for(Step step : steps)
                 stepText.append(" ").append(step.getText());

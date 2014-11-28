@@ -1,23 +1,25 @@
 package de.anycook.recipe;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.anycook.conf.Configuration;
-import de.anycook.db.mongo.RecipeDrafts;
+import de.anycook.db.drafts.RecipeDraftsStore;
 import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.db.mysql.DBTag;
 import de.anycook.db.mysql.DBUser;
+import de.anycook.drafts.IngredientDraft;
+import de.anycook.drafts.RecipeDraft;
+import de.anycook.drafts.StepDraft;
 import de.anycook.notifications.Notification;
-import de.anycook.recipe.ingredient.Ingredient;
-import de.anycook.recipe.step.Step;
+import de.anycook.recipe.ingredient.Ingredients;
+import de.anycook.recipe.step.Steps;
 import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -32,44 +34,50 @@ import java.util.Set;
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
-public class Recipes {
+public final class Recipes {
+    private Recipes() {
+
+    }
+
     public static String initDraftWithRecipe(String recipeName, Integer versionId, int userId)
-            throws SQLException, DBRecipe.RecipeNotFoundException {
+        throws SQLException, DBRecipe.RecipeNotFoundException, IOException {
 
         Recipe recipe;
-        List<Step> steps;
-        List<Ingredient> ingredients;
+        List<StepDraft> steps;
+        List<IngredientDraft> ingredients;
 
 
         if (versionId == null) {
             recipe = Recipe.init(recipeName);
-            steps = Step.loadRecipeSteps(recipeName);
-            ingredients = Ingredient.loadByRecipe(recipeName);
+            steps = Steps.loadStepDrafts(recipeName);
+            ingredients = Ingredients.loadIngredientDrafts(recipeName);
         } else {
             recipe = Recipe.init(recipeName, versionId);
-            steps = Step.loadRecipeSteps(recipeName, versionId);
-            ingredients = Ingredient.loadByRecipe(recipeName, versionId);
+            steps = Steps.loadStepDrafts(recipeName, versionId);
+            ingredients = Ingredients.loadIngredientDrafts(recipeName, versionId);
         }
 
         if (recipe == null || steps == null || ingredients == null) {
             return null;
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        List<Map<String, Object>> stepList = mapper.convertValue(steps, new TypeReference<List<Map<String, Object>>>(){});
-        List<Map<String, Object>> ingredientList = mapper.convertValue(ingredients, new TypeReference<List<Map<String, Object>>>(){});
 
-        try (RecipeDrafts drafts = new RecipeDrafts()) {
-            String draft_id = drafts.newDraft(userId);
+        try (RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
 
-            drafts.update(recipe.asMap(), userId, draft_id);
-            drafts.update("steps", stepList, userId, draft_id);
-            drafts.update("ingredients", ingredientList, userId, draft_id);
+            String draftId = draftsStore.newDraft(userId);
 
-            String image = getImageName(recipeName);
-            drafts.update("image", image, userId, draft_id);
+            RecipeDraft recipeDraft = recipe.asDraft();
+            recipeDraft.setId(draftId);
+            recipeDraft.setUserId(userId);
+            recipeDraft.setSteps(steps);
+            recipeDraft.setIngredients(ingredients);
+            recipeDraft.setImage(getImageName(recipeName));
 
-            return draft_id;
+            draftsStore.updateDraft(draftId, recipeDraft);
+
+            return recipeDraft.getId();
+        } catch (Exception e) {
+            throw new IOException(e);
         }
     }
 
@@ -267,4 +275,6 @@ public class Recipes {
             return dbGetRecipe.getLastModified();
         }
     }
+
+
 }

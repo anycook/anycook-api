@@ -164,7 +164,7 @@ public class Query {
 
     //time
     public boolean hasTime() {
-        return time != null && time.std + time.min > 0;
+        return time != null && time.getStd() + time.getMin() > 0;
     }
 
     public Time getTime() {

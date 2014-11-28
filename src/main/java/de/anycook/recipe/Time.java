@@ -18,9 +18,12 @@
 
 package de.anycook.recipe;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+
+@DynamoDBDocument
 public class Time{
-    public int std;
-    public int min;
+    private int std;
+    private int min;
 
     public Time() {}
 
@@ -29,5 +32,19 @@ public class Time{
         this.min = min;
     }
 
+    public int getStd() {
+        return std;
+    }
 
+    public void setStd(int std) {
+        this.std = std;
+    }
+
+    public int getMin() {
+        return min;
+    }
+
+    public void setMin(int min) {
+        this.min = min;
+    }
 }

@@ -21,9 +21,15 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBIngredient;
 import de.anycook.recipe.ingredient.Ingredient;
+import de.anycook.recipe.ingredient.Ingredients;
 import org.apache.log4j.Logger;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -36,19 +42,19 @@ import java.util.Set;
 public class IngredientApi {
 
     private Logger logger = Logger.getLogger(getClass());
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<Ingredient> getAll(@QueryParam("parent") boolean parent,
                                    @Context Request request){
 		 try {
-             return parent ? Ingredient.loadParents() : Ingredient.getAll();
+             return parent ? Ingredients.loadParents() : Ingredients.getAll();
         } catch (SQLException e) {
             logger.error(e);
              throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
-	
+
 	/**
 	 * Number of ingredients
 	 * @return
@@ -58,25 +64,25 @@ public class IngredientApi {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Integer getNum(){
         try {
-            return Ingredient.getTotal();
+            return Ingredients.getTotal();
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("extract")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Set<Ingredient> extractIngredients(@QueryParam("q") String query){
         try {
-            return Ingredient.searchNGram(query, 3);
+            return Ingredients.searchNGram(query, 3);
         } catch (SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("{ingredientName}")
 	@Produces(MediaType.APPLICATION_JSON)

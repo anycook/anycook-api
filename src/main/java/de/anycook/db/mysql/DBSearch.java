@@ -161,9 +161,9 @@ public class DBSearch extends DBHandler {
                 "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = id " +
                 "LEFT JOIN schmeckt ON schmeckt.gerichte_name = name " +
                 "WHERE (std<?) OR (std=? AND min<=?) GROUP BY gerichte.name ORDER BY COUNT(schmeckt.users_id) DESC");
-        pStatement.setInt(1, time.std);
-        pStatement.setInt(2, time.std);
-        pStatement.setInt(3, time.min);
+        pStatement.setInt(1, time.getStd());
+        pStatement.setInt(2, time.getStd());
+        pStatement.setInt(3, time.getStd());
         ResultSet data = pStatement.executeQuery();
         while (data.next())
             recipes.add(data.getString(1));

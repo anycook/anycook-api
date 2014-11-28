@@ -19,16 +19,26 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
-import de.anycook.db.mongo.RecipeDrafts;
+import de.anycook.db.drafts.RecipeDraftsStore;
 import de.anycook.db.mysql.DBRecipe;
-import de.anycook.drafts.DraftRecipe;
+import de.anycook.drafts.RecipeDraft;
 import de.anycook.newrecipe.DraftNumberProvider;
 import de.anycook.recipe.Recipes;
 import de.anycook.session.Session;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
@@ -47,28 +57,27 @@ public class DraftApi {
     public DraftApi(){
 		logger = Logger.getLogger(getClass());
 	}
-	
+
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<DraftRecipe> get(){
+	public List<RecipeDraft> get(){
 
-		try(RecipeDrafts drafts = new RecipeDrafts()){
-            return drafts.getAll(session.getUser().getId());
-        } catch (IOException e){
+		try(RecipeDraftsStore drafts = RecipeDraftsStore.getRecipeDraftStore()){
+            return drafts.getDrafts(session.getUser().getId());
+        } catch (Exception e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-	}
-	
+    }
+
 	@PUT
 	public String newDraft(@Context HttpServletRequest request){
-		try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
+		try(RecipeDraftsStore recipeDrafts = RecipeDraftsStore.getRecipeDraftStore()){
             return recipeDrafts.newDraft(session.getUser().getId());
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     @GET
@@ -77,24 +86,27 @@ public class DraftApi {
     public void getDraftNum(@QueryParam("lastNum") Integer lastNum,
                             @Suspended AsyncResponse asyncResponse){
         int userId = session.getUser().getId();
-        RecipeDrafts drafts = new RecipeDrafts();
-
-        int newNum = drafts.count(userId);
-        if(lastNum == null || newNum != lastNum) asyncResponse.resume(String.valueOf(newNum));
-        else DraftNumberProvider.INSTANCE.suspend(userId, asyncResponse);
+        try(RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
+            int newNum = draftsStore.countDrafts(userId);
+            if (lastNum == null || newNum != lastNum) asyncResponse.resume(String.valueOf(newNum));
+            else DraftNumberProvider.INSTANCE.suspend(userId, asyncResponse);
+        } catch (Exception e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
-	
+
 	@PUT
 	@Path("{recipeName}")
 	public String initWithRecipe(@PathParam("recipeName") String recipeName,
-                                 @FormParam("versionid") Integer versionid){
+                                 @FormParam("versionid") Integer versionId){
 		if(recipeName == null) throw new WebApplicationException(400);
 
         try {
             int user_id = session.getUser().getId();
 
-            return Recipes.initDraftWithRecipe(recipeName, versionid, user_id);
-        } catch (SQLException e) {
+            return Recipes.initDraftWithRecipe(recipeName, versionId, user_id);
+        } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
@@ -102,41 +114,49 @@ public class DraftApi {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
-	
+
 	@GET
 	@Path("{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public DraftRecipe getDraft(@PathParam("id") String draft_id){
-        try (RecipeDrafts recipeDrafts = new RecipeDrafts()) {
+	public RecipeDraft getDraft(@PathParam("id") String id){
+        try (RecipeDraftsStore recipeDrafts = RecipeDraftsStore.getRecipeDraftStore()) {
             int userId = session.getUser().getId();
-			return recipeDrafts.loadDraft(draft_id, userId);
-		}
+			return recipeDrafts.getDraft(id, userId);
+		} catch (Exception e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
     }
-	
+
 	@POST
 	@Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-	public Response setData(DraftRecipe draftData, @PathParam("id") String draft_id){
+	public Response setData(RecipeDraft draft, @PathParam("id") String id){
 
-		try (RecipeDrafts drafts = new RecipeDrafts()) {
+
+		try (RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
 			int userId = session.getUser().getId();
-			drafts.update(draftData, userId, draft_id);
-		}
+            draft.setUserId(userId);
+			draftsStore.updateDraft(id, draft);
+		} catch (Exception e) {
+            logger.error(e, e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        }
 
         return Response.ok("true").build();
 	}
-	
+
 	@DELETE
 	@Path("{id}")
-	public void remove(@PathParam("id") String draft_id){
-        try(RecipeDrafts recipeDrafts = new RecipeDrafts()){
-            int user_id = session.getUser().getId();
-            recipeDrafts.remove(user_id, draft_id);
-        } catch (SQLException e) {
+	public void remove(@PathParam("id") String id){
+        try(RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()){
+            int userId = session.getUser().getId();
+            draftsStore.deleteDraft(id, userId);
+        } catch (Exception e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 
     }
-	
+
 }
