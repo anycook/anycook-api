@@ -52,12 +52,7 @@ public enum MessageSessionProvider {
     public void suspend(int userId, AsyncResponse response){
         logger.debug("supending "+userId);
         try {
-            BlockingQueue<AsyncResponse> queue =  suspended.get(userId, new Callable<BlockingQueue<AsyncResponse>>() {
-                @Override
-                public BlockingQueue<AsyncResponse> call() throws Exception {
-                    return new ArrayBlockingQueue<>(1000);
-                }
-            });
+            BlockingQueue<AsyncResponse> queue =  suspended.get(userId, () -> new ArrayBlockingQueue<>(1000));
             queue.add(response);
             suspended.put(userId, queue);
         } catch (ExecutionException e) {

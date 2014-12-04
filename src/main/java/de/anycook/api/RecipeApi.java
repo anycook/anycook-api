@@ -57,6 +57,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -189,12 +190,25 @@ public class RecipeApi {
 
 	@GET
 	@Path("{recipeName}/ingredients")
-	public List<Ingredient> getRecipeIngredients(@PathParam("recipeName") String recipeName){
+	public List<Ingredient> getRecipeIngredients(@Context Request request,
+                                                 @PathParam("recipeName") String recipeName){
+
+
         try {
+            long lastChange = Recipe.init(recipeName).getLastChange();
+            Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(new Date(lastChange));
+
+            if (responseBuilder != null) {
+                throw new WebApplicationException(responseBuilder.build());
+            }
+
             return Ingredients.loadByRecipe(recipeName);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+        } catch (DBRecipe.RecipeNotFoundException e) {
+            logger.warn(e, e);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
 
