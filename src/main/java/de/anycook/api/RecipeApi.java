@@ -190,19 +190,21 @@ public class RecipeApi {
 
 	@GET
 	@Path("{recipeName}/ingredients")
-	public List<Ingredient> getRecipeIngredients(@Context Request request,
+	public Response getRecipeIngredients(@Context Request request,
                                                  @PathParam("recipeName") String recipeName){
 
 
         try {
             long lastChange = Recipe.init(recipeName).getLastChange();
-            Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(new Date(lastChange));
+            Date lastChangeDate = new Date(lastChange);
+            Response.ResponseBuilder responseBuilder = request.evaluatePreconditions(lastChangeDate);
 
             if (responseBuilder != null) {
                 throw new WebApplicationException(responseBuilder.build());
             }
 
-            return Ingredients.loadByRecipe(recipeName);
+            return Response.ok(new GenericEntity<List<Ingredient>>(Ingredients.loadByRecipe(recipeName)){})
+                .lastModified(lastChangeDate).build();
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
