@@ -43,8 +43,9 @@ public class DBDiscover extends DBRecipe {
             connection.prepareCall("SELECT versions.id AS id, beschreibung, " +
                 "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
                 "gerichte.eingefuegt AS created, min, std, skill, kalorien, gerichte.name AS name, " +
-                "personen, kategorien_name, active_id, users_id, nickname, users.image, COUNT(users_id) AS counter, " +
+                "personen, kategorien_name, active_id, users_id, nickname, users.image, " +
                 "viewed, last_change, " +
+                "(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name) AS counter, " +
                 "(SELECT COUNT(users_id) FROM schmeckt WHERE schmeckt.gerichte_name = gerichte.name " +
                 "AND schmeckt.users_id = ?) AS tastes " +
                 "FROM gerichte " +
