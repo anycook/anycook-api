@@ -144,19 +144,19 @@ public class DBIngredient extends DBHandler {
         return ingredients;
     }
 
-    public List<Ingredient> getAllIngredients() {
+    public List<Ingredient> getAllIngredients() throws SQLException {
         List<Ingredient> ingredients = new ArrayList<>();
-        try {
-            PreparedStatement pStatement = connection.prepareStatement("SELECT name FROM zutaten");
-            ResultSet data = pStatement.executeQuery();
-            while (data.next()) {
-                ingredients.add(new Ingredient(data.getString("name")));
-            }
-
-
-        } catch (SQLException e) {
-            logger.error("execute MySQL-query failed at setParentZutat.", e);
+        PreparedStatement pStatement =
+                connection.prepareStatement("SELECT name, singular, parent_zutaten_name FROM zutaten");
+        ResultSet data = pStatement.executeQuery();
+        while (data.next()) {
+            Ingredient ingredient = new Ingredient(data.getString("name"));
+            ingredient.setSingular(data.getString("singular"));
+            ingredient.setParent(data.getString("parent_zutaten_name"));
+            ingredients.add(ingredient);
         }
+
+
         return ingredients;
     }
 

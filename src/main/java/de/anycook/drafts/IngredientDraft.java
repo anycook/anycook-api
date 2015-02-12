@@ -16,8 +16,8 @@ public class IngredientDraft {
     }
 
     public IngredientDraft(Ingredient ingredient) {
-        this.name = ingredient.name;
-        this.amount = ingredient.amount;
+        this.name = ingredient.getName();
+        this.amount = ingredient.getAmount();
     }
 
     public String getName() {

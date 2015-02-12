@@ -18,15 +18,11 @@
 
 package de.anycook.recipe.ingredient;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.anycook.api.views.PublicView;
 import de.anycook.db.mysql.DBIngredient;
-import de.anycook.db.mysql.DBSearch;
-import de.anycook.search.Search;
 
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class Ingredient{
 
@@ -43,47 +39,101 @@ public class Ingredient{
         }
     }
 
-    public String name = null;
-    public String singular = null;
-    public String amount = null;
-    public Integer recipecounter = null;
-    public List<String> recipes = null;
+    private String name = null;
+
+    @PublicView
+    private String singular = null;
+
+    private String amount = null;
+
+    @PublicView
+    private String parent = null;
+    private Integer recipeCounter = null;
+
+    @PublicView
+    private List<String> recipes = null;
 
     public Ingredient() {
     }
 
     public Ingredient(String name) {
         this(name, null);
-
     }
 
     public Ingredient(String name, String amount) {
-        this(name, amount, -1);
+        this(name, amount, null, null);
     }
 
-    public Ingredient(String name, String singular, int gerichte) {
-        this(name, singular, null, gerichte);
+    public Ingredient(String name, String singular, Integer recipeCounter) {
+        this(name, singular, null, recipeCounter);
     }
 
-    public Ingredient(String name, String singular, List<String> gerichte) {
+    public Ingredient(String name, String singular, List<String> recipes) {
         this.name = name;
         this.singular = singular;
-        this.recipes = gerichte;
-        this.recipecounter = gerichte.size();
+        this.recipes = recipes;
+        this.recipeCounter = recipes.size();
 
     }
 
     public Ingredient(String name, String singular, String amount) {
-        this(name, singular, amount, -1);
+        this(name, singular, amount, null);
     }
 
-    public Ingredient(String name, String singular, String amount, int recipecounter) {
+    public Ingredient(String name, String singular, String amount, Integer recipeCounter) {
         this.name = name;
         this.singular = singular;
         this.amount = amount;
-        this.recipecounter = recipecounter;
+        this.recipeCounter = recipeCounter;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSingular() {
+        return singular;
+    }
+
+    public void setSingular(String singular) {
+        this.singular = singular;
+    }
+
+    public String getAmount() {
+        return amount;
+    }
+
+    public void setAmount(String amount) {
+        this.amount = amount;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public void setParent(String parent) {
+        this.parent = parent;
+    }
+
+    public Integer getRecipeCounter() {
+        return recipeCounter;
+    }
+
+    public void setRecipeCounter(Integer recipeCounter) {
+        this.recipeCounter = recipeCounter;
+    }
+
+    public List<String> getRecipes() {
+        return this.recipes;
+    }
+
+    public void setRecipes(List<String> recipes) {
+        this.recipes = recipes;
+    }
 
     @Override
     public int hashCode() {
@@ -95,28 +145,22 @@ public class Ingredient{
         return obj instanceof Ingredient && name.equals(((Ingredient) obj).name);
     }
 
-    public List<Ingredient> getChildren() throws SQLException {
-        try (DBIngredient db = new DBIngredient()) {
-            return db.getIngredientsByParent(name);
-        }
-    }
-
-    @JsonIgnore
+    /*@JsonIgnore
     public List<String> getRecipes() throws SQLException {
         try (DBSearch db = new DBSearch()) {
             return new LinkedList<>(db.getRecipesByIngredient(name));
         }
+    }*/
+
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "name='" + name + '\'' +
+                ", singular='" + singular + '\'' +
+                ", amount='" + amount + '\'' +
+                ", parent='" + parent + '\'' +
+                ", recipeCounter=" + recipeCounter +
+                ", recipes=" + recipes +
+                '}';
     }
-
-    @JsonIgnore
-    public List<String> getChildRecipes() throws SQLException {
-        Set<String> children = Search.getChildren(name);
-        children.add(name);
-
-        try (DBSearch db = new DBSearch()) {
-            return new LinkedList<>(db.getRecipesByIngredients(children));
-        }
-    }
-
-
 }

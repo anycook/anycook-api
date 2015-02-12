@@ -134,8 +134,8 @@ public class DBSaveRecipe extends DBRecipe {
         pStatement.setInt(1, stepId);
         pStatement.setInt(2, versionId);
         pStatement.setString(3, recipeName);
-        pStatement.setString(4, ingredient.name);
-        pStatement.setString(5, ingredient.amount);
+        pStatement.setString(4, ingredient.getName());
+        pStatement.setString(5, ingredient.getAmount());
         pStatement.setInt(6, i);
         pStatement.executeUpdate();
     }
@@ -157,7 +157,7 @@ public class DBSaveRecipe extends DBRecipe {
 
 
         try (DBIngredient dbIngredient = new DBIngredient()) {
-            if (!dbIngredient.exists(ingredient.name)) dbIngredient.newIngredient(ingredient.name);
+            if (!dbIngredient.exists(ingredient.getName())) dbIngredient.newIngredient(ingredient.getName());
         }
 
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO versions_has_zutaten" +
@@ -165,11 +165,11 @@ public class DBSaveRecipe extends DBRecipe {
 
         pStatement.setString(1, recipeName);
         pStatement.setInt(2, versionId);
-        pStatement.setString(3, ingredient.name);
-        pStatement.setString(4, ingredient.amount);
+        pStatement.setString(3, ingredient.getName());
+        pStatement.setString(4, ingredient.getAmount());
         pStatement.setInt(5, position);
         pStatement.executeUpdate();
-        logger.info("added ingredient '" + ingredient.name + "' to " + recipeName);
+        logger.info("added ingredient '" + ingredient.getName() + "' to " + recipeName);
     }
 
     public void addTags(String recipeName, Set<String> tags, int userId) throws SQLException {

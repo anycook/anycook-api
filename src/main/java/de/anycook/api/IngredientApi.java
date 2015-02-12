@@ -19,6 +19,7 @@
 package de.anycook.api;
 
 import de.anycook.api.util.MediaType;
+import de.anycook.api.views.PublicView;
 import de.anycook.db.mysql.DBIngredient;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.ingredient.Ingredients;
@@ -31,8 +32,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import java.lang.annotation.Annotation;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
@@ -45,10 +48,18 @@ public class IngredientApi {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Ingredient> getAll(@QueryParam("parent") boolean parent,
+	public Response getAll(@QueryParam("parent") boolean parent,
+                                   @QueryParam("detailed") boolean detailed,
                                    @Context Request request){
+        Annotation[] annotations = detailed ?
+                new Annotation[]{PublicView.Factory.get()} : new Annotation[]{};
+
 		 try {
-             return parent ? Ingredients.loadParents() : Ingredients.getAll();
+             List<Ingredient> ingredients = parent ?
+                     Ingredients.loadParents() : Ingredients.getAll();
+
+             return Response.ok().entity(new GenericEntity<List<Ingredient>>(ingredients){}, annotations)
+                     .build();
         } catch (SQLException e) {
             logger.error(e);
              throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);

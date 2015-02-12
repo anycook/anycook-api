@@ -33,12 +33,6 @@ public final class Ingredients {
         return total;
     }
 
-	/*public static Ingredient initWithJSON(JSONObject ingredientJSON) {
-        String name = (String) ingredientJSON.get("name");
-		String amount = (String) ingredientJSON.get("amount");
-		return new Ingredient(name, null, amount);
-	}*/
-
     private static Set<Ingredient> searchNGram(List<String> terms, int n, DBRecipe dbRecipe) throws SQLException {
         SnowballProgram stemmer = new GermanStemmer();
         Set<Ingredient> ingredients = new LinkedHashSet<>();
@@ -113,7 +107,7 @@ public final class Ingredients {
         List<Ingredient> parents = new LinkedList<>();
         for (Ingredient in : loadParents())
             try {
-                parents.add(Ingredient.init(in.name));
+                parents.add(Ingredient.init(in.getName()));
             } catch (DBIngredient.IngredientNotFoundException e) {
                 //nope
             }
