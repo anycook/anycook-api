@@ -24,7 +24,9 @@ import de.anycook.location.Location;
 import de.anycook.recipe.Recipe;
 import de.anycook.session.Session;
 import de.anycook.user.User;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
@@ -37,7 +39,7 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class DiscoverApi {
 
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LogManager.getLogger(getClass());
 
     @Context
     private Session session;

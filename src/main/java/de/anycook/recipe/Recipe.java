@@ -26,14 +26,16 @@ import de.anycook.drafts.RecipeDraft;
 import de.anycook.image.Image;
 import de.anycook.image.RecipeImage;
 import de.anycook.user.User;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+
+import java.sql.SQLException;
+import java.util.Date;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.sql.SQLException;
-import java.util.Date;
 
 
 /**
@@ -44,17 +46,20 @@ import java.util.Date;
 @XmlRootElement
 public class Recipe implements Comparable<Recipe> {
 
-    public static Recipe init(String recipeName) throws SQLException, DBRecipe.RecipeNotFoundException {
+    public static Recipe init(String recipeName)
+            throws SQLException, DBRecipe.RecipeNotFoundException {
         return init(recipeName, -1);
     }
 
-    public static Recipe init(String recipeName, int loginId) throws SQLException, DBRecipe.RecipeNotFoundException {
+    public static Recipe init(String recipeName, int loginId)
+            throws SQLException, DBRecipe.RecipeNotFoundException {
         try (DBGetRecipe db = new DBGetRecipe()) {
             return db.get(recipeName, loginId);
         }
     }
 
-    public static Recipe init(String recipeName, int versionId, int loginId) throws SQLException, DBRecipe.RecipeNotFoundException {
+    public static Recipe init(String recipeName, int versionId, int loginId)
+            throws SQLException, DBRecipe.RecipeNotFoundException {
         try (DBGetRecipe db = new DBGetRecipe()) {
             return db.getVersionData(recipeName, versionId, loginId);
         }
@@ -93,8 +98,10 @@ public class Recipe implements Comparable<Recipe> {
     public Recipe() {
     }
 
-    public Recipe(int id, String name, String description, String image, int person, Date created, Date lastChange,
-                  String category, int skill, int calorie, Time time, int activeId, int views, User author, boolean tasty) {
+    public Recipe(int id, String name, String description, String image, int person, Date created,
+                  Date lastChange,
+                  String category, int skill, int calorie, Time time, int activeId, int views,
+                  User author, boolean tasty) {
         this.name = name;
         this.description = description;
         this.image = new RecipeImage(image);
@@ -152,10 +159,10 @@ public class Recipe implements Comparable<Recipe> {
     @XmlElement
     @TasteNumView
     public int getTasteNum() {
-        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
             return dbGetRecipe.getTasteNum(name);
         } catch (SQLException e) {
-            Logger.getLogger(getClass()).error(e, e);
+            LogManager.getLogger(getClass()).error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 

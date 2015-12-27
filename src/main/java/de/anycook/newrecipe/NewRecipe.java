@@ -19,6 +19,7 @@
 package de.anycook.newrecipe;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import de.anycook.db.drafts.RecipeDraftsStore;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.discussion.Discussion;
@@ -27,18 +28,22 @@ import de.anycook.recipe.Recipes;
 import de.anycook.recipe.Time;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 
 /**
- * beinhaltet Daten, die während der Rezpterstellung vom User erzeugt und speichert diese zwischen. Beinhaltet ausserdem alle Funktionen die zur Rezeoterstellung benoetigt.
+ * beinhaltet Daten, die während der Rezpterstellung vom User erzeugt und speichert diese zwischen.
+ * Beinhaltet ausserdem alle Funktionen die zur Rezeoterstellung benoetigt.
  *
  * @author Jan Grassegger
  */
@@ -47,7 +52,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NewRecipe {
 
-    private static Logger logger = Logger.getLogger(NewRecipe.class);
+    private static Logger logger = LogManager.getLogger(NewRecipe.class);
 
     public String name;
     public String description;
@@ -66,42 +71,44 @@ public class NewRecipe {
 
     @Override
     public String toString() {
-        return String.format("description: %s, image: %s, steps: %s," +
-                "ingredients: %s, time: %s, skill: %s, calorie: %s," +
-                "persons: %s, tags: %s, comments: %s", description, image, steps,
-                ingredients, time, skill, calorie, persons, tags, comment);
+        return String.format(                                                     "description: %s, image: %s, steps: %s," +
+                             "ingredients: %s, time: %s, skill: %s, calorie: %s," +
+                             "persons: %s, tags: %s, comments: %s", description, image, steps,
+                             ingredients, time, skill, calorie, persons, tags, comment);
     }
 
     private boolean check() {
         return name != null && description != null && category != null &&
-                steps != null && steps.size() > 0 && ingredients != null &&
-                ingredients.size() > 0 && tags != null && time != null &&
-                !(time.getStd() == 0 && time.getMin() == 0) && skill > 0 && skill <= 5 &&
-                calorie > 0 && calorie <= 5 && persons > 0;
+               steps != null && steps.size() > 0 && ingredients != null &&
+               ingredients.size() > 0 && tags != null && time != null &&
+               !(time.getStd() == 0 && time.getMin() == 0) && skill > 0 && skill <= 5 &&
+               calorie > 0 && calorie <= 5 && persons > 0;
     }
 
 
-    public int save(int userId) throws SQLException, IOException, ParseException, InvalidRecipeException {
-        if (!check()) throw new InvalidRecipeException(name);
+    public int save(int userId)
+            throws SQLException, IOException, ParseException, InvalidRecipeException {
+        if (!check()) {
+            throw new InvalidRecipeException(name);
+        }
 
         int id = 0;
 
         try (DBSaveRecipe db = new DBSaveRecipe()) {
-            if (!db.check(name))
+            if (!db.check(name)) {
                 db.newRecipe(name);
-            else
+            } else {
                 id = db.getLastId(name) + 1;
-
+            }
 
             db.newVersion(id, this, userId);
         }
-
 
         Recipes.suggestTags(name, tags, userId);
 
         if (mongoId != null) {
 
-            try(RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
+            try (RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
                 draftsStore.deleteDraft(mongoId, userId);
             } catch (Exception e) {
                 logger.error(e, e);
@@ -111,23 +118,16 @@ public class NewRecipe {
         if (id == 0) {
             Discussion.addNewRecipeEvent(name, userId, comment, id);
             Lifes.addLife(Lifes.CaseType.NEW_RECIPE, userId, name, id);
-        }
-        else {
+        } else {
             Discussion.addNewVersionEvent(name, userId, comment, id);
             Lifes.addLife(Lifes.CaseType.NEW_VERSION, userId, name, id);
         }
-
 
         return id;
     }
 
     /**
      * Saves recipes from anonymous users
-     *
-     * @return
-     * @throws java.sql.SQLException
-     * @throws java.io.IOException
-     * @throws org.apache.lucene.queryparser.classic.ParseException
      */
     public int save() throws SQLException, IOException, ParseException, InvalidRecipeException {
         if (!check()) {
@@ -137,32 +137,30 @@ public class NewRecipe {
         int id = 0;
 
         try (DBSaveRecipe db = new DBSaveRecipe()) {
-            if (!db.check(name))
+            if (!db.check(name)) {
                 db.newRecipe(name);
-            else
+            } else {
                 id = db.getLastId(name) + 1;
-
+            }
 
             db.newVersion(id, this);
         }
-
 
         Recipes.suggestTags(name, tags);
 
         if (id == 0) {
             Discussion.addNewRecipeEvent(name, comment, id);
-        }
-        else {
+        } else {
             Discussion.addNewVersionEvent(name, comment, id);
         }
-
 
         return id;
     }
 
-    public static class InvalidRecipeException extends Exception{
-        public InvalidRecipeException(String recipeName){
-            super(recipeName+ "was not valid");
+    public static class InvalidRecipeException extends Exception {
+
+        public InvalidRecipeException(String recipeName) {
+            super(recipeName + "was not valid");
         }
     }
 

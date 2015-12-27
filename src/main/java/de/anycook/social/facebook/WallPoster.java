@@ -20,7 +20,9 @@ package de.anycook.social.facebook;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
@@ -38,7 +40,7 @@ public class WallPoster {
     private final ObjectMapper mapper;
 
     public WallPoster(long facebookID, String accessToken) throws IOException {
-        logger = Logger.getLogger(WallPoster.class);
+        logger = LogManager.getLogger(WallPoster.class);
         mapper = new ObjectMapper();
         content = new StringBuffer("access_token=" + URLEncoder.encode(accessToken, "UTF-8"));
         URL url = new URL("https://api.facebook.com/" + facebookID + "/feed");

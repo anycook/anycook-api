@@ -18,18 +18,20 @@
 
 package de.anycook.api.listener;
 
-import com.google.code.geocoder.Geocoder;
 import de.anycook.db.mysql.DBHandler;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.location.GeoCode;
 import de.anycook.location.Location;
 import de.anycook.user.User;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-import java.io.IOException;
 
 
 /**
@@ -43,7 +45,7 @@ public class StartListener implements ServletContextListener {
      * Default constructor. 
      */
     public StartListener() {
-    	logger = Logger.getLogger(getClass());
+    	logger = LogManager.getLogger(getClass());
     }
 
 	/**

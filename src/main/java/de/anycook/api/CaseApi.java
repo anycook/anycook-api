@@ -5,7 +5,9 @@ import de.anycook.db.mysql.DBLive;
 import de.anycook.news.Case;
 import de.anycook.news.Cases;
 import de.anycook.session.Session;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -27,7 +29,7 @@ import java.util.List;
  */
 @Path("/case")
 public class CaseApi {
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LogManager.getLogger(getClass());
 
     @Context
     private Session session;

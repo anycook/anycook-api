@@ -20,19 +20,24 @@ package de.anycook.social.facebook;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.anycook.conf.Configuration;
 import de.anycook.upload.UserUploader;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.FacebookApi;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -41,10 +46,13 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 
 public class FacebookHandler {
 
-    private final static Logger LOGGER = Logger.getLogger(FacebookHandler.class);
+    private final static Logger LOGGER = LogManager.getLogger(FacebookHandler.class);
     public final static String APP_ID = Configuration.getInstance().getFacebookAppId();
     private final static String APP_SECRET = Configuration.getInstance().getFacebookAppSecret();
 
@@ -52,7 +60,8 @@ public class FacebookHandler {
 
     public FacebookHandler() {
         service = new ServiceBuilder().provider(FacebookApi.class)
-                .apiKey(APP_ID).apiSecret(APP_SECRET).callback("http://test.anycook.de/anycook/NewFacebookUser").build();
+                .apiKey(APP_ID).apiSecret(APP_SECRET)
+                .callback("http://test.anycook.de/anycook/NewFacebookUser").build();
     }
 
     public String getAuthURL() {
@@ -62,7 +71,8 @@ public class FacebookHandler {
 
 
     @SuppressWarnings("unchecked")
-    public static String publishtoWall(long facebookID, String accessToken, String message, String header)
+    public static String publishtoWall(long facebookID, String accessToken, String message,
+                                       String header)
             throws IOException {
         StringBuilder out = new StringBuilder();
         StringBuilder data = new StringBuilder();
@@ -77,7 +87,8 @@ public class FacebookHandler {
             wr.write(data.toString());
             wr.flush();
 
-            try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            try (BufferedReader rd = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream()))) {
                 String line;
                 while ((line = rd.readLine()) != null) {
                     out.append(line);
@@ -113,7 +124,7 @@ public class FacebookHandler {
         String[] split = input.split("\\.");
         String sig = decodeBase64(split[0]);
         String data = decodeBase64(split[1]);
-        if (verifySigSHA256(sig, split[1])){
+        if (verifySigSHA256(sig, split[1])) {
             LOGGER.debug(data);
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(data, FacebookRequest.class);
@@ -125,11 +136,13 @@ public class FacebookHandler {
 
     public static String getUsersOAuthToken(long facebook_id) throws IOException {
         URL url = new URL("https://graph.facebook.com/anycook.oauth/access_token?" +
-                "client_id=" + APP_ID + "&" +
-                "client_secret=" + APP_SECRET + "&" +
-                "grant_type=client_credentials");
+                          "client_id=" + APP_ID + "&" +
+                          "client_secret=" + APP_SECRET + "&" +
+                          "grant_type=client_credentials");
         URLConnection urlconnection = url.openConnection();
-        BufferedReader rd = new BufferedReader(new InputStreamReader(urlconnection.getInputStream()));
+        BufferedReader
+                rd =
+                new BufferedReader(new InputStreamReader(urlconnection.getInputStream()));
         String response = rd.readLine();
         return response.split("=")[1];
 
@@ -160,8 +173,9 @@ public class FacebookHandler {
         } catch (UnsupportedEncodingException e) {
             LOGGER.error(e);
         }
-        if (sig.equals(expected_sig))
+        if (sig.equals(expected_sig)) {
             return true;
+        }
         LOGGER.error("signatures are not the same!");
         return false;
 
@@ -184,6 +198,7 @@ public class FacebookHandler {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class FacebookRequest {
+
         public String algorithm;
 
         public String code;

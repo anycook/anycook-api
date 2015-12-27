@@ -18,28 +18,25 @@
 
 package de.anycook.db.drafts.mongo;
 
-import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import org.apache.log4j.Logger;
+import com.mongodb.client.MongoCollection;
 
-import java.net.UnknownHostException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.bson.Document;
 
 public class Mongo {
+
     private MongoClient client = null;
     protected final Logger logger;
 
     protected Mongo() {
-        logger = Logger.getLogger(getClass());
-        try {
-            client = new MongoClient();
-        } catch (UnknownHostException e) {
-            logger.error(e);
-        }
-
+        logger = LogManager.getLogger(getClass());
+        client = new MongoClient();
     }
 
-    protected DBCollection getCollection(String collectionName) {
-        return client.getDB("anycook").getCollection(collectionName);
+    protected MongoCollection<Document> getCollection(String collectionName) {
+        return client.getDatabase("anycook").getCollection(collectionName);
     }
 
     public void close() {

@@ -5,7 +5,12 @@ import de.anycook.db.mysql.DBMailProvider;
 import de.anycook.mailprovider.MailProvider;
 import de.anycook.mailprovider.MailProviders;
 import de.anycook.session.Session;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.sql.SQLException;
+import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -16,8 +21,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
@@ -25,7 +28,8 @@ import java.util.List;
 @Path("/mailproviders")
 @Produces(MediaType.APPLICATION_JSON)
 public class MailProviderApi {
-    private final Logger logger = Logger.getLogger(getClass());
+
+    private final Logger logger = LogManager.getLogger(getClass());
 
     @Context
     private Session session;
@@ -56,7 +60,8 @@ public class MailProviderApi {
 
     @PUT
     @Path("{shortName}")
-    public void updateMailProvider(@PathParam("shortName") String shortName, MailProvider mailProvider) {
+    public void updateMailProvider(@PathParam("shortName") String shortName,
+                                   MailProvider mailProvider) {
         session.checkAdminLogin();
         try {
             MailProviders.updateMailProvider(shortName, mailProvider);
@@ -81,8 +86,9 @@ public class MailProviderApi {
     @GET
     @Path("domain/{domain}")
     public MailProvider getMailProviderByDomain(@PathParam("domain") String domain) {
-        if(domain == null)
+        if (domain == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
         try {
             return MailProviders.getMailProviderForDomain(domain);
         } catch (SQLException e) {

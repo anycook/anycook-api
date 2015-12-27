@@ -23,12 +23,21 @@ import de.anycook.db.mysql.DBUser;
 import de.anycook.session.Session;
 import de.anycook.user.User;
 import de.anycook.user.settings.NotificationSettings;
-import org.apache.log4j.Logger;
 
-import javax.ws.rs.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.sql.SQLException;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
@@ -36,7 +45,7 @@ import java.sql.SQLException;
 @Path("setting")
 public class SettingsApi {
 
-    public Logger logger = Logger.getLogger(getClass());
+    public Logger logger = LogManager.getLogger(getClass());
     @Context
     public Session session;
 
@@ -44,7 +53,7 @@ public class SettingsApi {
     @PUT
     @Path("name")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateUsername(String newUsername){
+    public void updateUsername(String newUsername) {
         try {
             User user = session.getUser();
             user.setName(newUsername);
@@ -58,7 +67,7 @@ public class SettingsApi {
     @PUT
     @Path("place")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updatePlace(String newPlace){
+    public void updatePlace(String newPlace) {
         try {
             User user = session.getUser();
             user.setPlace(newPlace);
@@ -72,7 +81,7 @@ public class SettingsApi {
     @PUT
     @Path("text")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateText(String newText){
+    public void updateText(String newText) {
         try {
             User user = session.getUser();
             user.setText(newText);
@@ -85,8 +94,10 @@ public class SettingsApi {
     @PUT
     @Path("email")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateMail(String newMail){
-        if(newMail == null) throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    public void updateMail(String newMail) {
+        if (newMail == null) {
+            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
 
         try {
             User user = session.getUser();
@@ -101,7 +112,7 @@ public class SettingsApi {
     @Path("email")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public String confirmMailUpdate(String code){
+    public String confirmMailUpdate(String code) {
         try {
             User user = session.getUser();
             return user.confirmMailCandidate(code);
@@ -117,12 +128,14 @@ public class SettingsApi {
     @PUT
     @Path("password")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void changePassword(NewPassword password){
+    public void changePassword(NewPassword password) {
         try {
             session.checkLogin();
             User user = session.getUser();
-            if(!User.checkPassword(password.newPassword) || !user.setNewPassword(password.oldPassword, password.newPassword))
+            if (!User.checkPassword(password.newPassword) || !user
+                    .setNewPassword(password.oldPassword, password.newPassword)) {
                 throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            }
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -132,7 +145,7 @@ public class SettingsApi {
     @GET
     @Path("notification")
     @Produces(MediaType.APPLICATION_JSON)
-    public NotificationSettings getNotificationSettings(){
+    public NotificationSettings getNotificationSettings() {
         try {
             return NotificationSettings.init(session.getUser().getId());
 
@@ -148,7 +161,7 @@ public class SettingsApi {
     @PUT
     @Path("notification")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateNotificationSettings(NotificationSettings settings){
+    public void updateNotificationSettings(NotificationSettings settings) {
         try {
             session.checkLogin();
             NotificationSettings.save(settings);
@@ -160,7 +173,8 @@ public class SettingsApi {
 
     }
 
-    public static class NewPassword{
+    public static class NewPassword {
+
         public String oldPassword;
         public String newPassword;
     }

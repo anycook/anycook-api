@@ -12,7 +12,8 @@ import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBUser;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -31,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class SiteMapGenerator {
-	private static Logger logger = Logger.getLogger(SiteMapGenerator.class);
+	private static Logger logger = LogManager.getLogger(SiteMapGenerator.class);
 
 	public static void generateAllSiteMaps() throws SQLException {
 		generateDefaultSiteMap();

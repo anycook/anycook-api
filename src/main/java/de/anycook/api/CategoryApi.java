@@ -21,7 +21,8 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBCategory;
 import de.anycook.recipe.category.Category;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -32,7 +33,7 @@ import java.util.List;
 @Path("/category")
 public class CategoryApi {
 
-    private final Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = LogManager.getLogger(getClass());
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)

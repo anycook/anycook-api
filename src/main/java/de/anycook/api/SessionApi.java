@@ -25,7 +25,13 @@ import de.anycook.session.LoginAttempt;
 import de.anycook.session.Session;
 import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.user.User;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -43,15 +49,12 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Map;
 
 
 @Path("session")
 public class SessionApi {
 
-	private final Logger logger;
+    private final Logger logger;
     private final String cookieDomain;
     private final boolean cookieSecure;
 
@@ -59,60 +62,64 @@ public class SessionApi {
     private Session session;
 
 
-	public SessionApi() {
-		logger = Logger.getLogger(getClass());
+    public SessionApi() {
+        logger = LogManager.getLogger(getClass());
         cookieDomain = de.anycook.conf.Configuration.getInstance().getCookieDomain();
         cookieSecure = !de.anycook.conf.Configuration.getInstance().isDeveloperMode();
-	}
+    }
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @PrivateView
-	public User getSession(){
+    public User getSession() {
         return session.getUser();
     }
 
-	@POST
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response login(@Context HttpServletRequest request,
-			Session.UserAuth auth){
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response login(@Context HttpServletRequest request,
+                          Session.UserAuth auth) {
 
         LoginAttempt loginAttempt = null;
 
-        try{
+        try {
             int userId = User.getUserId(auth.username);
-            if(!LoginAttempt.isLoginAllowed(userId)) {
-                logger.warn("too many login attempts for "+userId);
+            if (!LoginAttempt.isLoginAllowed(userId)) {
+                logger.warn("too many login attempts for " + userId);
                 throw new WebApplicationException(Response.Status.FORBIDDEN);
             }
 
-            loginAttempt = new LoginAttempt(userId, request.getRemoteAddr(), System.currentTimeMillis());
-
+            loginAttempt =
+                    new LoginAttempt(userId, request.getRemoteAddr(), System.currentTimeMillis());
 
             session.login(userId, auth.password);
             loginAttempt.setSuccessful(true);
             User user = session.getUser();
             ResponseBuilder response = Response.ok(user);
 
-            if(auth.stayLoggedIn){
+            if (auth.stayLoggedIn) {
                 logger.debug(String.format("stayLoggedIn"));
-                NewCookie cookie = new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/", cookieDomain,
-                        "", 7 * 24 * 60 * 60, cookieSecure, true);
+                NewCookie cookie =
+                        new NewCookie("anycook", session.makePermanentCookieId(user.getId()), "/",
+                                      cookieDomain,
+                                      "", 7 * 24 * 60 * 60, cookieSecure, true);
                 response.cookie(cookie);
             }
 
             return response.build();
-        }catch(User.LoginException|DBUser.UserNotFoundException e){
+        } catch (User.LoginException | DBUser.UserNotFoundException e) {
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         } catch (IOException | SQLException e) {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } finally {
-            if(loginAttempt != null) try {
-                loginAttempt.save();
-            } catch (SQLException e) {
-                logger.error(e);
+            if (loginAttempt != null) {
+                try {
+                    loginAttempt.save();
+                } catch (SQLException e) {
+                    logger.error(e);
+                }
             }
         }
     }
@@ -121,27 +128,27 @@ public class SessionApi {
     @Path("facebook")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void facebookLogin(String signedRequest){
+    public void facebookLogin(String signedRequest) {
         try {
             session.facebookLogin(signedRequest);
         } catch (IOException | SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } catch (User.LoginException|DBUser.UserNotFoundException e) {
+        } catch (User.LoginException | DBUser.UserNotFoundException e) {
             logger.warn(e);
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
     }
 
-	@DELETE
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response logout(@Context HttpHeaders hh){
-		Map<String, Cookie> cookies = hh.getCookies();
+    @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response logout(@Context HttpHeaders hh) {
+        Map<String, Cookie> cookies = hh.getCookies();
         session.checkLogin();
 
         ResponseBuilder response = Response.ok();
-		if(cookies.containsKey("anycook")){
-			Cookie cookie = cookies.get("anycook");
+        if (cookies.containsKey("anycook")) {
+            Cookie cookie = cookies.get("anycook");
             try {
                 session.deleteCookieID(cookie.getValue());
             } catch (SQLException e) {
@@ -149,16 +156,16 @@ public class SessionApi {
                 throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
             }
             NewCookie newCookie = new NewCookie(cookie, "", -1, false);
-			response.cookie(newCookie);
-		}
-		session.logout();
-		return response.entity("true").build();
-	}
+            response.cookie(newCookie);
+        }
+        session.logout();
+        return response.entity("true").build();
+    }
 
-	@POST
-	@Path("activate")
-	@Produces(MediaType.APPLICATION_JSON)
-	public void activateAccount(@FormParam("activationkey") String activationKey) {
+    @POST
+    @Path("activate")
+    @Produces(MediaType.APPLICATION_JSON)
+    public void activateAccount(@FormParam("activationkey") String activationKey) {
         try {
             User.activateById(activationKey);
             SiteMapGenerator.generateProfileSiteMap();
@@ -166,7 +173,7 @@ public class SessionApi {
             logger.error(e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBUser.ActivationFailedException e) {
-            logger.warn(e,e);
+            logger.warn(e, e);
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
     }
@@ -174,7 +181,7 @@ public class SessionApi {
     @POST
     @Path("resetPassword")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void resetPasswordRequest(String mail){
+    public void resetPasswordRequest(String mail) {
         try {
             User.createResetPasswordID(mail);
         } catch (SQLException | IOException e) {
@@ -189,7 +196,7 @@ public class SessionApi {
     @PUT
     @Path("resetPassword")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void resetPassword(PasswordReset passwordReset){
+    public void resetPassword(PasswordReset passwordReset) {
         try {
             User.resetPassword(passwordReset.id, passwordReset.newPassword);
         } catch (SQLException e) {
@@ -208,7 +215,8 @@ public class SessionApi {
         return request.getSession(true).getId();
     }
 
-    public static class PasswordReset{
+    public static class PasswordReset {
+
         public String id;
         public String newPassword;
     }

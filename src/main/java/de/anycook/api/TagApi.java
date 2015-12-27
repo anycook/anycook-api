@@ -22,21 +22,30 @@ import de.anycook.api.util.MediaType;
 import de.anycook.db.mysql.DBTag;
 import de.anycook.recipe.Recipes;
 import de.anycook.recipe.tag.Tag;
-import org.apache.log4j.Logger;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.SQLException;
 import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 
 @Path("tag")
 public class TagApi {
-    private final Logger logger = Logger.getLogger(getClass());
-	
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<Tag> getAll(){
+
+    private final Logger logger = LogManager.getLogger(getClass());
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Tag> getAll() {
         try {
             return Tag.getAll();
         } catch (SQLException e) {
@@ -44,15 +53,14 @@ public class TagApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
-	/**
-	 * Number of tags
-	 * @return
-	 */
-	@GET
-	@Path("number")
-	@Produces(MediaType.APPLICATION_JSON)
-	public int getNum(){
+
+    /**
+     * Number of tags
+     */
+    @GET
+    @Path("number")
+    @Produces(MediaType.APPLICATION_JSON)
+    public int getNum() {
         try {
             return Tag.getTotal();
         } catch (SQLException e) {
@@ -60,30 +68,32 @@ public class TagApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
-	/**
-	 * Tags ordered by popularity.
-	 * @param recipe If set tags of this recipe are excluded
-	 * @return Map of tags ordered by popularity with number of recipes
-	 */
-	@GET
-	@Path("popular")
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<Tag> getPopularTags(@QueryParam("recipe") String recipe){
-		try {
-            if(recipe==null)
+
+    /**
+     * Tags ordered by popularity.
+     *
+     * @param recipe If set tags of this recipe are excluded
+     * @return Map of tags ordered by popularity with number of recipes
+     */
+    @GET
+    @Path("popular")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Tag> getPopularTags(@QueryParam("recipe") String recipe) {
+        try {
+            if (recipe == null) {
                 return Recipes.getPopularTags();
+            }
             return Recipes.getPopularTags(recipe);
-        } catch (SQLException e){
+        } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-	}
-	
-	@GET
-	@Path("{tagName}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Tag getTag(@PathParam("tagName") String tagName){
+    }
+
+    @GET
+    @Path("{tagName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Tag getTag(@PathParam("tagName") String tagName) {
         try {
             return Tag.init(tagName);
         } catch (SQLException e) {

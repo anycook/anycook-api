@@ -18,7 +18,8 @@
 
 package de.anycook.stopwords;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,7 +28,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 public class Stopwords {
-    private static Logger logger = Logger.getLogger(Stopwords.class);
+    private static Logger logger = LogManager.getLogger(Stopwords.class);
     private final static String deStopWordPath = "/var/www/sites/anycook.de/stopwords/deStopWordList.txt";
 
     public static Set<String> getStopWords() {

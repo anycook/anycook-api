@@ -1,7 +1,9 @@
 package de.anycook.api.filter;
 
 import de.anycook.session.Session;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -22,7 +24,7 @@ public class BackendAuthFilter implements ContainerRequestFilter {
     private final Logger logger;
 
     public BackendAuthFilter(@Context HttpServletRequest request){
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
         this.request = request;
     }
 

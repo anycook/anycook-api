@@ -10,11 +10,14 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
+
 import de.anycook.conf.Configuration;
 import de.anycook.db.drafts.RecipeDraftsStore;
 import de.anycook.drafts.RecipeDraft;
 import de.anycook.newrecipe.DraftNumberProvider;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -23,20 +26,22 @@ import java.util.List;
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
-public class DynamoDBRecipeDraftsStore implements RecipeDraftsStore{
+public class DynamoDBRecipeDraftsStore implements RecipeDraftsStore {
 
     private final DynamoDBMapper mapper;
     private final Logger logger;
 
     public DynamoDBRecipeDraftsStore() {
-        this.logger = Logger.getLogger(getClass());
-        AWSCredentials credentials = new BasicAWSCredentials(Configuration.getInstance().getDynamoDbAccessKey(),
-            Configuration.getInstance().getDynamoDbAccessSecret());
+        this.logger = LogManager.getLogger(getClass());
+        AWSCredentials credentials =
+                new BasicAWSCredentials(Configuration.getInstance().getDynamoDbAccessKey(),
+                                        Configuration.getInstance().getDynamoDbAccessSecret());
         AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentials);
         dynamoDBClient.setRegion(Region.getRegion(Regions.EU_WEST_1));
 
         this.mapper = new DynamoDBMapper(dynamoDBClient,
-            new DynamoDBMapperConfig(DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES));
+                                         new DynamoDBMapperConfig(
+                                                 DynamoDBMapperConfig.SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES));
     }
 
     @Override

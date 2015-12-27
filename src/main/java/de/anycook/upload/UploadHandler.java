@@ -19,20 +19,28 @@
 package de.anycook.upload;
 
 import com.google.common.base.Preconditions;
+
 import de.anycook.conf.Configuration;
 import de.anycook.upload.imagesaver.AmazonS3ImageSaver;
 import de.anycook.upload.imagesaver.ImageSaver;
 import de.anycook.upload.imagesaver.LocalImageSaver;
+
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.SQLException;
+
+import javax.imageio.ImageIO;
 
 
 /**
@@ -62,19 +70,20 @@ public abstract class UploadHandler {
      * Konstruktor.
      */
     public UploadHandler(int smallSize, int bigWidth, int bigHeight, String imagePath) {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
 
         this.smallSize = smallSize;
         this.bigWidth = bigWidth;
         this.bigHeight = bigHeight;
 
-
-        this.imageSaver = Configuration.getInstance().isImageS3Upload() ? new AmazonS3ImageSaver(imagePath) :
+        this.imageSaver =
+                Configuration.getInstance().isImageS3Upload() ? new AmazonS3ImageSaver(imagePath) :
                 new LocalImageSaver(imagePath);
     }
 
     /**
      * ermoeglicht Upload einer Datei. Die entstandene File wird zurueckgegeben
+     *
      * @return uploaded file
      */
     public File uploadFile(InputStream inputStream) throws IOException, FileUploadException {
@@ -116,7 +125,6 @@ public abstract class UploadHandler {
      *
      * @param image    BufferedImage
      * @param filename Name der zu erzeugenden Datei
-     * @throws java.io.IOException
      */
     private void saveSmallImage(BufferedImage image, String filename) throws IOException {
         int height = image.getHeight();
@@ -126,14 +134,22 @@ public abstract class UploadHandler {
         int xtranslate = 0;
         int ytranslate = 0;
 
-        if (imageRatio > 1)
+        if (imageRatio > 1) {
             xtranslate = (width - height) / 2;
-        else
+        } else {
             ytranslate = (height - width) / 2;
+        }
 
-        BufferedImage tempImage = image.getSubimage(xtranslate, ytranslate, width - xtranslate * 2, height - ytranslate * 2);
-        BufferedImage newImage = new BufferedImage(smallSize, smallSize, BufferedImage.TYPE_INT_RGB);
-        newImage.getGraphics().drawImage(tempImage.getScaledInstance(smallSize, smallSize, Image.SCALE_SMOOTH), 0, 0, null);
+        BufferedImage
+                tempImage =
+                image.getSubimage(xtranslate, ytranslate, width - xtranslate * 2,
+                                  height - ytranslate * 2);
+        BufferedImage
+                newImage =
+                new BufferedImage(smallSize, smallSize, BufferedImage.TYPE_INT_RGB);
+        newImage.getGraphics()
+                .drawImage(tempImage.getScaledInstance(smallSize, smallSize, Image.SCALE_SMOOTH), 0,
+                           0, null);
 
         imageSaver.save("small/", filename, newImage);
     }
@@ -143,7 +159,6 @@ public abstract class UploadHandler {
      *
      * @param image    BufferedImage
      * @param filename Name der zu erzeugenden Datei
-     * @throws java.io.IOException
      */
     private void saveBigImage(BufferedImage image, String filename) throws IOException {
         int height = image.getHeight();
@@ -157,9 +172,10 @@ public abstract class UploadHandler {
             newWidth = new Double(((double) width / (double) height) * newHeight).intValue();
         }
 
-
         BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-        newImage.getGraphics().drawImage(image.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0, null);
+        newImage.getGraphics()
+                .drawImage(image.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH), 0, 0,
+                           null);
 
         imageSaver.save("big/", filename, newImage);
 
@@ -170,12 +186,10 @@ public abstract class UploadHandler {
      *
      * @param image    BufferedImage
      * @param filename Name der zu erzeugenden Datei
-     * @throws java.io.IOException
      */
     private void saveOriginalImage(BufferedImage image, String filename) throws IOException {
         int height = image.getHeight();
         int width = image.getWidth();
-
 
         BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         newImage.getGraphics().drawImage(image, 0, 0, null);

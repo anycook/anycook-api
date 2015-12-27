@@ -4,7 +4,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.MessageSession;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
@@ -21,8 +23,8 @@ public enum MessageProvider {
     private final Logger logger;
     private final Cache<Integer, BlockingQueue<UserResponse>> suspended;
 
-    private MessageProvider(){
-        logger = Logger.getLogger(getClass());
+    MessageProvider(){
+        logger = LogManager.getLogger(getClass());
         suspended = CacheBuilder.newBuilder()
                 .maximumSize(10000)
                 .expireAfterWrite(5, TimeUnit.MINUTES)
@@ -36,7 +38,7 @@ public enum MessageProvider {
 
 
         while(!queue.isEmpty()){
-            Logger.getLogger(MessageSession.class).debug("reading response");
+            LogManager.getLogger(MessageSession.class).debug("reading response");
             try {
                 UserResponse userResponse = queue.take();
                 AsyncResponse asyncResponse = userResponse.response;

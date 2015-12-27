@@ -26,7 +26,8 @@ import de.anycook.news.life.Lifes;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -54,7 +55,7 @@ public class Session {
      * Konstruktor initiert Variablen
      */
     private Session() {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
         login = null;
 
     }
@@ -81,7 +82,7 @@ public class Session {
             try {
                 session.loginWithCookies(request.getCookies());
             } catch (IOException | SQLException e) {
-                Logger.getLogger(Session.class).error(e, e);
+                LogManager.getLogger(Session.class).error(e, e);
             }
         }
 

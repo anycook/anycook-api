@@ -18,11 +18,18 @@
 
 package de.anycook.conf;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 import javax.xml.bind.annotation.XmlElement;
-import java.io.*;
-import java.util.Properties;
 
 /**
  * Loads app properties. For further information about the property options
@@ -30,7 +37,7 @@ import java.util.Properties;
  */
 public class Configuration {
 
-    private static final Logger logger = Logger.getLogger(Configuration.class);
+    private static final Logger logger = LogManager.getLogger(Configuration.class);
 
     private static final String
         PROPERTIES = "anycook.properties",

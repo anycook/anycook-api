@@ -1,6 +1,7 @@
 package de.anycook.api.listener;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.server.monitoring.ApplicationEvent;
 import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
@@ -25,7 +26,7 @@ public class ExceptionListener implements ApplicationEventListener {
         private final Logger logger;
 
         public ExceptionRequestEventListener(){
-            logger = Logger.getLogger(getClass());
+            logger = LogManager.getLogger(getClass());
         }
 
         @Override

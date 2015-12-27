@@ -3,7 +3,9 @@ package de.anycook.api.backend;
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.messages.MessageSession;
 import de.anycook.api.providers.MessageSessionProvider;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -23,7 +25,7 @@ public class MessageApi {
     private final Logger logger;
 
     public MessageApi() {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
     }
 
     @GET

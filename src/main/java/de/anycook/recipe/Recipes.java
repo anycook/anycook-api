@@ -17,7 +17,8 @@ import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,17 +36,17 @@ import java.util.Set;
  * @author Jan Graßegger<jan@anycook.de>
  */
 public final class Recipes {
+
     private Recipes() {
 
     }
 
     public static String initDraftWithRecipe(String recipeName, Integer versionId, int userId)
-        throws SQLException, DBRecipe.RecipeNotFoundException, IOException {
+            throws SQLException, DBRecipe.RecipeNotFoundException, IOException {
 
         Recipe recipe;
         List<StepDraft> steps;
         List<IngredientDraft> ingredients;
-
 
         if (versionId == null) {
             recipe = Recipe.init(recipeName);
@@ -60,7 +61,6 @@ public final class Recipes {
         if (recipe == null || steps == null || ingredients == null) {
             return null;
         }
-
 
         try (RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
 
@@ -84,23 +84,25 @@ public final class Recipes {
     public static List<Recipe> load(List<String> results, int loginId) {
         List<Recipe> recipes = new ArrayList<>();
 
-        for(String recipe : results) {
+        for (String recipe : results) {
             try {
                 recipes.add(Recipe.init(recipe, loginId));
             } catch (SQLException | DBRecipe.RecipeNotFoundException e) {
-                Logger.getLogger(Recipe.class).error(e, e);
+                LogManager.getLogger(Recipe.class).error(e, e);
             }
         }
         return recipes;
     }
 
-    public static int getAuthor(String recipe, int versionId) throws SQLException, DBRecipe.RecipeNotFoundException {
+    public static int getAuthor(String recipe, int versionId)
+            throws SQLException, DBRecipe.RecipeNotFoundException {
         try (DBGetRecipe db = new DBGetRecipe()) {
             return db.getAuthor(recipe, versionId);
         }
     }
 
-    public static List<Recipe> getTastingRecipesForUser(int userId, int loginId) throws SQLException {
+    public static List<Recipe> getTastingRecipesForUser(int userId, int loginId)
+            throws SQLException {
         try (DBGetRecipe db = new DBGetRecipe()) {
             return db.getTastingRecipes(userId, loginId);
         }
@@ -141,8 +143,11 @@ public final class Recipes {
         }
     }
 
-    public static URI getRecipeImage(String recipeName, ImageType type) throws URISyntaxException, SQLException {
-        StringBuilder imagePath = new StringBuilder(Configuration.getInstance().getImageBasePath()).append("recipe/");
+    public static URI getRecipeImage(String recipeName, ImageType type)
+            throws URISyntaxException, SQLException {
+        StringBuilder
+                imagePath =
+                new StringBuilder(Configuration.getInstance().getImageBasePath()).append("recipe/");
         switch (type) {
             case ORIGINAL:
                 imagePath.append("original/");
@@ -191,7 +196,7 @@ public final class Recipes {
 
 
     public static Set<Integer> getUsersforGericht(String recipeName) throws SQLException {
-        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
             return dbGetRecipe.getUsersFromGericht(recipeName);
         }
     }
@@ -202,7 +207,9 @@ public final class Recipes {
         try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()) {
             if (!dbSaveRecipe.hasTag(recipeName, tag)) {
                 try (DBTag dbTag = new DBTag()) {
-                    if (!dbTag.exists(tag)) dbTag.create(tag);
+                    if (!dbTag.exists(tag)) {
+                        dbTag.create(tag);
+                    }
                 }
 
                 dbSaveRecipe.suggestTag(recipeName, tag, userId);
@@ -211,31 +218,31 @@ public final class Recipes {
     }
 
     public static List<Recipe> getAll(int loginId) throws SQLException {
-        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
             return dbGetRecipe.getAllRecipes(loginId);
         }
     }
 
     public static List<Recipe> getAll(int loginId, Date lastModified) throws SQLException {
-        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
             return dbGetRecipe.getAllRecipes(loginId, lastModified);
         }
     }
 
     public static List<Recipe> getAllVersions(String recipeName, int loginId) throws SQLException {
-        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
             return dbGetRecipe.getVersions(recipeName, loginId);
         }
     }
 
     public static void setActiveId(String recipeName, int activeId) throws SQLException {
-        try(DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()){
+        try (DBSaveRecipe dbSaveRecipe = new DBSaveRecipe()) {
             dbSaveRecipe.setActiveId(recipeName, activeId);
         }
     }
 
     public static List<User> getAuthors(String recipeName) throws SQLException {
-        try(DBGetRecipe dbGetRecipe = new DBGetRecipe()){
+        try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
             return dbGetRecipe.getAuthors(recipeName);
         }
     }
@@ -251,7 +258,9 @@ public final class Recipes {
     }
 
     public static void suggestTags(String name, List<String> tags, int userId) throws SQLException {
-        for (String tag : tags) suggestTag(name, tag, userId);
+        for (String tag : tags) {
+            suggestTag(name, tag, userId);
+        }
 
         Map<String, String> data = new HashMap<>(3);
         try {

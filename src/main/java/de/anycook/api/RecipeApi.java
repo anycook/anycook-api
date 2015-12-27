@@ -39,7 +39,9 @@ import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import javax.ws.rs.Consumes;
@@ -73,7 +75,7 @@ import java.util.stream.Collectors;
 @Path("/recipe")
 @Produces(MediaType.APPLICATION_JSON)
 public class RecipeApi {
-	private final Logger logger = Logger.getLogger(getClass());
+	private final Logger logger = LogManager.getLogger(getClass());
 
     @Context
     private Session session;

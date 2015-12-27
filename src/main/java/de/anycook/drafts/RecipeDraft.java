@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DBObject;
 import de.anycook.recipe.Time;
 
+import org.bson.Document;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +43,8 @@ public class RecipeDraft {
 
     public RecipeDraft(){}
 
-    public RecipeDraft(DBObject dbObject) {
-        read(dbObject);
+    public RecipeDraft(Document document) {
+        read(document);
     }
 
     @DynamoDBHashKey(attributeName = "userId")
@@ -153,37 +155,37 @@ public class RecipeDraft {
         this.percentage = percentage;
     }
 
-    public void read(DBObject dbObject){
-        this.id = dbObject.get("_id").toString();
-        if(dbObject.containsField("value")){
-            dbObject = (DBObject)dbObject.get("value");
+    public void read(Document document){
+        this.id = document.get("_id").toString();
+        if(document.containsKey("value")){
+            document = (Document) document.get("value");
         }
 
 
-        if(dbObject.containsField("timestamp")) this.timestamp = (long)dbObject.get("timestamp");
-        if(dbObject.containsField("image")) this.image = (String)dbObject.get("image");
-        if(dbObject.containsField("name")) this.name = (String)dbObject.get("name");
-        if(dbObject.containsField("description")) this.description = (String)dbObject.get("description");
+        if(document.containsKey("timestamp")) this.timestamp = (long)document.get("timestamp");
+        if(document.containsKey("image")) this.image = (String)document.get("image");
+        if(document.containsKey("name")) this.name = (String)document.get("name");
+        if(document.containsKey("description")) this.description = (String)document.get("description");
 
         ObjectMapper mapper = new ObjectMapper();
-        if(dbObject.containsField("steps")) {
-            this.steps = mapper.convertValue(dbObject.get("steps"),
+        if(document.containsKey("steps")) {
+            this.steps = mapper.convertValue(document.get("steps"),
                     new TypeReference<List<StepDraft>>(){});
         }
-        if(dbObject.containsField("persons")) this.persons = (int)dbObject.get("persons");
-        if(dbObject.containsField("ingredients")){
-            this.ingredients = mapper.convertValue(dbObject.get("ingredients"),
+        if(document.containsKey("persons")) this.persons = (int)document.get("persons");
+        if(document.containsKey("ingredients")){
+            this.ingredients = mapper.convertValue(document.get("ingredients"),
                     new TypeReference<List<IngredientDraft>>(){});
         }
-        if(dbObject.containsField("category")) this.category = (String)dbObject.get("category");
-        if(dbObject.containsField("skill")) this.skill = (int)dbObject.get("skill");
-        if(dbObject.containsField("calorie")) this.calorie = (int)dbObject.get("calorie");
-        if(dbObject.containsField("tags")){
-            this.tags = mapper.convertValue(dbObject.get("tags"),
+        if(document.containsKey("category")) this.category = (String)document.get("category");
+        if(document.containsKey("skill")) this.skill = (int)document.get("skill");
+        if(document.containsKey("calorie")) this.calorie = (int)document.get("calorie");
+        if(document.containsKey("tags")){
+            this.tags = mapper.convertValue(document.get("tags"),
                     new TypeReference<List<String>>(){});
         }
-        if(dbObject.containsField("time")) this.time =  mapper.convertValue(dbObject.get("time"), Time.class);
-        if(dbObject.containsField("percentage")) this.percentage = (double)dbObject.get("percentage");
+        if(document.containsKey("time")) this.time =  mapper.convertValue(document.get("time"), Time.class);
+        if(document.containsKey("percentage")) this.percentage = (double)document.get("percentage");
     }
 
     public void write(DBObject updateObj) {

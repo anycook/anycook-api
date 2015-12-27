@@ -27,11 +27,20 @@ import de.anycook.news.News;
 import de.anycook.notifications.Notification;
 import de.anycook.user.User;
 import de.anycook.utils.enumerations.NotificationType;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.sql.SQLException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
-import java.sql.SQLException;
-import java.util.*;
 
 
 public class MessageSession extends News {
@@ -39,37 +48,42 @@ public class MessageSession extends News {
     private final static Logger sLogger;
 
     static {
-        sLogger = Logger.getLogger(MessageSession.class);
+        sLogger = LogManager.getLogger(MessageSession.class);
     }
 
-    public static MessageSession getSession(int sessionId, int userId) throws SQLException, DBMessage.SessionNotFoundException {
+    public static MessageSession getSession(int sessionId, int userId)
+            throws SQLException, DBMessage.SessionNotFoundException {
         return getSession(sessionId, userId, -1);
     }
 
-    public static MessageSession getSession(int sessionId, int userId, int lastId) throws SQLException,
-            DBMessage.SessionNotFoundException {
+    public static MessageSession getSession(int sessionId, int userId, int lastId)
+            throws SQLException,
+                   DBMessage.SessionNotFoundException {
         try (DBMessage db = new DBMessage()) {
-            if (!db.checkSession(sessionId, userId))
+            if (!db.checkSession(sessionId, userId)) {
                 throw new DBMessage.SessionNotFoundException(sessionId, userId);
+            }
 
             Set<User> recipients = db.getRecipients(sessionId);
             List<Message> messages = db.getMessages(sessionId, lastId, userId, 100);
 
             Date lastChange = null;
-            if(messages.size() > 0)
+            if (messages.size() > 0) {
                 lastChange = db.lastChange(sessionId);
+            }
 
             return new MessageSession(sessionId, recipients, messages, lastChange);
         }
     }
 
     public static int getNewMessageNum(int userId) throws SQLException {
-        try(DBMessage dbmessage = new DBMessage()){
+        try (DBMessage dbmessage = new DBMessage()) {
             return dbmessage.getNewMessageNum(userId);
         }
     }
 
-    public static MessageSession getSession(List<Integer> userIds) throws SQLException, DBMessage.SessionNotFoundException {
+    public static MessageSession getSession(List<Integer> userIds)
+            throws SQLException, DBMessage.SessionNotFoundException {
         try (DBMessage db = new DBMessage()) {
             int sessionId;
             try {
@@ -84,15 +98,17 @@ public class MessageSession extends News {
 
     }
 
-    public static MessageSession getAnycookSession(int userId) throws SQLException, DBMessage.SessionNotFoundException {
+    public static MessageSession getAnycookSession(int userId)
+            throws SQLException, DBMessage.SessionNotFoundException {
         List<Integer> userIds = new LinkedList<>();
         userIds.add(1);
         userIds.add(userId);
         return getSession(userIds);
     }
 
-    public static List<MessageSession> getSessionsFromUser(int userId, Date lastChange) throws SQLException, DBMessage.SessionNotFoundException {
-        try(DBMessage db = new DBMessage()) {
+    public static List<MessageSession> getSessionsFromUser(int userId, Date lastChange)
+            throws SQLException, DBMessage.SessionNotFoundException {
+        try (DBMessage db = new DBMessage()) {
             Set<Integer> sessionIds = db.getSessionIDsFromUser(userId, lastChange);
             List<MessageSession> sessions = new LinkedList<>();
             for (Integer sessionId : sessionIds) {
@@ -104,7 +120,7 @@ public class MessageSession extends News {
     }
 
     public static List<MessageSession> getSessionsFromUser(int userId) throws SQLException {
-        try(DBMessage db = new DBMessage()) {
+        try (DBMessage db = new DBMessage()) {
             Set<Integer> sessionIds = db.getSessionIDsFromUser(userId);
             List<MessageSession> sessions = new LinkedList<>();
             for (Integer sessionId : sessionIds) {
@@ -126,14 +142,14 @@ public class MessageSession extends News {
 
 
     public MessageSession() {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
     }
 
     public MessageSession(int id, Set<User> recipients, List<Message> messages, Date lastChange) {
         super(id, lastChange);
         this.messages = messages;
         this.recipients = recipients;
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
 
     }
 
@@ -153,7 +169,7 @@ public class MessageSession extends News {
 
     @Override
     @XmlElement
-    public long getDatetime(){
+    public long getDatetime() {
         return super.getDatetime();
     }
 
@@ -178,9 +194,11 @@ public class MessageSession extends News {
     }
 
     public void newMessage(int sender, String text, boolean sendNotification) throws SQLException {
-        if (text == null) return;
+        if (text == null) {
+            return;
+        }
 
-        try(DBMessage db = new DBMessage()){
+        try (DBMessage db = new DBMessage()) {
             int messageId = db.newMessage(sender, id, text);
 
             for (User recipient : recipients) {
@@ -189,13 +207,13 @@ public class MessageSession extends News {
 
                     db.unreadMessage(recipient.getId(), id, messageId);
 
-
-                    if(sendNotification){
+                    if (sendNotification) {
                         try {
                             Map<String, String> data = new HashMap<>();
                             data.put("sender", User.getUsername(sender));
                             data.put("content", text);
-                            Notification.sendNotification(recipient.getId(), NotificationType.NEW_MESSAGE, data);
+                            Notification.sendNotification(recipient.getId(),
+                                                          NotificationType.NEW_MESSAGE, data);
                         } catch (DBUser.UserNotFoundException e) {
                             logger.error(e, e);
                         }

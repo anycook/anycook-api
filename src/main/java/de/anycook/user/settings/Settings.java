@@ -18,7 +18,9 @@
 
 package de.anycook.user.settings;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class Settings {
     protected final Logger logger;
@@ -26,7 +28,7 @@ public abstract class Settings {
 
 
     public Settings(int userId) {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
         this.userId = userId;
     }
 

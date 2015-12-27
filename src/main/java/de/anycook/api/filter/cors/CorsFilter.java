@@ -19,7 +19,12 @@
 package de.anycook.api.filter.cors;
 
 import de.anycook.conf.Configuration;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -27,8 +32,6 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -45,7 +48,7 @@ public class CorsFilter implements ContainerResponseFilter {
 	 *
 	 */
 	public CorsFilter() {
-		logger = Logger.getLogger(getClass());
+		logger = LogManager.getLogger(getClass());
 	}
 
 	@Override

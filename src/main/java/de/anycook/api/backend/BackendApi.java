@@ -4,7 +4,9 @@ import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.status.Status;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -22,7 +24,7 @@ public class BackendApi {
     private final Logger logger;
 
     public BackendApi() {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
     }
 
     @GET

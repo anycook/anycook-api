@@ -20,6 +20,7 @@ package de.anycook.notifications;
 
 import com.google.template.soy.SoyFileSet;
 import com.google.template.soy.tofu.SoyTofu;
+
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.db.mysql.DBUser;
@@ -29,7 +30,9 @@ import de.anycook.messages.MessageSession;
 import de.anycook.user.User;
 import de.anycook.user.settings.NotificationSettings;
 import de.anycook.utils.enumerations.NotificationType;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -47,29 +50,34 @@ public class Notification {
         try {
             String messagePath = "/notification/message.soy";
             String subjectPath = "/notification/subject.soy";
-            SoyFileSet soyFileSet = (new SoyFileSet.Builder())
+            SoyFileSet soyFileSet = SoyFileSet.builder()
                     .add(Notification.class.getResource(messagePath).toURI().toURL(), messagePath)
-                    .add(Notification.class.getResource(subjectPath).toURI().toURL(), subjectPath).build();
+                    .add(Notification.class.getResource(subjectPath).toURI().toURL(), subjectPath)
+                    .build();
             tofu = soyFileSet.compileToTofu().forNamespace("de.anycook.notification");
         } catch (URISyntaxException | MalformedURLException e) {
-            Logger.getLogger(Notification.class).error(e, e);
+            LogManager.getLogger(Notification.class).error(e, e);
         }
 
     }
 
-    public static void sendNotifications(Collection<Integer> recipientIds, NotificationType type, Map<String, String> data)
+    public static void sendNotifications(Collection<Integer> recipientIds, NotificationType type,
+                                         Map<String, String> data)
             throws SQLException, DBUser.UserNotFoundException {
-        for(int recipientId : recipientIds)
+        for (int recipientId : recipientIds) {
             sendNotification(recipientId, type, data);
+        }
     }
 
-    public static void sendNotification(int recipientId, NotificationType type, Map<String, String> data)
+    public static void sendNotification(int recipientId, NotificationType type,
+                                        Map<String, String> data)
             throws SQLException, DBUser.UserNotFoundException {
         Notification notification = new Notification(recipientId, type, data);
         notification.send();
     }
 
-    public static void sendAdminNotification(NotificationType type, Map<String, String> data) throws SQLException{
+    public static void sendAdminNotification(NotificationType type, Map<String, String> data)
+            throws SQLException {
         List<Integer> admins = User.getAdminIds();
         try {
             sendNotifications(admins, type, data);
@@ -78,12 +86,12 @@ public class Notification {
         }
     }
 
-    private static String getMessage(NotificationType type, Map<String, String> data){
-        return tofu.newRenderer(".message."+type).setData(data).render();
+    private static String getMessage(NotificationType type, Map<String, String> data) {
+        return tofu.newRenderer(".message." + type).setData(data).render();
     }
 
-    private static String getSubject(NotificationType type, Map<String, String> data){
-        return tofu.newRenderer(".subject."+type).setData(data).render();
+    private static String getSubject(NotificationType type, Map<String, String> data) {
+        return tofu.newRenderer(".subject." + type).setData(data).render();
     }
 
     private Logger logger;
@@ -91,8 +99,9 @@ public class Notification {
     private NotificationType type;
     private Map<String, String> data;
 
-    public Notification(int recipientId, NotificationType type, Map<String, String> data) throws SQLException, DBUser.UserNotFoundException {
-        this.logger = Logger.getLogger(getClass());
+    public Notification(int recipientId, NotificationType type, Map<String, String> data)
+            throws SQLException, DBUser.UserNotFoundException {
+        this.logger = LogManager.getLogger(getClass());
 
         this.recipientId = recipientId;
         this.type = type;
@@ -108,10 +117,14 @@ public class Notification {
 
         if (Configuration.getInstance().isDeveloperMode()) {
             try {
-                sendMail = type == NotificationType.ACCOUNT_ACTIVATION || type == NotificationType.RESET_PASSWORD ||
+                sendMail =
+                        type == NotificationType.ACCOUNT_ACTIVATION
+                        || type == NotificationType.RESET_PASSWORD ||
                         type == NotificationType.NEW_MAIL ||
-                        User.init(recipientId).isAdmin() && NotificationSettings.init(recipientId).check(type);
-                logger.debug("sendMail is "+sendMail+" for "+type+" for user "+recipientId);
+                        User.init(recipientId).isAdmin() && NotificationSettings.init(recipientId)
+                                .check(type);
+                logger.debug(
+                        "sendMail is " + sendMail + " for " + type + " for user " + recipientId);
             } catch (DBUser.UserNotFoundException | IOException e) {
                 //won't happen
                 sendMail = false;
@@ -120,12 +133,11 @@ public class Notification {
             sendMail = NotificationSettings.init(recipientId).check(type);
         }
 
-
         String message = getMessage(type, data);
 
         if (sendMail) {
             String userMail = type == NotificationType.NEW_MAIL ?
-                    User.getMailCandidate(recipientId) : User.getUseremail(recipientId);
+                              User.getMailCandidate(recipientId) : User.getUseremail(recipientId);
             String subject = getSubject(type, data);
             logger.debug(String.format("sending mail to %d", recipientId));
             MailHandler mailhandler = MailHandler.getSingleton();

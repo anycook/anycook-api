@@ -18,7 +18,8 @@
 
 package de.anycook.messages;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.ConnectionCallback;
@@ -29,7 +30,7 @@ public abstract class Checker implements Runnable {
     protected boolean timeout;
 
     public Checker() {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
         timeout = false;
     }
 
@@ -51,7 +52,7 @@ public abstract class Checker implements Runnable {
         @Override
         public void handleTimeout(AsyncResponse asyncResponse) {
             Thread.currentThread().interrupt();
-            Logger.getLogger(TimeOut.class).debug("timeout");
+            LogManager.getLogger(TimeOut.class).debug("timeout");
         }
     }
 

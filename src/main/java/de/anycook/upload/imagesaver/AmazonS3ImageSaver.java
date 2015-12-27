@@ -7,17 +7,21 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+
 import de.anycook.conf.Configuration;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import javax.imageio.ImageIO;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
@@ -29,11 +33,12 @@ public class AmazonS3ImageSaver extends ImageSaver {
     private final Logger logger;
     private final String subPath;
 
-    public AmazonS3ImageSaver(String subPath){
-        logger = Logger.getLogger(getClass());
+    public AmazonS3ImageSaver(String subPath) {
+        logger = LogManager.getLogger(getClass());
 
-        AWSCredentials awsCredentials = new BasicAWSCredentials(Configuration.getInstance().getImageS3AccessKey(),
-                Configuration.getInstance().getImageS3AccessSecret());
+        AWSCredentials awsCredentials =
+                new BasicAWSCredentials(Configuration.getInstance().getImageS3AccessKey(),
+                                        Configuration.getInstance().getImageS3AccessSecret());
         s3Client = new AmazonS3Client(awsCredentials);
         bucketName = Configuration.getInstance().getImageS3Bucket();
         this.subPath = subPath;
@@ -48,7 +53,7 @@ public class AmazonS3ImageSaver extends ImageSaver {
     }
 
     @Override
-    public void save(String path, String fileName, byte[] bytes){
+    public void save(String path, String fileName, byte[] bytes) {
         byte[] md5 = DigestUtils.md5(bytes);
         InputStream is = new ByteArrayInputStream(bytes);
         ObjectMetadata metadata = new ObjectMetadata();
@@ -57,7 +62,8 @@ public class AmazonS3ImageSaver extends ImageSaver {
         //setting max-age to 15 days
         metadata.setCacheControl("max-age=1296000");
         metadata.setContentMD5(new String(Base64.encodeBase64(md5)));
-        PutObjectRequest request = new PutObjectRequest(bucketName, subPath + path + fileName, is, metadata);
+        PutObjectRequest request =
+                new PutObjectRequest(bucketName, subPath + path + fileName, is, metadata);
         request.setCannedAcl(CannedAccessControlList.PublicRead);
         PutObjectResult result = s3Client.putObject(request);
         logger.debug("Etag:" + result.getETag() + "-->" + result);

@@ -19,14 +19,14 @@
 package de.anycook.db.drafts.mongo;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MapReduceCommand;
-import com.mongodb.MapReduceOutput;
+import com.mongodb.client.MongoCollection;
+
 import de.anycook.db.drafts.RecipeDraftsStore;
 import de.anycook.drafts.RecipeDraft;
 import de.anycook.newrecipe.DraftNumberProvider;
+
+import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.io.IOException;
@@ -35,23 +35,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Manages access to mongodb recipedraft collection
- * Document structure:
- * {
- * _id:unique_id,
- * user_id:number,
- * draft_id:number,
- * name:string,
- * <p/>
- * }
- * <p/>
- * index: {user_id:1, draft_id:-1}
+ * Manages access to mongodb recipedraft collection Document structure: { _id:unique_id,
+ * user_id:number, draft_id:number, name:string, <p/> } <p/> index: {user_id:1, draft_id:-1}
  *
  * @author Jan Graßegger <jan@anycook.de>
  */
 public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore, AutoCloseable {
 
-    private DBCollection coll;
+    private MongoCollection<Document> coll;
 
     public MongoDBRecipeDraftsStore() {
         super();
@@ -61,33 +52,29 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
     @Override
     public List<RecipeDraft> getDrafts(int user_id) throws IOException {
         String map = "function(){" +
-                "var percentage = 0;" +
-                "for(var key in this){" +
-                "percentage++;" +
-                "}" +
-                "percentage/=14;" +
-                "var out = { percentage : percentage," +
-                "timestamp:this.timestamp," +
-                "description:this.description," +
-                "image:this.image," +
-                "name : this.name," +
-                "percentage : percentage" +
-                "};" +
-                "emit(this._id, out);" +
-                "}";
+                     "var percentage = 0;" +
+                     "for(var key in this){" +
+                     "percentage++;" +
+                     "}" +
+                     "percentage/=14;" +
+                     "var out = { percentage : percentage," +
+                     "timestamp:this.timestamp," +
+                     "description:this.description," +
+                     "image:this.image," +
+                     "name : this.name," +
+                     "percentage : percentage" +
+                     "};" +
+                     "emit(this._id, out);" +
+                     "}";
         String reduce = "function(key, values){" +
-                "values.forEach(function(doc){" +
-                "return doc;" +
-                "});}";
-        DBObject query = getQuery(user_id);
+                        "values.forEach(function(doc){" +
+                        "return doc;" +
+                        "});}";
+        Document query = getQuery(user_id);
 
-        MapReduceCommand mapReduce =
-                new MapReduceCommand(coll, map, reduce, null, MapReduceCommand.OutputType.INLINE, query);
-
-        MapReduceOutput out = coll.mapReduce(mapReduce);
         List<RecipeDraft> drafts = new LinkedList<>();
 
-        for (DBObject res : out.results()) {
+        for (Document res : coll.mapReduce(map, reduce).filter(query)) {
             String id = res.get("_id").toString();
 
             /*Map<String, Object> data = new HashMap<>();
@@ -101,28 +88,27 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
 
     @Override
     public RecipeDraft getDraft(String draft_id, int user_id) throws DraftNotFoundException {
-        DBObject query = getQuery(user_id, draft_id);
-        DBObject draftObject = coll.findOne(query);
-        if (draftObject == null) {
+        Document query = getQuery(user_id, draft_id);
+        Document draft = coll.find(query).iterator().tryNext();
+        if (draft == null) {
             throw new DraftNotFoundException(draft_id, user_id);
         }
-        return new RecipeDraft(draftObject);
+
+        return new RecipeDraft(draft);
     }
 
     @Override
     public int countDrafts(int userId) {
-        DBObject query = getQuery(userId);
-        try (DBCursor results = coll.find(query)) {
-            return results.count();
-        }
+        Document query = getQuery(userId);
+        return (int) coll.count(query);
     }
 
     @Override
     public String newDraft(int user_id) throws SQLException {
         long time = System.currentTimeMillis();
-        DBObject obj = new BasicDBObject("user_id", user_id)
+        Document obj = new Document("user_id", user_id)
                 .append("timestamp", time);
-        coll.insert(obj);
+        coll.insertOne(obj);
         ObjectId id = (ObjectId) obj.get("_id");
 
         DraftNumberProvider.INSTANCE.wakeUpSuspended(user_id);
@@ -137,15 +123,15 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
     }
 
     private void update(DBObject updateObj, int user_id, String draft_id) {
-        DBObject query = getQuery(user_id, draft_id);
-        DBObject set = new BasicDBObject("$set", updateObj);
-        coll.update(query, set);
+        Document query = getQuery(user_id, draft_id);
+        Document set = new Document("$set", updateObj);
+        coll.findOneAndUpdate(query, set);
     }
 
     @Override
     public void deleteDraft(String id, int userId) throws SQLException {
-        DBObject query = getQuery(userId, id);
-        coll.remove(query);
+        Document query = getQuery(userId, id);
+        coll.findOneAndDelete(query);
         DraftNumberProvider.INSTANCE.wakeUpSuspended(userId);
     }
 
@@ -155,11 +141,11 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
         coll = null;
     }
 
-    private static DBObject getQuery(int user_id) {
-        return new BasicDBObject("user_id", user_id);
+    private static Document getQuery(int user_id) {
+        return new Document("user_id", user_id);
     }
 
-    private static DBObject getQuery(int user_id, String draft_id) {
-        return new BasicDBObject("_id", new ObjectId(draft_id)).append("user_id", user_id);
+    private static Document getQuery(int user_id, String draft_id) {
+        return new Document("_id", new ObjectId(draft_id)).append("user_id", user_id);
     }
 }

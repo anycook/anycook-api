@@ -31,11 +31,10 @@ import java.io.Reader;
 public class NGramAnalyzer extends Analyzer {
 
     @Override
-    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
-        Tokenizer tokenizer = new LowerCaseTokenizer(Version.LUCENE_45, reader);
-        TokenStream filter = new NGramTokenFilter(Version.LUCENE_45, tokenizer, 1, 5);
+    protected TokenStreamComponents createComponents(String fieldName) {
+        Tokenizer tokenizer = new LowerCaseTokenizer();
+        TokenStream filter = new NGramTokenFilter(tokenizer, 1, 5);
 
         return new TokenStreamComponents(tokenizer, filter);
-
     }
 }

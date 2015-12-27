@@ -23,9 +23,12 @@ package de.anycook.db.mysql;
 
 
 import com.google.common.base.Preconditions;
+
 import de.anycook.conf.Configuration;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.log4j.Logger;
+
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -40,7 +43,8 @@ import java.util.Enumeration;
  * @author Jan Grassegger
  */
 public class DBHandler implements AutoCloseable {
-    private static Logger sLogger = Logger.getLogger(DBHandler.class);
+
+    private static Logger sLogger = LogManager.getLogger(DBHandler.class);
 
 
     protected static BasicDataSource dataSource;
@@ -65,7 +69,7 @@ public class DBHandler implements AutoCloseable {
      * Laedt jdbc-Driver und ruft {@link de.anycook.db.mysql.DBHandler#connect()} auf.
      */
     public DBHandler() throws SQLException {
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
         //logger.debug("created new connection");
 
         connect();
@@ -77,8 +81,8 @@ public class DBHandler implements AutoCloseable {
     }
 
     /**
-     * Nur zur Sicherheit, falls jemand vergessen hat die DB-Verbindung zu schließen.
-     * Sollte aber trotzdem immer gemacht werden!
+     * Nur zur Sicherheit, falls jemand vergessen hat die DB-Verbindung zu schließen. Sollte aber
+     * trotzdem immer gemacht werden!
      */
     @Override
     protected void finalize() throws Throwable {
@@ -86,7 +90,8 @@ public class DBHandler implements AutoCloseable {
         close();
     }
 
-    private static BasicDataSource setupDataSource(String server, int port, String dbName, String username,
+    private static BasicDataSource setupDataSource(String server, int port, String dbName,
+                                                   String username,
                                                    String password, int maxActive, int maxIdle) {
         Preconditions.checkNotNull(server);
         Preconditions.checkNotNull(dbName);
@@ -97,20 +102,22 @@ public class DBHandler implements AutoCloseable {
         ds.setUsername(username);
         ds.setPassword(password);
 
-
-        String url = String.format("jdbc:mysql://%s:%d/%s?useConfigs=maxPerformance&useCompression=true",
-                server, port, dbName);
+        String
+                url =
+                String.format("jdbc:mysql://%s:%d/%s?useConfigs=maxPerformance&useCompression=true",
+                              server, port, dbName);
         ds.setUrl(url);
         ds.setValidationQuery("SELECT 1;");
         ds.setTestWhileIdle(true);
         ds.setTestOnReturn(true);
-        ds.setMaxActive(maxActive);
+        ds.setMaxTotal(maxActive);
         ds.setMaxIdle(maxIdle);
-        ds.setRemoveAbandoned(true);
+        ds.setRemoveAbandonedOnBorrow(true);
         ds.setRemoveAbandonedTimeout(60);
 
-        if(Configuration.getInstance().isDeveloperMode())
+        if (Configuration.getInstance().isDeveloperMode()) {
             ds.setLogAbandoned(true);
+        }
 
         sLogger.info("created new Connectionpool");
         return ds;
@@ -130,7 +137,9 @@ public class DBHandler implements AutoCloseable {
     }
 
     private void connect() throws SQLException {
-        if (dataSource == null) throw new SQLException("Connection pool has not been initialized");
+        if (dataSource == null) {
+            throw new SQLException("Connection pool has not been initialized");
+        }
         connection = dataSource.getConnection();
     }
 
@@ -139,7 +148,9 @@ public class DBHandler implements AutoCloseable {
         try {
             connection.close();
             connection = null;
-        } catch (SQLException e) {logger.debug("failed to close connection", e);}
+        } catch (SQLException e) {
+            logger.debug("failed to close connection", e);
+        }
         //logger.debug("closed a connection");
     }
 
@@ -148,7 +159,7 @@ public class DBHandler implements AutoCloseable {
     }
 
     public static void checkDataSourceStatus() {
-        if (dataSource.getMaxActive() - dataSource.getNumActive() <= 12) {
+        if (dataSource.getMaxTotal() - dataSource.getNumActive() <= 12) {
             sLogger.warn("running out of connections!");
             printDataSourceStatus();
         }
@@ -156,8 +167,8 @@ public class DBHandler implements AutoCloseable {
 
     public static void printDataSourceStatus() {
         sLogger.info(String.format("MySQLConn. Idle: %d MaxIdle: %d NumActive: %d MaxActive: %d",
-                dataSource.getNumIdle(), dataSource.getMaxIdle(), dataSource.getNumActive(), dataSource.getMaxActive()));
-
+                                   dataSource.getNumIdle(), dataSource.getMaxIdle(),
+                                   dataSource.getNumActive(), dataSource.getMaxTotal()));
     }
 
     public static int getNumActive() {
@@ -165,7 +176,7 @@ public class DBHandler implements AutoCloseable {
     }
 
     public static int getMaxActive() {
-        return dataSource.getMaxActive();
+        return dataSource.getMaxTotal();
     }
 
     public static int getNumIdle() {
@@ -186,6 +197,7 @@ public class DBHandler implements AutoCloseable {
     }
 
     public static class ConnectionStatus {
+
         private int numActive;
         private int maxActive;
         private int numIdle;

@@ -23,7 +23,9 @@ package de.anycook.mail;
 
 import com.google.common.base.Preconditions;
 import de.anycook.conf.Configuration;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -60,7 +62,7 @@ public class MailHandler {
      */
     private MailHandler() {
 
-        logger = Logger.getLogger(getClass());
+        logger = LogManager.getLogger(getClass());
         executor = Executors.newFixedThreadPool(10);
 
 
@@ -126,7 +128,7 @@ public class MailHandler {
     }
 
     private static class MailSender implements Runnable{
-        private static Logger logger = Logger.getLogger(MailSender.class);
+        private static Logger logger = LogManager.getLogger(MailSender.class);
 
         private final MimeMessage message;
 

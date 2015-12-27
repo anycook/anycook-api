@@ -18,7 +18,8 @@
 
 package de.anycook.utils;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -26,7 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateParser {
-    private final static Logger logger = Logger.getLogger(DateParser.class);
+
+    private final static Logger logger = LogManager.getLogger(DateParser.class);
     private final static String DATE_FORMAT = "yyyy-MM-dd";
     private final static String DATETIME_FORMAT = DATE_FORMAT + " HH:mm:ss";
     private final static DateFormat datetimeparser = new SimpleDateFormat(DATETIME_FORMAT);
@@ -51,12 +53,16 @@ public class DateParser {
     }
 
     public static String dateToString(Date date) {
-        if (date == null) return null;
+        if (date == null) {
+            return null;
+        }
         return dateparser.format(date);
     }
 
     public static String datetimeToString(Date datetime) {
-        if (datetime == null) return null;
+        if (datetime == null) {
+            return null;
+        }
         return datetimeparser.format(datetime);
     }
 }

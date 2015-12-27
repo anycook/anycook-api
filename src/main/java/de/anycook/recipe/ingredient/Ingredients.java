@@ -4,7 +4,7 @@ import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBIngredient;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.drafts.IngredientDraft;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.tartarus.snowball.SnowballProgram;
 import org.tartarus.snowball.ext.GermanStemmer;
 
@@ -27,10 +27,9 @@ public final class Ingredients {
     }
 
     public static int getTotal() throws SQLException {
-        DBGetRecipe db = new DBGetRecipe();
-        int total = db.getTotalIngredients();
-        db.close();
-        return total;
+        try (DBGetRecipe db = new DBGetRecipe()) {
+            return db.getTotalIngredients();
+        }
     }
 
     private static Set<Ingredient> searchNGram(List<String> terms, int n, DBRecipe dbRecipe) throws SQLException {
@@ -44,7 +43,8 @@ public final class Ingredients {
             try {
                 sb.append(terms.get(i));
             } catch (IndexOutOfBoundsException e) {
-                Logger.getLogger(Ingredient.class).error("terms: " + terms + " n:" + n + " i:" + i, e);
+                LogManager.getLogger(Ingredient.class)
+                        .error("terms: " + terms + " n:" + n + " i:" + i, e);
             }
             int j;
             for (j = i + 1; j < i + n; ++j)

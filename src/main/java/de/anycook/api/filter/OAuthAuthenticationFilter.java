@@ -18,9 +18,10 @@
 
 package de.anycook.api.filter;
 
-import java.net.URI;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+import java.net.URI;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -28,16 +29,17 @@ import javax.ws.rs.ext.Provider;
 
 @Provider
 public class OAuthAuthenticationFilter implements ContainerRequestFilter {
-	private final Logger logger;
-	
-	public OAuthAuthenticationFilter(){
-		logger = Logger.getLogger(getClass());
-	}
-	
 
-	@Override
-	public void filter(ContainerRequestContext containerRequest) {
-		URI uri = containerRequest.getUriInfo().getRequestUri();
+    private final Logger logger;
+
+    public OAuthAuthenticationFilter() {
+        logger = LogManager.getLogger(getClass());
+    }
+
+
+    @Override
+    public void filter(ContainerRequestContext containerRequest) {
+        URI uri = containerRequest.getUriInfo().getRequestUri();
 //		URI referer;
 //		try {
 //			String refererStr = containerRequest.getHeaderValue("referer");
@@ -49,17 +51,15 @@ public class OAuthAuthenticationFilter implements ContainerRequestFilter {
 //		if(refererDomain.endsWith("anycook.de")){
 //			return containerRequest;
 //		}
-		
-		
-		
-		//use path to check if de.anycook.oauth is needed
-		/*String path = uri.getPath();
+
+        //use path to check if de.anycook.oauth is needed
+        /*String path = uri.getPath();
 		logger.debug(path);
 		if(path.startsWith("oauth"))
 			containerReque     */
-		
+
 //		logger.debug(uri);
-		
+
 //		DBApps db = new DBApps();
 //		String appSecret = db.getAppSecretByDomain(refererDomain);
 //		Integer appID = db.getAppIDbyDomain(refererDomain);
@@ -107,6 +107,6 @@ public class OAuthAuthenticationFilter implements ContainerRequestFilter {
 //        // Return the request
 //        db.close();
         //return containerRequest;
-	}
+    }
 
 }

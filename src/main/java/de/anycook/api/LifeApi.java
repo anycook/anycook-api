@@ -25,8 +25,14 @@ import de.anycook.api.providers.LifeProvider;
 import de.anycook.api.util.MediaType;
 import de.anycook.news.life.Life;
 import de.anycook.news.life.Lifes;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.server.ManagedAsync;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -38,9 +44,6 @@ import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Graph for lifes stream
@@ -49,7 +52,8 @@ import java.util.concurrent.TimeUnit;
  */
 @Path("/life")
 public class LifeApi {
-    private final Logger logger = Logger.getLogger(getClass());
+
+    private final Logger logger = LogManager.getLogger(getClass());
 
     @GET
     @ManagedAsync
@@ -67,17 +71,20 @@ public class LifeApi {
 
         try {
             List<Life> lives = oldestId == null ?
-                    Lifes.getLastLives(newestId) : Lifes.getOlderLives(oldestId);
+                               Lifes.getLastLives(newestId) : Lifes.getOlderLives(oldestId);
 
             if (lives.size() > 0) {
                 final GenericEntity<List<Life>> entity = new GenericEntity<List<Life>>(lives) {
                 };
                 asyncResponse.resume(entity);
-            } else LifeProvider.suspend(asyncResponse);
+            } else {
+                LifeProvider.suspend(asyncResponse);
+            }
 
         } catch (SQLException e) {
             logger.error(e, e);
-            asyncResponse.resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
+            asyncResponse
+                    .resume(new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR));
         }
 
     }

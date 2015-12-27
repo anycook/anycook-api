@@ -3,7 +3,9 @@ package de.anycook.newrecipe;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import de.anycook.db.drafts.RecipeDraftsStore;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.core.Response;
@@ -23,7 +25,7 @@ public enum DraftNumberProvider {
     private final Cache<Integer, BlockingQueue<AsyncResponse>> suspended;
 
     private DraftNumberProvider(){
-    logger = Logger.getLogger(getClass());
+    logger = LogManager.getLogger(getClass());
     suspended = CacheBuilder.newBuilder()
             .maximumSize(10000)
             .expireAfterWrite(5, TimeUnit.MINUTES)

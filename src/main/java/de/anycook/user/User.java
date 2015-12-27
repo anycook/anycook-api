@@ -19,6 +19,7 @@
 package de.anycook.user;
 
 import de.anycook.api.views.PrivateView;
+import de.anycook.api.views.PublicView;
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.image.Image;
@@ -31,14 +32,19 @@ import de.anycook.sitemap.SiteMapGenerator;
 import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.utils.enumerations.ImageType;
 import de.anycook.utils.enumerations.NotificationType;
-import de.anycook.api.views.PublicView;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 
@@ -51,14 +57,16 @@ public class User implements Comparable<User> {
 
     private static final Logger logger;
     private static final String adminMail;
-    private final static Pattern passwordRegex = Pattern.compile("((?=.*\\d)(?=.*[a-zA-Z@#$%]).{6,})");
+    private final static Pattern passwordRegex =
+            Pattern.compile("((?=.*\\d)(?=.*[a-zA-Z@#$%]).{6,})");
 
     static {
-        logger = Logger.getLogger(User.class);
+        logger = LogManager.getLogger(User.class);
         adminMail = Configuration.getInstance().getAdminMail();
     }
 
-    public static User init(String nameOrMail) throws SQLException, DBUser.UserNotFoundException, IOException {
+    public static User init(String nameOrMail)
+            throws SQLException, DBUser.UserNotFoundException, IOException {
         try (DBUser dbuser = new DBUser()) {
             int id = dbuser.getUserId(nameOrMail);
             return init(id);
@@ -72,8 +80,9 @@ public class User implements Comparable<User> {
     }
 
     public static User initAdmin() {
-        return new User(99999, "admin", "admin@anycook.de", -1, null, 2, null, null, null, null, -1, -1,
-                null, null, null);
+        return new User(99999, "admin", "admin@anycook.de", -1, null, 2, null, null, null, null, -1,
+                        -1,
+                        null, null, null);
 
     }
 
@@ -87,8 +96,9 @@ public class User implements Comparable<User> {
         return passwordRegex.matcher(newPw).matches();
     }
 
-    public static User login(int id, String pwd) throws SQLException, IOException, DBUser.UserNotFoundException,
-            LoginException {
+    public static User login(int id, String pwd)
+            throws SQLException, IOException, DBUser.UserNotFoundException,
+                   LoginException {
         try (DBUser dbuser = new DBUser()) {
             if (dbuser.login(id, pwd)) {
                 dbuser.setLastLogin(id);
@@ -101,8 +111,9 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static User login(String cookieId) throws SQLException, IOException, DBUser.UserNotFoundException,
-            DBUser.CookieNotFoundException {
+    public static User login(String cookieId)
+            throws SQLException, IOException, DBUser.UserNotFoundException,
+                   DBUser.CookieNotFoundException {
         try (DBUser dbuser = new DBUser()) {
             int userId = dbuser.getUserIdFromCookieId(cookieId);
 
@@ -119,8 +130,9 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static User facebookLogin(Long uid) throws SQLException, IOException, DBUser.UserNotFoundException,
-            LoginException {
+    public static User facebookLogin(Long uid)
+            throws SQLException, IOException, DBUser.UserNotFoundException,
+                   LoginException {
         try (DBUser dbuser = new DBUser()) {
             int userId = dbuser.facebookLogin(uid);
             if (userId != -1) {
@@ -157,7 +169,8 @@ public class User implements Comparable<User> {
         return newUser(mail, pwd, username, false);
     }
 
-    public static boolean newUser(String mail, String pwd, String username, boolean active) throws SQLException {
+    public static boolean newUser(String mail, String pwd, String username, boolean active)
+            throws SQLException {
         logger.info("started to add new user");
         if (!checkPassword(pwd)) {
             logger.info(String.format("bad password: %s %s,  %s", mail, username, pwd));
@@ -166,8 +179,9 @@ public class User implements Comparable<User> {
 
         try (DBUser dbuser = new DBUser()) {
             String activationID = null;
-            if (!active)
+            if (!active) {
                 activationID = RandomStringUtils.randomAlphanumeric(20);
+            }
 
             logger.debug("activationId is:" + activationID);
             String image = User.getRandomUserpic();
@@ -175,12 +189,13 @@ public class User implements Comparable<User> {
             Integer newUserId = dbuser.newUser(mail, pwd, username, activationID, image);
 
             if (newUserId != null) {
-                if (!active)
+                if (!active) {
                     try {
                         User.sendAccountActivationMail(newUserId, username, activationID);
                     } catch (DBUser.UserNotFoundException e) {
                         logger.error(e, e);
                     }
+                }
                 logger.info("user created. Username:" + username + " Mail: " + mail);
                 return true;
             }
@@ -189,7 +204,8 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static boolean newFacebookUser(String mail, String name, long facebook_id) throws SQLException {
+    public static boolean newFacebookUser(String mail, String name, long facebook_id)
+            throws SQLException {
         try (DBUser dbuser = new DBUser()) {
             Integer newUserId = dbuser.newFacebookUser(mail, name, facebook_id);
             if (newUserId != null) {
@@ -227,7 +243,8 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static void activateById(String activationId) throws SQLException, DBUser.ActivationFailedException {
+    public static void activateById(String activationId)
+            throws SQLException, DBUser.ActivationFailedException {
         try (DBUser dbuser = new DBUser()) {
             int userid = dbuser.activateById(activationId);
             Lifes.addLife(Lifes.CaseType.NEW_USER, userid);
@@ -244,7 +261,8 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static void resetPassword(String id, String newPw) throws SQLException, ResetPasswordException {
+    public static void resetPassword(String id, String newPw)
+            throws SQLException, ResetPasswordException {
         try (DBUser dbuser = new DBUser()) {
             if (dbuser.checkResetPasswordID(id)) {
                 dbuser.resetPassword(id, newPw);
@@ -270,19 +288,22 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static String getUseremail(String username) throws SQLException, DBUser.UserNotFoundException {
+    public static String getUseremail(String username)
+            throws SQLException, DBUser.UserNotFoundException {
         try (DBUser dbuser = new DBUser()) {
             return dbuser.getUserEmail(username);
         }
     }
 
-    public static String getMailCandidate(int userId) throws SQLException, DBUser.UserNotFoundException {
-        try (DBUser dbuser = new DBUser()){
+    public static String getMailCandidate(int userId)
+            throws SQLException, DBUser.UserNotFoundException {
+        try (DBUser dbuser = new DBUser()) {
             return dbuser.getMailCandidate(userId);
         }
     }
 
-    public static String getUseremail(int userId) throws SQLException, DBUser.UserNotFoundException {
+    public static String getUseremail(int userId)
+            throws SQLException, DBUser.UserNotFoundException {
         try (DBUser dbuser = new DBUser()) {
             return dbuser.getUserEmail(userId);
         }
@@ -294,15 +315,21 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static int getUserId(String nameOrMail) throws SQLException, DBUser.UserNotFoundException {
+    public static int getUserId(String nameOrMail)
+            throws SQLException, DBUser.UserNotFoundException {
         try (DBUser dbuser = new DBUser()) {
-            if (nameOrMail.equals(adminMail)) return -1;
+            if (nameOrMail.equals(adminMail)) {
+                return -1;
+            }
             return dbuser.getUserId(nameOrMail);
         }
     }
 
-    public static String getUserImage(int userId, ImageType type) throws SQLException, IOException, DBUser.UserNotFoundException {
-        StringBuilder imagePath = new StringBuilder(Configuration.getInstance().getImageBasePath()).append("user/");
+    public static String getUserImage(int userId, ImageType type)
+            throws SQLException, IOException, DBUser.UserNotFoundException {
+        StringBuilder
+                imagePath =
+                new StringBuilder(Configuration.getInstance().getImageBasePath()).append("user/");
         try (DBUser dbuser = new DBUser()) {
             String userImage = dbuser.getUserImage(userId);
 
@@ -318,15 +345,16 @@ public class User implements Comparable<User> {
                     imagePath.append("original/");
                     break;
             }
-            if (userImage != null){
+            if (userImage != null) {
                 return imagePath.append(userImage).toString();
             }
 
             logger.info("userimage was null");
             User user = User.init(userId);
 
-            if (user != null && user.facebookID != 0)
+            if (user != null && user.facebookID != 0) {
                 return user.getUserImage(type);
+            }
             return imagePath.append(getRandomUserpic()).toString();
         }
 
@@ -334,8 +362,9 @@ public class User implements Comparable<User> {
 
     public static List<String> getUsernames(List<User> list) {
         List<String> userNames = new LinkedList<>();
-        for (User user : list)
+        for (User user : list) {
             userNames.add(user.name);
+        }
         return userNames;
     }
 
@@ -351,11 +380,12 @@ public class User implements Comparable<User> {
     }
 
 
-    public static void createResetPasswordID(String mail) throws SQLException, IOException, DBUser.UserNotFoundException {
+    public static void createResetPasswordID(String mail)
+            throws SQLException, IOException, DBUser.UserNotFoundException {
         User user = User.init(mail);
 
         String resetPWID = RandomStringUtils.randomAlphanumeric(16);
-        try(DBUser dbuser = new DBUser()){
+        try (DBUser dbuser = new DBUser()) {
             dbuser.setResetPasswordID(user.getId(), resetPWID);
         }
         user.sendResetPasswordMail(resetPWID);
@@ -364,17 +394,20 @@ public class User implements Comparable<User> {
 
     public static String generateAndSaveActivationId(int userId) throws SQLException {
         String activationId = RandomStringUtils.randomAlphanumeric(20);
-        try(DBUser dbUser = new DBUser()) {
+        try (DBUser dbUser = new DBUser()) {
             dbUser.setActivationId(userId, activationId);
             return activationId;
         }
     }
 
-    public static void resendActivationId(int userId) throws SQLException, DBUser.UserNotFoundException {
+    public static void resendActivationId(int userId)
+            throws SQLException, DBUser.UserNotFoundException {
         String username = User.getUsername(userId);
         try (DBUser dbUser = new DBUser()) {
             String activationId = dbUser.getActivationId(userId);
-            if (activationId == null) activationId = User.generateAndSaveActivationId(userId);
+            if (activationId == null) {
+                activationId = User.generateAndSaveActivationId(userId);
+            }
             User.sendAccountActivationMail(userId, username, activationId);
         }
     }
@@ -430,8 +463,8 @@ public class User implements Comparable<User> {
     private List<Integer> followers;
 
 
-
-    public User(){}
+    public User() {
+    }
 
 
     public User(int id, String name, String image) {
@@ -571,7 +604,8 @@ public class User implements Comparable<User> {
     }
 
     //@JsonIgnore
-    public String getUserImage(ImageType type) throws SQLException, IOException, DBUser.UserNotFoundException {
+    public String getUserImage(ImageType type)
+            throws SQLException, IOException, DBUser.UserNotFoundException {
         return getUserImage(id, type);
     }
 
@@ -626,7 +660,7 @@ public class User implements Comparable<User> {
 
 
     public void setImage(String newImage) throws SQLException {
-        try(DBUser db = new DBUser()){
+        try (DBUser db = new DBUser()) {
             db.changeImage(id, newImage);
             logger.info(mail + " changed image to " + image);
             this.image = new UserImage(newImage);
@@ -634,9 +668,11 @@ public class User implements Comparable<User> {
     }
 
     public boolean setName(String name) throws SQLException {
-        if (name == null || this.name != null && this.name.equals(name)) return false;
+        if (name == null || this.name != null && this.name.equals(name)) {
+            return false;
+        }
 
-        try(DBUser db = new DBUser()){
+        try (DBUser db = new DBUser()) {
             db.changeName(id, name);
         }
 
@@ -646,14 +682,16 @@ public class User implements Comparable<User> {
 
     public boolean setPlace(String place) throws SQLException {
 
-        if (place == null || this.place != null && this.place.equals(place)) return false;
+        if (place == null || this.place != null && this.place.equals(place)) {
+            return false;
+        }
 
-        try(DBUser db = new DBUser()){
+        try (DBUser db = new DBUser()) {
             db.changePlace(id, place);
 
             GeoCode geoCode = new GeoCode();
             setLocation(geoCode.getLocation(place));
-        } catch (GeoCode.LocationNotFoundException|IOException e) {
+        } catch (GeoCode.LocationNotFoundException | IOException e) {
             logger.debug(e, e);
         }
 
@@ -662,13 +700,15 @@ public class User implements Comparable<User> {
     }
 
     public boolean setText(String text) throws SQLException {
-        if (text == null || this.text != null && this.text.equals(text))
+        if (text == null || this.text != null && this.text.equals(text)) {
             return false;
+        }
 
-        if (text.length() > 140)
+        if (text.length() > 140) {
             return false;
+        }
 
-        try(DBUser dbuser = new DBUser()){
+        try (DBUser dbuser = new DBUser()) {
             dbuser.changeText(id, text);
         }
 
@@ -678,8 +718,10 @@ public class User implements Comparable<User> {
     }
 
     public void setLocation(Location location) throws SQLException {
-        if(location == null) return;
-        try(DBUser dbUser = new DBUser()) {
+        if (location == null) {
+            return;
+        }
+        try (DBUser dbUser = new DBUser()) {
             dbUser.changeLocation(id, location);
         }
 
@@ -691,7 +733,7 @@ public class User implements Comparable<User> {
     public void setMailCandidate(String newMail) throws SQLException {
         String mailActivationCode = RandomStringUtils.randomAlphanumeric(16);
 
-        try(DBUser dbUser = new DBUser()){
+        try (DBUser dbUser = new DBUser()) {
             dbUser.setMailCandidate(id, newMail, mailActivationCode);
         }
         Map<String, String> data = new HashMap<>();
@@ -707,20 +749,20 @@ public class User implements Comparable<User> {
 
     public String confirmMailCandidate(String code) throws DBUser.WrongCodeException, SQLException {
         String oldMail = this.mail;
-        try(DBUser dbUser = new DBUser()){
+        try (DBUser dbUser = new DBUser()) {
             dbUser.updateMail(this.id, code);
         }
 
         this.mail = this.emailCandidate;
         this.emailCandidate = null;
 
-        logger.info(id+" changed mail from "+oldMail+" to "+mail);
+        logger.info(id + " changed mail from " + oldMail + " to " + mail);
 
         return this.mail;
     }
 
     public boolean setNewPassword(String oldPassword, String newPassword) throws SQLException {
-        try(DBUser dbUser = new DBUser()){
+        try (DBUser dbUser = new DBUser()) {
             return dbUser.changePassword(id, oldPassword, newPassword);
         }
     }
@@ -731,13 +773,14 @@ public class User implements Comparable<User> {
     }
 
     public static List<Integer> getAdminIds() throws SQLException {
-        try(DBUser dbUser = new DBUser()){
+        try (DBUser dbUser = new DBUser()) {
             return dbUser.getAdminIds();
         }
     }
 
     // inner classes
     public static class LoginException extends Exception {
+
         public LoginException(long uid) {
             super("login failed for facebook id: " + uid);
         }
@@ -751,9 +794,10 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static class ResetPasswordException extends Exception{
-        public ResetPasswordException(String id){
-            super("failed to reset password for "+id);
+    public static class ResetPasswordException extends Exception {
+
+        public ResetPasswordException(String id) {
+            super("failed to reset password for " + id);
         }
     }
 

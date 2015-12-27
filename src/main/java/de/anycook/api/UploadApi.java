@@ -23,17 +23,13 @@ import de.anycook.session.Session;
 import de.anycook.upload.RecipeUploader;
 import de.anycook.upload.UploadHandler;
 import de.anycook.upload.UserUploader;
+
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,44 +37,56 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 
 @Path("upload")
 public class UploadApi {
-	private final Logger logger;
-	
-	public UploadApi() {
-		logger = Logger.getLogger(getClass());
-	}
-	
-	
-	@POST
-	@Path("image/{type}")
+
+    private final Logger logger;
+
+    public UploadApi() {
+        logger = LogManager.getLogger(getClass());
+    }
+
+
+    @POST
+    @Path("image/{type}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response uploadRecipeImage(@Context HttpServletRequest request,
-			@Context HttpHeaders hh,
-            @FormDataParam("file") InputStream uploadedInputStream,
-            @FormDataParam("file") FormDataContentDisposition fileDetail,
-			@PathParam("type") String type){
-		
-		UploadHandler upload;
-		Session session = Session.init(request.getSession());
-		
-		switch (type) {
-		case "recipe":
-			upload = new RecipeUploader();
-			break;
-		case "user":
-            session.checkLogin();
-            upload = new UserUploader();
-			break;
-		default:
-			throw new WebApplicationException(400);
-		}
+    public Response uploadRecipeImage(@Context HttpServletRequest request,
+                                      @Context HttpHeaders hh,
+                                      @FormDataParam("file") InputStream uploadedInputStream,
+                                      @FormDataParam("file") FormDataContentDisposition fileDetail,
+                                      @PathParam("type") String type) {
+
+        UploadHandler upload;
+        Session session = Session.init(request.getSession());
+
+        switch (type) {
+            case "recipe":
+                upload = new RecipeUploader();
+                break;
+            case "user":
+                session.checkLogin();
+                upload = new UserUploader();
+                break;
+            default:
+                throw new WebApplicationException(400);
+        }
         File tempFile;
         try {
             tempFile = upload.uploadFile(uploadedInputStream);
         } catch (IOException | FileUploadException e) {
-            logger.error(e,e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } finally {
             try {
@@ -88,22 +96,24 @@ public class UploadApi {
             }
         }
 
-        if(tempFile == null)
+        if (tempFile == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
+        }
 
-        try{
+        try {
             String newFilename = upload.saveFile(tempFile);
-            if(type.equals("user"))
+            if (type.equals("user")) {
                 session.getUser().setImage(newFilename);
+            }
 
             String basePath = Configuration.getInstance().getImageBasePath();
             String path = String.format("%s%s/big/%s", basePath, type, newFilename);
-            return  Response.created(new URI(path)).build();
+            return Response.created(new URI(path)).build();
         } catch (SQLException | IOException | URISyntaxException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
-	
+
+
 }

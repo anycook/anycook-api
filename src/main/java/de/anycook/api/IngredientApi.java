@@ -23,7 +23,14 @@ import de.anycook.api.views.PublicView;
 import de.anycook.db.mysql.DBIngredient;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.ingredient.Ingredients;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.lang.annotation.Annotation;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,45 +42,41 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
-import java.lang.annotation.Annotation;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
 
 
 @Path("/ingredient")
 public class IngredientApi {
 
-    private Logger logger = Logger.getLogger(getClass());
+    private Logger logger = LogManager.getLogger(getClass());
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAll(@QueryParam("parent") boolean parent,
-                                   @QueryParam("detailed") boolean detailed,
-                                   @Context Request request){
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAll(@QueryParam("parent") boolean parent,
+                           @QueryParam("detailed") boolean detailed,
+                           @Context Request request) {
         Annotation[] annotations = detailed ?
-                new Annotation[]{PublicView.Factory.get()} : new Annotation[]{};
+                                   new Annotation[]{PublicView.Factory.get()} : new Annotation[]{};
 
-		 try {
-             List<Ingredient> ingredients = parent ?
-                     Ingredients.loadParents() : Ingredients.getAll();
+        try {
+            List<Ingredient> ingredients = parent ?
+                                           Ingredients.loadParents() : Ingredients.getAll();
 
-             return Response.ok().entity(new GenericEntity<List<Ingredient>>(ingredients){}, annotations)
-                     .build();
+            return Response.ok().entity(new GenericEntity<List<Ingredient>>(ingredients) {
+            }, annotations)
+                    .build();
         } catch (SQLException e) {
             logger.error(e);
-             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-	}
+    }
 
-	/**
-	 * Number of ingredients
-	 * @return
-	 */
-	@GET
-	@Path("number")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Integer getNum(){
+    /**
+     * Number of ingredients
+     */
+    @GET
+    @Path("number")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Integer getNum() {
         try {
             return Ingredients.getTotal();
         } catch (SQLException e) {
@@ -82,10 +85,10 @@ public class IngredientApi {
         }
     }
 
-	@GET
-	@Path("extract")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Set<Ingredient> extractIngredients(@QueryParam("q") String query){
+    @GET
+    @Path("extract")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Set<Ingredient> extractIngredients(@QueryParam("q") String query) {
         try {
             return Ingredients.searchNGram(query, 3);
         } catch (SQLException e) {
@@ -94,17 +97,17 @@ public class IngredientApi {
         }
     }
 
-	@GET
-	@Path("{ingredientName}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Ingredient getIngredient(@PathParam("ingredientName") String ingredientName){
+    @GET
+    @Path("{ingredientName}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Ingredient getIngredient(@PathParam("ingredientName") String ingredientName) {
         try {
             return Ingredient.init(ingredientName);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBIngredient.IngredientNotFoundException e) {
-            logger.info(e,e);
+            logger.info(e, e);
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
     }
