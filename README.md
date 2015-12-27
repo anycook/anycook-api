@@ -3,7 +3,7 @@ anycook-api
 
 REST Api for anycook
 
-[![Build Status](https://jenkins.anycook.de:443/buildStatus/icon?job=anycook-api)](https://jenkins.anycook.de:443/job/anycook-api/)
+[![Build Status](https://jenkins.gesundkrank.de/buildStatus/icon?job=anycook-api)](https://jenkins.gesundkrank.de/job/anycook-api)
 
 ## Documentation
 A detailed API documentation can be found [here](http://docs.anycook.apiary.io/) (still in progress).
