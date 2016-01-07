@@ -100,7 +100,10 @@ public class DBHandler implements AutoCloseable {
         BasicDataSource ds = new BasicDataSource();
         ds.setDriverClassName("com.mysql.jdbc.Driver");
         ds.setUsername(username);
-        ds.setPassword(password);
+
+        if (password.length() > 0) {
+            ds.setPassword(password);
+        }
 
         String
                 url =
