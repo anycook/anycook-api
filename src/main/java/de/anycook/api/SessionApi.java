@@ -71,8 +71,12 @@ public class SessionApi {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @PrivateView
-    public User getSession() {
-        return session.getUser();
+    public Response getSession() {
+        try {
+            return Response.accepted(session.getUser()).build();
+        } catch (WebApplicationException e) {
+            return e.getResponse();
+        }
     }
 
     @POST
