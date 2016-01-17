@@ -12,8 +12,9 @@ class anycook {
   }
 
   file { '/etc/anycook/anycook.properties' :
-      ensure => present,
-      source => "${settings::manifestdir}/anycook.properties",
+      ensure => link,
+      target => "${settings::manifestdir}/anycook.properties",
+      force  => true,
       #onlyif => 'test -f /etc/anycook/anycook.properties',
       require => File['/etc/anycook'],
       #before => Class['tomcat7'],
@@ -204,6 +205,19 @@ class mongodb {
   }
 }
 
+class install_postgres {
+  class { 'postgresql::server':
+    listen_addresses           => '*',
+    ipv4acls          => [
+      'host anycook_db anycook 127.0.0.1/32 trust',
+      'local anycook_db anycook trust'
+    ]
+  }->
+  postgresql::server::db { 'anycook_db':
+    user     => 'anycook',
+    password => 'anycook'
+  }
+}
 
 
 class install_mysql {
@@ -276,4 +290,4 @@ include java8
 include anycook
 include tomcat7
 include mongodb
-include install_mysql
+include install_postgres
