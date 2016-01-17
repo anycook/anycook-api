@@ -41,7 +41,10 @@ public class Api extends ResourceConfig{
         property("sessionCookieDomain", Configuration.getInstance().getCookieDomain());
         register(MultiPartFeature.class);
         register(EntityFilteringFeature.class);
-        register(ExceptionListener.class);
+
+        if (Configuration.getInstance().isDeveloperMode()) {
+            register(ExceptionListener.class);
+        }
 
         // makes Session available with @Context
         register(new AbstractBinder() {
