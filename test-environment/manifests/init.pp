@@ -205,27 +205,9 @@ class mongodb {
   }
 }
 
-class install_postgres {
-  class { 'postgresql::server':
-    listen_addresses           => '*',
-    ipv4acls          => [
-      'host anycook_db anycook 127.0.0.1/32 trust',
-      'local anycook_db anycook trust'
-    ]
-  }->
-  postgresql::server::db { 'anycook_db':
-    user     => 'anycook',
-    password => 'anycook'
-  }
-}
-
-
 class install_mysql {
   $user = 'anycook'
   $mysql_schema = "/mysql/anycook_procedures.sql"
-
-#include '::mysql::server'
-
 
   class { '::mysql::server':
 
@@ -290,4 +272,4 @@ include java8
 include anycook
 include tomcat7
 include mongodb
-include install_postgres
+include install_mysql
