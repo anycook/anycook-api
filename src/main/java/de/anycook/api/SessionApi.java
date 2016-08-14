@@ -115,14 +115,14 @@ public class SessionApi {
         } catch (User.LoginException | DBUser.UserNotFoundException e) {
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         } catch (IOException | SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } finally {
             if (loginAttempt != null) {
                 try {
                     loginAttempt.save();
                 } catch (SQLException e) {
-                    logger.error(e);
+                    logger.error(e, e);
                 }
             }
         }
@@ -139,7 +139,7 @@ public class SessionApi {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (User.LoginException | DBUser.UserNotFoundException e) {
-            logger.warn(e);
+            logger.warn(e, e);
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
     }
@@ -156,7 +156,7 @@ public class SessionApi {
             try {
                 session.deleteCookieID(cookie.getValue());
             } catch (SQLException e) {
-                logger.error(e);
+                logger.error(e, e);
                 throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
             }
             NewCookie newCookie = new NewCookie(cookie, "", -1, false);
@@ -174,7 +174,7 @@ public class SessionApi {
             User.activateById(activationKey);
             SiteMapGenerator.generateProfileSiteMap();
         } catch (SQLException e) {
-            logger.error(e);
+            logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBUser.ActivationFailedException e) {
             logger.warn(e, e);
