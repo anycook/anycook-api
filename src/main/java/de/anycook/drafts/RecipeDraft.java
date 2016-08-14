@@ -7,13 +7,15 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DBObject;
+
 import de.anycook.recipe.Time;
 
 import org.bson.Document;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
@@ -155,60 +157,117 @@ public class RecipeDraft {
         this.percentage = percentage;
     }
 
-    public void read(Document document){
+    private void read(Document document){
         this.id = document.get("_id").toString();
         if(document.containsKey("value")){
             document = (Document) document.get("value");
         }
 
+        if(document.containsKey("timestamp")) {
+            this.timestamp = document.get("timestamp", Long.class);
+        }
 
-        if(document.containsKey("timestamp")) this.timestamp = (long)document.get("timestamp");
-        if(document.containsKey("image")) this.image = (String)document.get("image");
-        if(document.containsKey("name")) this.name = (String)document.get("name");
-        if(document.containsKey("description")) this.description = (String)document.get("description");
+        if(document.containsKey("image")) {
+            this.image = document.get("image", String.class);
+        }
+
+        if(document.containsKey("name")) {
+            this.name = document.get("name", String.class);
+        }
+
+        if(document.containsKey("description")) {
+            this.description = document.get("description", String.class);
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         if(document.containsKey("steps")) {
             this.steps = mapper.convertValue(document.get("steps"),
                     new TypeReference<List<StepDraft>>(){});
         }
-        if(document.containsKey("persons")) this.persons = (int)document.get("persons");
+
+        if(document.containsKey("persons")) {
+            this.persons = (int)document.get("persons");
+        }
+
         if(document.containsKey("ingredients")){
             this.ingredients = mapper.convertValue(document.get("ingredients"),
                     new TypeReference<List<IngredientDraft>>(){});
         }
-        if(document.containsKey("category")) this.category = (String)document.get("category");
-        if(document.containsKey("skill")) this.skill = (int)document.get("skill");
-        if(document.containsKey("calorie")) this.calorie = (int)document.get("calorie");
+
+        if(document.containsKey("category")) {
+            this.category = document.get("category", String.class);
+        }
+
+        if(document.containsKey("skill")) {
+            this.skill = document.get("skill", Integer.class);
+        }
+
+        if(document.containsKey("calorie")) {
+            this.calorie = document.get("calorie", Integer.class);
+        }
+
         if(document.containsKey("tags")){
             this.tags = mapper.convertValue(document.get("tags"),
                     new TypeReference<List<String>>(){});
         }
-        if(document.containsKey("time")) this.time =  mapper.convertValue(document.get("time"), Time.class);
-        if(document.containsKey("percentage")) this.percentage = (double)document.get("percentage");
+
+        if(document.containsKey("time")) {
+            this.time =  mapper.convertValue(document.get("time"), Time.class);
+        }
+
+        if(document.containsKey("percentage")) {
+            this.percentage = document.get("percentage", Double.class);
+        }
     }
 
     public void write(DBObject updateObj) {
-        if(image != null) updateObj.put("image", image);
-        if(name != null) updateObj.put("name", name);
-        if(description != null) updateObj.put("description", description);
+        if(image != null) {
+            updateObj.put("image", image);
+        }
+
+        if(name != null) {
+            updateObj.put("name", name);
+        }
+
+        if(description != null) {
+            updateObj.put("description", description);
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         if(steps != null) {
-            List<Map<String, Object>> stepList = mapper.convertValue(steps, new TypeReference<List<Map<String, Object>>>(){});
+            List<Map<String, Object>> stepList =
+                    mapper.convertValue(steps, new TypeReference<List<Map<String, Object>>>(){});
             updateObj.put("steps", stepList);
         }
-        if(persons != null) updateObj.put("persons", persons);
+
+        if(persons != null) {
+            updateObj.put("persons", persons);
+        }
+
         if(ingredients != null) {
             List<Map<String, Object>> ingredientList = mapper.convertValue(ingredients, new TypeReference<List<Map<String, Object>>>(){});
             updateObj.put("ingredients", ingredientList);
         }
-        if(category != null) updateObj.put("category", category);
-        if(skill != null) updateObj.put("skill", skill);
-        if(calorie != null) updateObj.put("calorie", calorie);
-        if(tags != null) updateObj.put("tags", tags);
+
+        if(category != null) {
+            updateObj.put("category", category);
+        }
+
+        if(skill != null) {
+            updateObj.put("skill", skill);
+        }
+
+        if(calorie != null) {
+            updateObj.put("calorie", calorie);
+        }
+
+        if(tags != null) {
+            updateObj.put("tags", tags);
+        }
+
         if(time != null) {
-            Map<String, Integer> timeObject = mapper.convertValue(time, new TypeReference<Map<String, Integer>>(){});
+            Map<String, Integer> timeObject =
+                    mapper.convertValue(time, new TypeReference<Map<String, Integer>>(){});
             updateObj.put("time", timeObject);
         }
 
