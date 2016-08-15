@@ -1,6 +1,7 @@
 package de.anycook.drafts;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+
 import de.anycook.recipe.ingredient.Ingredients;
 import de.anycook.recipe.step.Step;
 
@@ -15,9 +16,7 @@ public class StepDraft implements Comparable<StepDraft>{
     private String text;
     private List<IngredientDraft> ingredients;
 
-    public StepDraft() {
-
-    }
+    public StepDraft() {}
 
     public StepDraft(Step step) {
         this.id = step.getId();

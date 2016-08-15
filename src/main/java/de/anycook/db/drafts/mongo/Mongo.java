@@ -19,11 +19,17 @@
 package de.anycook.db.drafts.mongo;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
+
+import de.anycook.db.drafts.mongo.codecs.DraftCodecProvider;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistries;
+import org.bson.codecs.configuration.CodecRegistry;
 
 public class Mongo {
 
@@ -32,7 +38,13 @@ public class Mongo {
 
     protected Mongo() {
         logger = LogManager.getLogger(getClass());
-        client = new MongoClient();
+
+        final CodecRegistry codecRegistry = CodecRegistries.fromRegistries(
+                CodecRegistries.fromProviders(new DraftCodecProvider()),
+                MongoClient.getDefaultCodecRegistry());
+        final MongoClientOptions options = MongoClientOptions.builder()
+                .codecRegistry(codecRegistry).build();
+        client = new MongoClient(new ServerAddress(), options);
     }
 
     protected MongoCollection<Document> getCollection(String collectionName) {

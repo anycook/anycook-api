@@ -8,7 +8,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBSaveExpression;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 
 import de.anycook.conf.Configuration;
@@ -95,7 +94,6 @@ public class DynamoDBRecipeDraftsStore implements RecipeDraftsStore {
     @Override
     public void updateDraft(String id, RecipeDraft recipeDraft) {
         recipeDraft.setId(id);
-        DynamoDBSaveExpression saveExpression = new DynamoDBSaveExpression();
         mapper.save(recipeDraft);
     }
 
