@@ -29,8 +29,6 @@ import de.anycook.session.Session;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -114,12 +112,12 @@ public class DraftApi {
             int user_id = session.getUser().getId();
 
             return Recipes.initDraftWithRecipe(recipeName, versionId, user_id);
-        } catch (IOException | SQLException e) {
-            logger.error(e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         } catch (DBRecipe.RecipeNotFoundException e) {
             logger.warn(e);
             throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }  catch (Exception e) {
+            logger.error(e);
+            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
 
