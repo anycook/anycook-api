@@ -82,10 +82,8 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
                         + "}";
         Document query = getQuery(user_id);
 
-        List<RecipeDraft> drafts = coll.mapReduce(map, reduce, RecipeDraftWrapper.class).filter(query)
+        return coll.mapReduce(map, reduce, RecipeDraftWrapper.class).filter(query)
                 .map(RecipeDraftWrapper::getRecipeDraft).into(new ArrayList<>());
-        System.out.println(drafts);
-        return drafts;
     }
 
     @Override
@@ -111,7 +109,7 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
         Document obj = new Document("userId", userId)
                 .append("timestamp", time);
         coll.insertOne(obj);
-        ObjectId id = (ObjectId) obj.get("_id");
+        ObjectId id = obj.getObjectId("_id");
 
         DraftNumberProvider.INSTANCE.wakeUpSuspended(userId);
         return id.toString();
