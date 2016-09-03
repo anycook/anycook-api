@@ -2,22 +2,16 @@
 	path => "/usr/bin",
 } */
 
-class { 'apt':
-  always_apt_update    => true
-}
+include apt
 
 class anycook {
   file { '/etc/anycook' :
       ensure => directory,
-  }
-
+  }->
   file { '/etc/anycook/anycook.properties' :
       ensure => link,
       target => "${settings::manifestdir}/anycook.properties",
       force  => true,
-      #onlyif => 'test -f /etc/anycook/anycook.properties',
-      require => File['/etc/anycook'],
-      #before => Class['tomcat7'],
   }
 }
 
@@ -102,22 +96,24 @@ class java8 {
     location   => 'http://ppa.launchpad.net/webupd8team/java/ubuntu',
     release    => 'trusty',
     repos      => ' main',
-    key        => 'EEA14886',
-    key_server => 'keyserver.ubuntu.com',
-    include_src       => false,
-  }
-
+    key        => {
+      id        => 'EEA14886',
+      server => 'keyserver.ubuntu.com',
+    },
+    include => {
+      src => false,
+      deb => true
+    }
+  }->
   exec { 'oracle-license':
     command => 'echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections',
     path => ['/bin', '/usr/bin'],
-    require => Apt::Source['oracle-java'],
     onlyif => 'test -z `debconf-show oracle-java7-installer | grep true | echo`'
-  }
-
+  }->
 	# resources
 	package { "oracle-java8-installer":
 		ensure => present,
-		require => Exec['oracle-license'],
+    require => Class['apt::update'],
 	}
 }
 
@@ -129,58 +125,42 @@ class tomcat7 {
 	# resources
 	package { "tomcat7":
 		ensure => present,
-		require => [Class["java8"], Package["apache2"]],
-	}
-
+		require => [Class['java8'], Package["apache2"]],
+	}->
 	file { "server.xml":
 		ensure => link,
 		force => true,
 		path => "/etc/tomcat7/server.xml",
-		require => Package["tomcat7"],
 		target => "${settings::manifestdir}/tomcat-conf/server.xml",
-	}
-
+	}->
 	file { "setenv.sh":
         ensure => link,
         force => true,
         path => "/usr/share/tomcat7/bin/setenv.sh",
-        require => Package["tomcat7"],
         target => "${settings::manifestdir}/tomcat-conf/setenv.sh",
-  }
-
+  }->
   file { 'tomcat7':
     ensure => link,
     force => true,
     path => '/etc/default/tomcat7',
-    require => Package["tomcat7"],
     target => "${settings::manifestdir}/tomcat-conf/tomcat7",
-  }
-
+  }->
 	file { "/var/lib/tomcat7/webapps/ROOT":
 		ensure => absent,
   	require => Package["tomcat7"],
-    before => File['war'],
 		force => true,
-	}
-
-	file { "war":
-		ensure => link,
-		path => "/var/lib/tomcat7/webapps/ROOT.war",
-		target => "/war/anycook-api-0.1.0.war",
-		force => true,
-		require => [Package["tomcat7"]],
-	}
-
-
-
-	service { "tomcat7":
-	    enable => true,
+	}->
+  service { 'tomcat7':
+    enable => true,
 		ensure => running,
-		#hasrestart => true,
-		#hasstatus => true,
-		require => [Package["tomcat7"], File["war"], File["setenv.sh"], File['tomcat7']],
-		subscribe => [File["server.xml"], File["war"]],
-	}
+		subscribe => File["server.xml"],
+	}->
+  file { 'war':
+    ensure => link,
+    path => "/var/lib/tomcat7/webapps/ROOT.war",
+    target => "/war/anycook-api-0.1.0.war",
+    force => true,
+  }
 }
 
 class mongodb {
@@ -188,20 +168,22 @@ class mongodb {
     location   => 'http://downloads-distro.mongodb.org/repo/ubuntu-upstart/',
     release    => 'dist',
     repos      => ' 10gen',
-    key        => '7F0CEB10',
-    key_server => 'keyserver.ubuntu.com',
-    include_src       => false,
-  }
-
+    key        => {
+      id        => '7F0CEB10',
+      server => 'keyserver.ubuntu.com',
+    },
+    include => {
+      src => false,
+      deb => true
+    }
+  }->
   package { "mongodb-10gen":
       ensure => installed,
-      require => Apt::Source["mongodb"],
-  }
-
+      require => Class['apt::update']
+  }->
   service { "mongodb" :
       enable => true,
       ensure => running,
-      require => Package["mongodb-10gen"],
   }
 }
 
@@ -209,8 +191,22 @@ class install_mysql {
   $user = 'anycook'
   $mysql_schema = "/mysql/anycook_procedures.sql"
 
+  apt::source { 'mariadb':
+    location => 'http://sfo1.mirrors.digitalocean.com/mariadb/repo/10.1/ubuntu',
+    release  => $::lsbdistcodename,
+    repos    => 'main',
+    key      => {
+      id     => '199369E5404BD5FC7D2FE43BCBCB082A1BB943DB',
+      server => 'hkp://keyserver.ubuntu.com:80',
+    },
+    include => {
+      src   => false,
+      deb   => true,
+    },
+  }->
   class { '::mysql::server':
-
+    package_name => 'mariadb-server',
+    package_ensure => latest,
     override_options => {
       'mysqld' => {
         'bind-address'  => '0.0.0.0',
@@ -219,46 +215,39 @@ class install_mysql {
     service_enabled => true,
     service_manage => true,
     restart => true,
-    require => Class["apt"],
-  }
-
+    require => Class['apt::update'],
+  }->
   mysql_database { 'anycook_db':
     ensure  => 'present',
     charset => 'utf8',
     collate => 'utf8_unicode_ci'
-  }
-
+  }->
   exec { "schema":
     path => "/usr/bin",
     command => "mysql -uroot anycook_db < ${mysql_schema}",
     require => Class['::mysql::server']
 
-  }
-
+  }->
   mysql_user { 'anycook@localhost':
     ensure    => 'present',
     require   => Mysql_database['anycook_db'],
-  }
-
+  }->
   mysql_user { 'root@%':
     ensure    => 'present',
     require   => Class['mysql::server'],
-  }
-
+  }->
   mysql_grant { 'root@%/*.*':
     privileges => ['ALL'],
     table     => "*.*",
     user      => 'root@%',
     require   => [Mysql_user['root@%']],
-  }
-
-  mysql_grant { 'anycook@localhost/anycook_db':
+  }->
+  mysql_grant { 'anycook@localhost/anycook_db.*':
     privileges => ['ALL', 'SELECT'],
     table     => "anycook_db.*",
     user      => 'anycook@localhost',
     require   => [Mysql_user['anycook@localhost']],
-  }
-
+  }->
   mysql_grant { 'anycook@localhost/mysql.proc':
     privileges => ['SELECT'],
     table     => 'mysql.proc',
