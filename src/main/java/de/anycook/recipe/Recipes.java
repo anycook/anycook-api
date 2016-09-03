@@ -67,7 +67,6 @@ public final class Recipes {
             String draftId = draftsStore.newDraft(userId);
 
             RecipeDraft recipeDraft = recipe.asDraft();
-            recipeDraft.setId(draftId);
             recipeDraft.setUserId(userId);
             recipeDraft.setSteps(steps);
             recipeDraft.setIngredients(ingredients);
@@ -75,7 +74,7 @@ public final class Recipes {
 
             draftsStore.updateDraft(draftId, recipeDraft);
 
-            return recipeDraft.getId();
+            return draftId;
         } catch (Exception e) {
             throw new IOException(e);
         }
