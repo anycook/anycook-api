@@ -25,7 +25,7 @@ dependencies {
             'com.google.guava:guava:19.0',
             'com.google.template:soy:2015-04-10',
             'it.unimi.dsi:fastutil:7.0.9',
-            'javax.mail:javax.mail-api:1.5.5',
+            'com.sun.mail:javax.mail:1.5.6',
             'javax.ws.rs:javax.ws.rs-api:2.0.1',
             'org.apache.commons:commons-math3:3.5',
             'org.apache.commons:commons-lang3:3.4',
