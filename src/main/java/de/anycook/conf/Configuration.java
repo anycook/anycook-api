@@ -77,7 +77,7 @@ public class Configuration {
         SMTP_PASSWORD = "SMTP_PASSWORD",
         TUMBLR_APP_ID = "TUMBLR_APP_ID",
         TUMBLR_APP_SECRET = "TUMBLR_APP_SECRET",
-        WWW_ROOT = "WWW_ROOT";
+        SITEMAP_ROOT = "SITEMAP_ROOT";
 
     private static Configuration instance;
 
@@ -309,8 +309,8 @@ public class Configuration {
     }
 
     @XmlElement
-    public String getWWWRoot() {
-        return properties.getProperty(WWW_ROOT, "/var/www/anycook");
+    public String getSitemapRoot() {
+        return properties.getProperty(SITEMAP_ROOT, "/var/www/anycook-sitemaps");
     }
 
 

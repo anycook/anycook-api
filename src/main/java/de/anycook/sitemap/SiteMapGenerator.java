@@ -26,7 +26,7 @@ public class SiteMapGenerator {
 
     private final static Logger logger = LogManager.getLogger(SiteMapGenerator.class);
     private final static String CHARSET = StandardCharsets.UTF_8.toString();
-    private final static File WWW_ROOT = new File(Configuration.getInstance().getWWWRoot());
+    private final static File SITEMAP_ROOT = new File(Configuration.getInstance().getSitemapRoot());
 
     public static void generateAllSiteMaps() throws SQLException {
         generateDefaultSiteMap();
@@ -57,7 +57,7 @@ public class SiteMapGenerator {
         sites.add("registration");
         sites.add("developer");
 
-        File file = new File(WWW_ROOT, "sitemap1.xml");
+        File file = new File(SITEMAP_ROOT, "sitemap1.xml");
 
         try {
             writer = factory.createXMLStreamWriter(new FileOutputStream(file));
@@ -89,7 +89,7 @@ public class SiteMapGenerator {
             logger.info("Recipes: " + allRecipes.subList(0, 10).toString());
 
             final String priority = "0.8";
-            File file = new File(WWW_ROOT, "sitemap2.xml");
+            File file = new File(SITEMAP_ROOT, "sitemap2.xml");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             XMLStreamWriter writer;
             try {
@@ -124,7 +124,7 @@ public class SiteMapGenerator {
             List<String> allTags = db.getAllTags();
 
             final String priority = "0.4";
-            File file = new File(WWW_ROOT, "sitemap3.xml");
+            File file = new File(SITEMAP_ROOT, "sitemap3.xml");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             XMLStreamWriter writer;
 
@@ -156,7 +156,7 @@ public class SiteMapGenerator {
             List<String> users = db.getActiveUsers();
 
             final String priority = "0.5";
-            File file = new File(WWW_ROOT, "sitemap4.xml");
+            File file = new File(SITEMAP_ROOT, "sitemap4.xml");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             XMLStreamWriter writer;
             writer = factory.createXMLStreamWriter(new FileOutputStream(file));
