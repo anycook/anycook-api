@@ -1,27 +1,15 @@
 package de.anycook.sitemap;
 
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.PutObjectResult;
-
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBUser;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -36,8 +24,9 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class SiteMapGenerator {
 
-    private static Logger logger = LogManager.getLogger(SiteMapGenerator.class);
+    private final static Logger logger = LogManager.getLogger(SiteMapGenerator.class);
     private final static String CHARSET = StandardCharsets.UTF_8.toString();
+    private final static File WWW_ROOT = new File(Configuration.getInstance().getWWWRoot());
 
     public static void generateAllSiteMaps() throws SQLException {
         generateDefaultSiteMap();
@@ -58,7 +47,7 @@ public class SiteMapGenerator {
         writer.writeEndElement();
     }
 
-    public static void generateDefaultSiteMap() {
+    private static void generateDefaultSiteMap() {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         XMLStreamWriter writer;
         List<String> sites = new LinkedList<>();
@@ -68,7 +57,7 @@ public class SiteMapGenerator {
         sites.add("registration");
         sites.add("developer");
 
-        File file = new File("/tmp/sitemap1.xml");
+        File file = new File(WWW_ROOT, "sitemap1.xml");
 
         try {
             writer = factory.createXMLStreamWriter(new FileOutputStream(file));
@@ -88,9 +77,6 @@ public class SiteMapGenerator {
             }
             writer.writeEndElement();
             writer.writeEndDocument();
-            if (Configuration.getInstance().isSiteMapS3Upload()) {
-                uploadSiteMap(file);
-            }
 
         } catch (IOException | XMLStreamException e1) {
             logger.error(e1);
@@ -103,7 +89,7 @@ public class SiteMapGenerator {
             logger.info("Recipes: " + allRecipes.subList(0, 10).toString());
 
             final String priority = "0.8";
-            File file = new File("/tmp/sitemap2.xml");
+            File file = new File(WWW_ROOT, "sitemap2.xml");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             XMLStreamWriter writer;
             try {
@@ -124,9 +110,6 @@ public class SiteMapGenerator {
 
                 writer.writeEndElement();
                 writer.writeEndDocument();
-                if (Configuration.getInstance().isSiteMapS3Upload()) {
-                    uploadSiteMap(file);
-                }
 
             } catch (IOException | XMLStreamException e1) {
                 logger.error(e1);
@@ -141,7 +124,7 @@ public class SiteMapGenerator {
             List<String> allTags = db.getAllTags();
 
             final String priority = "0.4";
-            File file = new File("/tmp/sitemap3.xml");
+            File file = new File(WWW_ROOT, "sitemap3.xml");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             XMLStreamWriter writer;
 
@@ -162,9 +145,6 @@ public class SiteMapGenerator {
 
             writer.writeEndElement();
             writer.writeEndDocument();
-            if (Configuration.getInstance().isSiteMapS3Upload()) {
-                uploadSiteMap(file);
-            }
 
         } catch (IOException | XMLStreamException e1) {
             logger.error(e1);
@@ -176,7 +156,7 @@ public class SiteMapGenerator {
             List<String> users = db.getActiveUsers();
 
             final String priority = "0.5";
-            File file = new File("/tmp/sitemap4.xml");
+            File file = new File(WWW_ROOT, "sitemap4.xml");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             XMLStreamWriter writer;
             writer = factory.createXMLStreamWriter(new FileOutputStream(file));
@@ -196,35 +176,9 @@ public class SiteMapGenerator {
 
             writer.writeEndElement();
             writer.writeEndDocument();
-            if (Configuration.getInstance().isSiteMapS3Upload()) {
-                uploadSiteMap(file);
-            }
 
         } catch (IOException | XMLStreamException e1) {
             logger.error(e1);
         }
     }
-
-    private static void uploadSiteMap(File siteMap) throws IOException {
-        AWSCredentials
-                awsCredentials =
-                new BasicAWSCredentials(Configuration.getInstance().getSiteMapS3AccessKey(),
-                                        Configuration.getInstance().getSiteMapS3AccessSecret());
-        AmazonS3Client s3Client = new AmazonS3Client(awsCredentials);
-        String bucketName = Configuration.getInstance().getSiteMapS3Bucket();
-
-        byte[] md5 = DigestUtils.md5(new FileInputStream(siteMap));
-        InputStream is = new FileInputStream(siteMap);
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(siteMap.length());
-
-        metadata.setContentMD5(new String(Base64.encodeBase64(md5)));
-        PutObjectRequest request =
-                new PutObjectRequest(bucketName, "sitemaps/" + siteMap.getName(), is, metadata);
-        request.setCannedAcl(CannedAccessControlList.PublicRead);
-        PutObjectResult result = s3Client.putObject(request);
-        logger.debug("Etag:" + result.getETag() + "-->" + result);
-    }
-
-
 }

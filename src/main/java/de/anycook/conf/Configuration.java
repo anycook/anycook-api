@@ -71,16 +71,13 @@ public class Configuration {
         MYSQL_USER = "MYSQL_USER",
         MYSQL_PASSWORD = "MYSQL_PASSWORD",
         REDIRECT_DOMAIN = "REDIRECT_DOMAIN",
-        SITE_MAP_S3_UPLOAD = "SITE_MAP_S3_UPLOAD",
-        SITE_MAP_S3_ACCESS_KEY = "SITE_MAP_S3_ACCESS_KEY",
-        SITE_MAP_S3_ACCESS_SECRET = "SITE_MAP_S3_ACCESS_SECRET",
-        SITE_MAP_S3_BUCKET = "SITE_MAP_S3_BUCKET",
         SMTP_HOST = "SMTP_HOST",
         SMTP_PORT = "SMTP_PORT",
         SMTP_USER = "SMTP_USER",
         SMTP_PASSWORD = "SMTP_PASSWORD",
         TUMBLR_APP_ID = "TUMBLR_APP_ID",
-        TUMBLR_APP_SECRET = "TUMBLR_APP_SECRET";
+        TUMBLR_APP_SECRET = "TUMBLR_APP_SECRET",
+        WWW_ROOT = "WWW_ROOT";
 
     private static Configuration instance;
 
@@ -284,26 +281,6 @@ public class Configuration {
     }
 
     @XmlElement
-    public boolean isSiteMapS3Upload() {
-        String uploadToS3 =  properties.getProperty(SITE_MAP_S3_UPLOAD, isImageS3Upload() ? "ON" : "OFF");
-        return uploadToS3.equals("ON");
-    }
-
-    @XmlElement
-    public String getSiteMapS3AccessKey() {
-        return properties.getProperty(SITE_MAP_S3_ACCESS_KEY, getAwsAccessKey());
-    }
-
-    public String getSiteMapS3AccessSecret() {
-        return properties.getProperty(SITE_MAP_S3_ACCESS_SECRET, getAwsAccessSecret());
-    }
-
-    @XmlElement
-    public String getSiteMapS3Bucket() {
-        return properties.getProperty(SITE_MAP_S3_BUCKET, "anycook.de");
-    }
-
-    @XmlElement
     public String getSMTPHost() {
         return properties.getProperty(SMTP_HOST);
     }
@@ -329,6 +306,11 @@ public class Configuration {
 
     public String getTumblrAppSecret() {
         return properties.getProperty(TUMBLR_APP_SECRET);
+    }
+
+    @XmlElement
+    public String getWWWRoot() {
+        return properties.getProperty(WWW_ROOT, "/var/www/anycook");
     }
 
 
