@@ -7,17 +7,16 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBGetRecipe;
 import de.anycook.db.mysql.DBUser;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -31,69 +30,77 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 public class SiteMapGenerator {
-	private static Logger logger = LogManager.getLogger(SiteMapGenerator.class);
 
-	public static void generateAllSiteMaps() throws SQLException {
-		generateDefaultSiteMap();
-		generateRecipeSiteMap();
-		generateTagSitemap();
-		generateProfileSiteMap();
-	}
+    private static Logger logger = LogManager.getLogger(SiteMapGenerator.class);
+    private final static String CHARSET = StandardCharsets.UTF_8.toString();
 
-	private static void writeURL(XMLStreamWriter writer, String url, String priority) throws XMLStreamException{
-		writer.writeStartElement("url");
-			writer.writeStartElement("loc");
-				writer.writeCharacters(url);
-			writer.writeEndElement();
-			writer.writeStartElement("priority");
-				writer.writeCharacters(priority);
-			writer.writeEndElement();
-		writer.writeEndElement();
-	}
+    public static void generateAllSiteMaps() throws SQLException {
+        generateDefaultSiteMap();
+        generateRecipeSiteMap();
+        generateTagSitemap();
+        generateProfileSiteMap();
+    }
 
-	public static void generateDefaultSiteMap(){
-		XMLOutputFactory factory = XMLOutputFactory.newInstance();
-		XMLStreamWriter writer;
-		List<String> sites = new LinkedList<>();
-		sites.add("about_us");
-		sites.add("feedback");
-		sites.add("impressum");
-		sites.add("registration");
-		sites.add("developer");
+    private static void writeURL(XMLStreamWriter writer, String url, String priority)
+            throws XMLStreamException {
+        writer.writeStartElement("url");
+        writer.writeStartElement("loc");
+        writer.writeCharacters(url);
+        writer.writeEndElement();
+        writer.writeStartElement("priority");
+        writer.writeCharacters(priority);
+        writer.writeEndElement();
+        writer.writeEndElement();
+    }
+
+    public static void generateDefaultSiteMap() {
+        XMLOutputFactory factory = XMLOutputFactory.newInstance();
+        XMLStreamWriter writer;
+        List<String> sites = new LinkedList<>();
+        sites.add("about_us");
+        sites.add("feedback");
+        sites.add("impressum");
+        sites.add("registration");
+        sites.add("developer");
 
         File file = new File("/tmp/sitemap1.xml");
 
-		try {
-			writer = factory.createXMLStreamWriter(new FileOutputStream(file));
-			writer.writeStartDocument();
-			writer.writeStartElement("urlset");
-			writer.writeAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
-			writeURL(writer, "http://anycook.de/", "1");
+        try {
+            writer = factory.createXMLStreamWriter(new FileOutputStream(file));
+            writer.writeStartDocument();
+            writer.writeStartElement("urlset");
+            writer.writeAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
+            writeURL(writer, "http://anycook.de/", "1");
 
-			for(String site : sites){
-				try {
-					String url = "http://anycook.de/#/"+URLEncoder.encode(site, "UTF-8");
-					writeURL(writer, url, "0.2");
-				} catch (UnsupportedEncodingException e) {
-					logger.error(e);
-				}
-			}
-			writer.writeEndElement();
-			writer.writeEndDocument();
+            for (String site : sites) {
+                try {
+                    String url = String.format("http://anycook.de/#/%s",
+                                               URLEncoder.encode(site, CHARSET));
+                    writeURL(writer, url, "0.2");
+                } catch (UnsupportedEncodingException e) {
+                    logger.error(e);
+                }
+            }
+            writer.writeEndElement();
+            writer.writeEndDocument();
             if (Configuration.getInstance().isSiteMapS3Upload()) {
                 uploadSiteMap(file);
             }
 
-		} catch (IOException | XMLStreamException e1) {
-			logger.error(e1);
-		}
+        } catch (IOException | XMLStreamException e1) {
+            logger.error(e1);
+        }
     }
 
-	public static void generateRecipeSiteMap() throws SQLException {
-		try(DBGetRecipe db = new DBGetRecipe()){
+    public static void generateRecipeSiteMap() throws SQLException {
+        try (DBGetRecipe db = new DBGetRecipe()) {
             List<String> allRecipes = new ArrayList<>(db.getAllActiveRecipeNames());
-            logger.info("Recipes: "+allRecipes.subList(0, 10).toString());
+            logger.info("Recipes: " + allRecipes.subList(0, 10).toString());
 
             final String priority = "0.8";
             File file = new File("/tmp/sitemap2.xml");
@@ -105,9 +112,10 @@ public class SiteMapGenerator {
                 writer.writeStartElement("urlset");
                 writer.writeAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-                for(String recipe : allRecipes){
+                for (String recipe : allRecipes) {
                     try {
-                        String url = "http://anycook.de/#/recipe/"+URLEncoder.encode(recipe, "UTF-8");
+                        String url = String.format("http://anycook.de/#/recipe/%s",
+                                                   URLEncoder.encode(recipe, CHARSET));
                         writeURL(writer, url, priority);
                     } catch (UnsupportedEncodingException e) {
                         logger.error(e);
@@ -126,11 +134,10 @@ public class SiteMapGenerator {
         }
 
 
+    }
 
-	}
-
-	public static void generateTagSitemap() throws SQLException {
-		try(DBGetRecipe db = new DBGetRecipe()){
+    public static void generateTagSitemap() throws SQLException {
+        try (DBGetRecipe db = new DBGetRecipe()) {
             List<String> allTags = db.getAllTags();
 
             final String priority = "0.4";
@@ -143,9 +150,10 @@ public class SiteMapGenerator {
             writer.writeStartElement("urlset");
             writer.writeAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-            for(String tag : allTags){
+            for (String tag : allTags) {
                 try {
-                    String url = "http://anycook.de/#/search/tagged/"+URLEncoder.encode(tag, "UTF-8");
+                    String url = String.format("http://anycook.de/#/search/tagged/%s",
+                                               URLEncoder.encode(tag, CHARSET));
                     writeURL(writer, url, priority);
                 } catch (UnsupportedEncodingException e) {
                     logger.error(e);
@@ -158,17 +166,17 @@ public class SiteMapGenerator {
                 uploadSiteMap(file);
             }
 
-		} catch (IOException | XMLStreamException e1) {
-			logger.error(e1);
-		}
+        } catch (IOException | XMLStreamException e1) {
+            logger.error(e1);
+        }
     }
 
-	public static void generateProfileSiteMap() throws SQLException {
-		try(DBUser db = new DBUser()){
+    public static void generateProfileSiteMap() throws SQLException {
+        try (DBUser db = new DBUser()) {
             List<String> users = db.getActiveUsers();
 
             final String priority = "0.5";
-            File file =  new File("/tmp/sitemap4.xml");
+            File file = new File("/tmp/sitemap4.xml");
             XMLOutputFactory factory = XMLOutputFactory.newInstance();
             XMLStreamWriter writer;
             writer = factory.createXMLStreamWriter(new FileOutputStream(file));
@@ -176,10 +184,10 @@ public class SiteMapGenerator {
             writer.writeStartElement("urlset");
             writer.writeAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-            for(String user : users){
+            for (String user : users) {
                 try {
-                    String url = "http://anycook.de/#/profile/"+URLEncoder.encode(user,
-                            StandardCharsets.UTF_8.toString());
+                    String url = String.format("http://anycook.de/#/profile/%s",
+                                               URLEncoder.encode(user, CHARSET));
                     writeURL(writer, url, priority);
                 } catch (UnsupportedEncodingException e) {
                     logger.error(e);
@@ -192,14 +200,16 @@ public class SiteMapGenerator {
                 uploadSiteMap(file);
             }
 
-		} catch (IOException | XMLStreamException e1) {
-			logger.error(e1);
-		}
+        } catch (IOException | XMLStreamException e1) {
+            logger.error(e1);
+        }
     }
 
     private static void uploadSiteMap(File siteMap) throws IOException {
-        AWSCredentials awsCredentials = new BasicAWSCredentials(Configuration.getInstance().getSiteMapS3AccessKey(),
-            Configuration.getInstance().getSiteMapS3AccessSecret());
+        AWSCredentials
+                awsCredentials =
+                new BasicAWSCredentials(Configuration.getInstance().getSiteMapS3AccessKey(),
+                                        Configuration.getInstance().getSiteMapS3AccessSecret());
         AmazonS3Client s3Client = new AmazonS3Client(awsCredentials);
         String bucketName = Configuration.getInstance().getSiteMapS3Bucket();
 
@@ -208,10 +218,9 @@ public class SiteMapGenerator {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(siteMap.length());
 
-        //setting max-age to 15 days
-        //metadata.setCacheControl("max-age=1296000");
         metadata.setContentMD5(new String(Base64.encodeBase64(md5)));
-        PutObjectRequest request = new PutObjectRequest(bucketName, "sitemaps/" + siteMap.getName(), is, metadata);
+        PutObjectRequest request =
+                new PutObjectRequest(bucketName, "sitemaps/" + siteMap.getName(), is, metadata);
         request.setCannedAcl(CannedAccessControlList.PublicRead);
         PutObjectResult result = s3Client.putObject(request);
         logger.debug("Etag:" + result.getETag() + "-->" + result);
