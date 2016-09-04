@@ -257,6 +257,10 @@ public final class Recipes {
     }
 
     public static void suggestTags(String name, List<String> tags, int userId) throws SQLException {
+        if (tags.isEmpty()) {
+            return;
+        }
+
         for (String tag : tags) {
             suggestTag(name, tag, userId);
         }
