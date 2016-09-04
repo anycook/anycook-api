@@ -68,7 +68,7 @@ public class SiteMapGenerator {
 
             for (String site : sites) {
                 try {
-                    String url = String.format("http://anycook.de/#/%s",
+                    String url = String.format("http://anycook.de/#!/%s",
                                                URLEncoder.encode(site, CHARSET));
                     writeURL(writer, url, "0.2");
                 } catch (UnsupportedEncodingException e) {
@@ -100,7 +100,7 @@ public class SiteMapGenerator {
 
                 for (String recipe : allRecipes) {
                     try {
-                        String url = String.format("http://anycook.de/#/recipe/%s",
+                        String url = String.format("http://anycook.de/#!/recipe/%s",
                                                    URLEncoder.encode(recipe, CHARSET));
                         writeURL(writer, url, priority);
                     } catch (UnsupportedEncodingException e) {
@@ -135,7 +135,7 @@ public class SiteMapGenerator {
 
             for (String tag : allTags) {
                 try {
-                    String url = String.format("http://anycook.de/#/search/tagged/%s",
+                    String url = String.format("http://anycook.de/#!/search/tagged/%s",
                                                URLEncoder.encode(tag, CHARSET));
                     writeURL(writer, url, priority);
                 } catch (UnsupportedEncodingException e) {
@@ -166,7 +166,7 @@ public class SiteMapGenerator {
 
             for (String user : users) {
                 try {
-                    String url = String.format("http://anycook.de/#/profile/%s",
+                    String url = String.format("http://anycook.de/#!/profile/%s",
                                                URLEncoder.encode(user, CHARSET));
                     writeURL(writer, url, priority);
                 } catch (UnsupportedEncodingException e) {
