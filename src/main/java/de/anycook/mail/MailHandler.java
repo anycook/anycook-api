@@ -22,20 +22,27 @@
 package de.anycook.mail;
 
 import com.google.common.base.Preconditions;
+
 import de.anycook.conf.Configuration;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeUtility;
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
 
 
 /**
@@ -69,8 +76,7 @@ public class MailHandler {
         Properties props = new Properties();
         props.put("mail.smtps.auth", "true");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.socketFactory.class",
-                "javax.net.ssl.SSLSocketFactory");
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
         props.put("mail.smtp.host", Configuration.getInstance().getSMTPHost());
         props.put("mail.smtp.socketFactory.port", Configuration.getInstance().getSMTPPort());
 
@@ -81,12 +87,14 @@ public class MailHandler {
     }
 
     public void sendMail(String mailTo, String subject, String message) {
-        logger.info("sending mail to:" + mailTo + " subject:" + subject + " message:" + message);
+        logger.info(String.format("sending mail to:%s subject:%s message:%s", mailTo, subject,
+                                  message));
         try {
             Transport transport = session.getTransport("smtps");
             Preconditions.checkNotNull(session, mailTo, subject, message);
 
-            InternetAddress addressFrom = new InternetAddress(Configuration.getInstance().getMailAddress(),
+            InternetAddress addressFrom =
+                    new InternetAddress(Configuration.getInstance().getMailAddress(),
                     MimeUtility.encodeText(Configuration.getInstance().getMailSender()));
             Preconditions.checkNotNull(transport, addressFrom);
 
