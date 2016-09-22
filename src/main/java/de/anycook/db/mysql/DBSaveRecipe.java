@@ -127,6 +127,10 @@ public class DBSaveRecipe extends DBRecipe {
 
     private void addStepIngredient(String recipeName, int stepId, int versionId, Ingredient ingredient, int i)
             throws SQLException {
+        if (ingredient.getName().isEmpty()) {
+            return;
+        }
+        
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO " +
                 "schritte_has_zutaten(schritte_idschritte, schritte_versions_id, schritte_versions_gerichte_name, " +
                 "zutaten_name, menge, position) VALUES (?,?,?,?, ?,?)");
