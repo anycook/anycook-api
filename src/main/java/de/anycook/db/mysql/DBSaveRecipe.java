@@ -65,7 +65,7 @@ public class DBSaveRecipe extends DBRecipe {
 
         addSteps(newRecipe.name, id, newRecipe.steps);
         addIngredients(newRecipe.name, id, newRecipe.ingredients);
-        logger.info("newversion for " + newRecipe.name + " added from " + userId);
+        logger.info("newversion for {} added from {}", newRecipe.name, userId);
     }
 
     public int getLastId(String recipeName) throws SQLException {
@@ -130,7 +130,7 @@ public class DBSaveRecipe extends DBRecipe {
         if (ingredient.getName().isEmpty()) {
             return;
         }
-        
+
         PreparedStatement pStatement = connection.prepareStatement("INSERT INTO " +
                 "schritte_has_zutaten(schritte_idschritte, schritte_versions_id, schritte_versions_gerichte_name, " +
                 "zutaten_name, menge, position) VALUES (?,?,?,?, ?,?)");
