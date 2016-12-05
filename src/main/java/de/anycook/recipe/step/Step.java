@@ -63,6 +63,15 @@ public class Step implements Serializable {
         this.ingredients = ingredients;
     }
 
+    @Override
+    public String toString() {
+        return "Step{" +
+               "id=" + id +
+               ", text='" + text + '\'' +
+               ", ingredients=" + ingredients +
+               '}';
+    }
+
     /*@Override
 	public String toJSONString() {
 		return toJSON().toJSONString();

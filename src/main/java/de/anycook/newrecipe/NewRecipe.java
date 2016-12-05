@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -71,10 +72,25 @@ public class NewRecipe {
 
     @Override
     public String toString() {
-        return String.format("description: %s, image: %s, steps: %s," +
-                             "ingredients: %s, time: %s, skill: %s, calorie: %s," +
-                             "persons: %s, tags: %s, comments: %s", description, image, steps,
-                             ingredients, time, skill, calorie, persons, tags, comment);
+        final StringWriter writer = new StringWriter();
+        writer.write(String.format("description: %s, image: %s, time: %s, skill: %s, "
+                                   + "calorie: %s, persons: %s, tags: %s, comments: %s, "
+                                   + "mongoId: %s%n", description, image, steps, ingredients, time,
+                                   skill, calorie, persons, tags, comment, mongoId));
+
+        writer.write("Ingredients: \n");
+        for (final Ingredient ingredient : ingredients) {
+            writer.write(ingredient.toString());
+            writer.write('\n');
+        }
+
+        writer.write("Steps: \n");
+        for (final Step step : steps) {
+            writer.write(step.toString());
+            writer.write('\n');
+        }
+
+        return writer.toString();
     }
 
     private boolean check() {
@@ -94,6 +110,8 @@ public class NewRecipe {
 
         int id = 0;
 
+        logger.debug("Creating new version of recipe {}: {}", name, this);
+
         try (final DBSaveRecipe db = new DBSaveRecipe()) {
             if (!db.check(name)) {
                 db.newRecipe(name);
@@ -107,7 +125,6 @@ public class NewRecipe {
         Recipes.suggestTags(name, tags, userId);
 
         if (mongoId != null) {
-
             try (final RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
                 draftsStore.deleteDraft(mongoId, userId);
             } catch (Exception e) {
