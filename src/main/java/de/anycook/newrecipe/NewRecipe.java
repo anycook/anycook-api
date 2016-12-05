@@ -71,7 +71,7 @@ public class NewRecipe {
 
     @Override
     public String toString() {
-        return String.format(                                                     "description: %s, image: %s, steps: %s," +
+        return String.format("description: %s, image: %s, steps: %s," +
                              "ingredients: %s, time: %s, skill: %s, calorie: %s," +
                              "persons: %s, tags: %s, comments: %s", description, image, steps,
                              ingredients, time, skill, calorie, persons, tags, comment);
@@ -86,15 +86,15 @@ public class NewRecipe {
     }
 
 
-    public int save(int userId)
-            throws SQLException, IOException, ParseException, InvalidRecipeException {
+    public int save(final int userId) throws SQLException, IOException, ParseException,
+                                             InvalidRecipeException {
         if (!check()) {
             throw new InvalidRecipeException(name);
         }
 
         int id = 0;
 
-        try (DBSaveRecipe db = new DBSaveRecipe()) {
+        try (final DBSaveRecipe db = new DBSaveRecipe()) {
             if (!db.check(name)) {
                 db.newRecipe(name);
             } else {
@@ -108,7 +108,7 @@ public class NewRecipe {
 
         if (mongoId != null) {
 
-            try (RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
+            try (final RecipeDraftsStore draftsStore = RecipeDraftsStore.getRecipeDraftStore()) {
                 draftsStore.deleteDraft(mongoId, userId);
             } catch (Exception e) {
                 logger.error(e, e);
