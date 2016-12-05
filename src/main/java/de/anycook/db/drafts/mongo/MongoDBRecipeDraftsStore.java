@@ -31,7 +31,6 @@ import org.bson.types.ObjectId;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -47,7 +46,7 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
     }
 
     @Override
-    public List<RecipeDraft> getDrafts(int user_id) throws IOException {
+    public List<RecipeDraft> getDrafts(final int user_id) throws IOException {
         //language=JavaScript 1.6
         String map = "function(){var percentage = 0;\n"
                      + "    for(var key in this) {\n"
@@ -87,9 +86,10 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
     }
 
     @Override
-    public RecipeDraft getDraft(String draft_id, int user_id) throws DraftNotFoundException {
-        Document query = getQuery(user_id, draft_id);
-        RecipeDraft draft = coll.find(query, RecipeDraft.class).iterator().tryNext();
+    public RecipeDraft getDraft(final String draft_id, final int user_id)
+            throws DraftNotFoundException {
+        final Document query = getQuery(user_id, draft_id);
+        final RecipeDraft draft = coll.find(query, RecipeDraft.class).iterator().tryNext();
         if (draft == null) {
             throw new DraftNotFoundException(draft_id, user_id);
         }
@@ -98,37 +98,37 @@ public class MongoDBRecipeDraftsStore extends Mongo implements RecipeDraftsStore
     }
 
     @Override
-    public int countDrafts(int userId) {
-        Document query = getQuery(userId);
+    public int countDrafts(final int userId) {
+        final Document query = getQuery(userId);
         return (int) coll.count(query);
     }
 
     @Override
-    public String newDraft(int userId) throws SQLException {
-        long time = System.currentTimeMillis();
-        Document obj = new Document("userId", userId)
+    public String newDraft(final int userId) throws SQLException {
+        final long time = System.currentTimeMillis();
+        final Document obj = new Document("userId", userId)
                 .append("timestamp", time);
         coll.insertOne(obj);
-        ObjectId id = obj.getObjectId("_id");
+        final ObjectId id = obj.getObjectId("_id");
 
         DraftNumberProvider.INSTANCE.wakeUpSuspended(userId);
         return id.toString();
     }
 
     @Override
-    public void updateDraft(String id, RecipeDraft data) {
+    public void updateDraft(final String id, final RecipeDraft data) {
         update(data, data.getUserId(), id);
     }
 
-    private void update(RecipeDraft updateObj, int user_id, String draft_id) {
-        Document query = getQuery(user_id, draft_id);
-        Document set = new Document("$set", updateObj);
+    private void update(final RecipeDraft updateObj, final int user_id, final String draft_id) {
+        final Document query = getQuery(user_id, draft_id);
+        final Document set = new Document("$set", updateObj);
         coll.findOneAndUpdate(query, set);
     }
 
     @Override
-    public void deleteDraft(String id, int userId) throws SQLException {
-        Document query = getQuery(userId, id);
+    public void deleteDraft(final String id, final int userId) throws SQLException {
+        final Document query = getQuery(userId, id);
         coll.findOneAndDelete(query);
         DraftNumberProvider.INSTANCE.wakeUpSuspended(userId);
     }
