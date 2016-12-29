@@ -38,7 +38,7 @@ public class DBDiscover extends DBRecipe {
         super();
     }
 
-    public List<Recipe> getTastyRecipes(int num, int loginId) throws SQLException {
+    public List<Recipe> getTastyRecipes(int offset, int num, int loginId) throws SQLException {
         PreparedStatement preparedStatement =
             connection.prepareCall("SELECT versions.id AS id, beschreibung, " +
                 "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
@@ -52,9 +52,10 @@ public class DBDiscover extends DBRecipe {
                 "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id " +
                 "INNER JOIN users ON users_id = users.id " +
                 "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
-                "GROUP BY gerichte.name ORDER BY counter DESC LIMIT ?;");
+                "GROUP BY gerichte.name ORDER BY counter DESC LIMIT ?,?;");
         preparedStatement.setInt(1, loginId);
-        preparedStatement.setInt(2, num);
+        preparedStatement.setInt(2, offset);
+        preparedStatement.setInt(3, num);
 
         ResultSet data = preparedStatement.executeQuery();
         return getRecipes(data);
@@ -65,7 +66,7 @@ public class DBDiscover extends DBRecipe {
      *
      * @return List mit den neusten Gerichten
      */
-    public List<Recipe> getNewestRecipes(int num, int loginId) throws SQLException {
+    public List<Recipe> getNewestRecipes(int offset, int num, int loginId) throws SQLException {
         PreparedStatement preparedStatement =
             connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
                 "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
@@ -77,9 +78,10 @@ public class DBDiscover extends DBRecipe {
                 "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id " +
                 "INNER JOIN users ON users_id = users.id " +
                 "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
-                "GROUP BY gerichte.name ORDER BY gerichte.eingefuegt DESC LIMIT ?;");
+                "GROUP BY gerichte.name ORDER BY gerichte.eingefuegt DESC LIMIT ?,?;");
         preparedStatement.setInt(1, loginId);
-        preparedStatement.setInt(2, num);
+        preparedStatement.setInt(2, offset);
+        preparedStatement.setInt(3, num);
 
         ResultSet data = preparedStatement.executeQuery();
         return getRecipes(data);
@@ -90,7 +92,7 @@ public class DBDiscover extends DBRecipe {
      *
      * @return List mit den beliebtesten Gerichten
      */
-    public List<Recipe> getPopularRecipes(int num, int loginId) throws SQLException {
+    public List<Recipe> getPopularRecipes(int offset, int num, int loginId) throws SQLException {
         PreparedStatement preparedStatement =
             connection.prepareStatement("SELECT versions.id AS id, beschreibung, " +
                 "IFNULL(versions.imagename, CONCAT('category/', kategorien.image)) AS image, " +
@@ -104,7 +106,8 @@ public class DBDiscover extends DBRecipe {
                 "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
                 "GROUP BY gerichte.name ORDER BY viewed DESC LIMIT ?;");
         preparedStatement.setInt(1, loginId);
-        preparedStatement.setInt(2, num);
+        preparedStatement.setInt(2, offset);
+        preparedStatement.setInt(3, num);
 
         ResultSet data = preparedStatement.executeQuery();
         return getRecipes(data);

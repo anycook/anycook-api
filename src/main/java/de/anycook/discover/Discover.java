@@ -32,9 +32,9 @@ public class Discover {
     public static Discover.Recipes getDiscoverRecipes(int num) throws SQLException {
         Recipes recipes = new Recipes();
         try (DBDiscover dbDiscover = new DBDiscover()){
-            recipes.setNewest(dbDiscover.getNewestRecipes(num, -1));
-            recipes.setTasty(dbDiscover.getTastyRecipes(num, -1));
-            recipes.setRecommended(dbDiscover.getPopularRecipes(num, -1));
+            recipes.setNewest(dbDiscover.getNewestRecipes(0, num, -1));
+            recipes.setTasty(dbDiscover.getTastyRecipes(0, num, -1));
+            recipes.setRecommended(dbDiscover.getPopularRecipes(0, num, -1));
         }
         return recipes;
     }
@@ -42,40 +42,40 @@ public class Discover {
     public static Discover.Recipes getDiscoverRecipes(int num, int userId) throws SQLException {
         Recipes recipes = new Recipes();
         try (DBDiscover dbDiscover = new DBDiscover()){
-            recipes.setNewest(dbDiscover.getNewestRecipes(num, userId));
-            recipes.setTasty(dbDiscover.getTastyRecipes(num, userId));
+            recipes.setNewest(dbDiscover.getNewestRecipes(0, num, userId));
+            recipes.setTasty(dbDiscover.getTastyRecipes(0, num, userId));
             List<Recipe> recommended = Recommendation.recommend(userId, num);
             if(recommended.size() < 0)
-                recommended = dbDiscover.getPopularRecipes(num, userId);
+                recommended = dbDiscover.getPopularRecipes(0, num, userId);
             recipes.setRecommended(recommended);
         }
         return recipes;
     }
 
 
-    public static List<Recipe> getRecommendedRecipes(int num, int userId) throws SQLException {
+    public static List<Recipe> getRecommendedRecipes(int start, int num, int userId) throws SQLException {
         List<Recipe> recommended = Recommendation.recommend(userId, num);
         if (recommended.size() > 0)
             return recommended;
 
-        return getPopularRecipes(num, userId);
+        return getPopularRecipes(start, num, userId);
     }
 
-    public static List<Recipe> getTastyRecipes(int num, int loginId) throws SQLException {
+    public static List<Recipe> getTastyRecipes(int offset, int num, int loginId) throws SQLException {
         try(DBDiscover discover = new DBDiscover()) {
-            return discover.getTastyRecipes(num, loginId);
+            return discover.getTastyRecipes(offset, num, loginId);
         }
     }
 
-    public static List<Recipe> getNewestRecipes(int num, int loginId) throws SQLException {
+    public static List<Recipe> getNewestRecipes(int offset, int num, int loginId) throws SQLException {
         try(DBDiscover discover = new DBDiscover()) {
-            return discover.getNewestRecipes(num, loginId);
+            return discover.getNewestRecipes(offset, num, loginId);
         }
     }
 
-    public static List<Recipe> getPopularRecipes(int num, int loginId) throws SQLException {
+    public static List<Recipe> getPopularRecipes(int offset, int num, int loginId) throws SQLException {
         try(DBDiscover discover = new DBDiscover()) {
-            return discover.getPopularRecipes(num, loginId);
+            return discover.getPopularRecipes(offset, num, loginId);
         }
     }
 
