@@ -104,7 +104,7 @@ public class DBDiscover extends DBRecipe {
                 "INNER JOIN versions ON gerichte.name = gerichte_name AND active_id = versions.id " +
                 "INNER JOIN users ON users_id = users.id " +
                 "INNER JOIN kategorien ON kategorien_name = kategorien.name " +
-                "GROUP BY gerichte.name ORDER BY viewed DESC LIMIT ?;");
+                "GROUP BY gerichte.name ORDER BY viewed DESC LIMIT ?,?;");
         preparedStatement.setInt(1, loginId);
         preparedStatement.setInt(2, offset);
         preparedStatement.setInt(3, num);
