@@ -28,11 +28,17 @@ import de.anycook.user.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.List;
+
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 
 
 @Path("/discover")
@@ -58,44 +64,48 @@ public class DiscoverApi {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("recommended")
-	public List<Recipe> getDiscoverRecommended(@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber,
+	public List<Recipe> getDiscoverRecommended(
+	        @DefaultValue("0") @QueryParam("offset") int offset,
+	        @DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber,
                                                @Context Session session){
         try {
             try {
                 User user = session.getUser();
-                return Discover.getRecommendedRecipes(recipeNumber, user.getId());
+                return Discover.getRecommendedRecipes(offset, recipeNumber, user.getId());
             } catch (WebApplicationException e) {
-                return Discover.getPopularRecipes(recipeNumber, -1);
+                return Discover.getPopularRecipes(offset, recipeNumber, -1);
             }
         } catch (SQLException e){
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
 	}
-	
+
 	@GET
 	@Path("tasty")
     public List<Recipe> getDiscoverTasty(
-			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
+            @DefaultValue("0") @QueryParam("offset") int offset,
+            @DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
             int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
-            return Discover.getTastyRecipes(recipeNumber, loginId);
+            return Discover.getTastyRecipes(offset, recipeNumber, loginId);
         } catch (SQLException e) {
             logger.error(e ,e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
     }
-	
+
 	@GET
 	@Path("new")
     public List<Recipe> getDiscoverNew(
-			@DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
+            @DefaultValue("0") @QueryParam("offset") int offset,
+            @DefaultValue("30") @QueryParam("recipeNumber") int recipeNumber){
         try {
             int loginId = session.checkLoginWithoutException() ? session.getUser().getId() : -1;
-            return Discover.getNewestRecipes(recipeNumber, loginId);
+            return Discover.getNewestRecipes(offset, recipeNumber, loginId);
         } catch (SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
