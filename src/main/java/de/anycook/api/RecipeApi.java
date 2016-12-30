@@ -168,12 +168,19 @@ public class RecipeApi {
     @GET
     @Path("{recipeName}")
     @PublicView
-    public Recipe getRecipe(@PathParam("recipeName") final String recipeName) {
+    public Response getRecipe(@HeaderParam(HttpHeaders.IF_MODIFIED_SINCE) final Date date,
+                            @PathParam("recipeName") final String recipeName) {
         try {
             final int loginId = session.checkLoginWithoutException() ? session.getUser().getId()
                                                                      : -1;
             Recipes.increaseViewCount(recipeName);
-            return Recipe.init(recipeName, loginId);
+
+            final Recipe recipe = Recipe.init(recipeName, loginId);
+
+            return Response.ok()
+                    .entity(recipe)
+                    .lastModified(new Date(recipe.getLastChange()))
+                    .build();
         } catch (final SQLException e) {
             logger.error(e, e);
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
