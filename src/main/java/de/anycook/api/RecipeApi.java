@@ -167,8 +167,7 @@ public class RecipeApi {
 
     @GET
     @Path("{recipeName}")
-    @PublicView
-    public Response getRecipe(@HeaderParam(HttpHeaders.IF_MODIFIED_SINCE) final Date date,
+    public Response getRecipe(@Context final Request request,
                             @PathParam("recipeName") final String recipeName) {
         try {
             final int loginId = session.checkLoginWithoutException() ? session.getUser().getId()
@@ -177,8 +176,16 @@ public class RecipeApi {
 
             final Recipe recipe = Recipe.init(recipeName, loginId);
 
+            final Date lastChangeDate = new Date(recipe.getLastChange());
+            final Response.ResponseBuilder responseBuilder =
+                    request.evaluatePreconditions(lastChangeDate);
+
+            if (responseBuilder != null) {
+                throw new WebApplicationException(responseBuilder.build());
+            }
+
             return Response.ok()
-                    .entity(recipe)
+                    .entity(recipe, new Annotation[]{PublicView.Factory.get()})
                     .lastModified(new Date(recipe.getLastChange()))
                     .build();
         } catch (final SQLException e) {
