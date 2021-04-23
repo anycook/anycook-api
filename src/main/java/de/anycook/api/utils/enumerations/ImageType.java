@@ -16,33 +16,8 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.social;
+package de.anycook.api.utils.enumerations;
 
-import org.scribe.model.Token;
-import org.scribe.oauth.OAuthService;
-
-import java.sql.SQLException;
-
-public abstract class Social {
-    protected static OAuthService service;
-    protected static String consumer_key = null;
-    protected static String secret_key = null;
-    protected static String callback = null;
-
-    protected Social() {
-    }
-
-
-    public void addService(OAuthService s) {
-        service = s;
-    }
-
-    public OAuthService getService() {
-        return service;
-    }
-
-    public abstract Token exchangeRequestForAccess(String veri_token, Integer users_id) throws SQLException;
-
-
-    public abstract String getAuthUrl();
+public enum ImageType {
+    SMALL, LARGE, ORIGINAL;
 }

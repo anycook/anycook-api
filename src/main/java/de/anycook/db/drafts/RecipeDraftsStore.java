@@ -1,13 +1,11 @@
 package de.anycook.db.drafts;
 
-import de.anycook.conf.Configuration;
-import de.anycook.db.drafts.dynamo.DynamoDBRecipeDraftsStore;
-import de.anycook.db.drafts.mongo.MongoDBRecipeDraftsStore;
-import de.anycook.drafts.RecipeDraft;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+
+import de.anycook.db.drafts.mongo.MongoDBRecipeDraftsStore;
+import de.anycook.drafts.RecipeDraft;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
@@ -58,11 +56,7 @@ public interface RecipeDraftsStore extends AutoCloseable {
     public void deleteDraft(String id, int userId) throws SQLException;
 
     public static RecipeDraftsStore getRecipeDraftStore() {
-        if (Configuration.getInstance().isDynamoDbDrafts()) {
-            return new DynamoDBRecipeDraftsStore();
-        }
         return new MongoDBRecipeDraftsStore();
-
     }
 
     public static class DraftNotFoundException extends Exception {

@@ -26,7 +26,7 @@ import de.anycook.db.mysql.DBUser;
 import de.anycook.news.News;
 import de.anycook.notifications.Notification;
 import de.anycook.user.User;
-import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.api.utils.enumerations.NotificationType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -47,18 +47,11 @@ public class Configuration {
         AWS_ACCESS_SECRET = "AWS_ACCESS_SECRET",
         COOKIE_DOMAIN = "COOKIE_DOMAIN",
         DEVELOPMENT_MODE = "DEVELOPMENT_MODE",
-        DYNAMO_DB_DRAFTS = "DYNAMO_DB_DRAFTS",
-        DYNAMO_DB_ACCESS_KEY = "DYNAMO_DB_ACCESS_KEY",
-        DYNAMO_DB_ACCESS_SECRET = "DYNAMO_DB_ACCESS_SECRET",
         FACEBOOK_APP_ID = "FACEBOOK_APP_ID",
         FACEBOOK_APP_SECRET = "FACEBOOK_APP_SECRET",
         FULL_TEXT_INDEX_PATH = "FULL_TEXT_INDEX_PATH",
         IMAGE_ROOT = "IMAGE_ROOT",
         IMAGE_BASE_PATH = "IMAGE_BASE_PATH",
-        IMAGE_S3_UPLOAD = "IMAGE_S3_UPLOAD",
-        IMAGE_S3_ACCESS_KEY = "IMAGE_S3_ACCESS_KEY",
-        IMAGE_S3_ACCESS_SECRET = "IMAGE_S3_ACCESS_SECRET",
-        IMAGE_S3_BUCKET = "IMAGE_S3_BUCKET",
         LOGIN_ATTEMPTS_MAX = "LOGIN_ATTEMPTS_MAX",
         LOGIN_ATTEMPTS_TIME = "LOGIN_ATTEMPTS_TIME",
         MAIL_ADDRESS = "MAIL_ADDRESS",
@@ -77,6 +70,7 @@ public class Configuration {
         SMTP_PASSWORD = "SMTP_PASSWORD",
         TUMBLR_APP_ID = "TUMBLR_APP_ID",
         TUMBLR_APP_SECRET = "TUMBLR_APP_SECRET",
+        SESSION_COOKIE_NAME = "SESSION_COOKIE_NAME",
         SITEMAP_ROOT = "SITEMAP_ROOT";
 
     private static Configuration instance;
@@ -148,40 +142,8 @@ public class Configuration {
     }
 
     @XmlElement
-    public String getAwsAccessKey() {
-        return properties.getProperty(AWS_ACCESS_KEY);
-    }
-
-    public String getAwsAccessSecret() {
-        return properties.getProperty(AWS_ACCESS_SECRET);
-    }
-
-    @XmlElement
     public String getCookieDomain() {
         return properties.getProperty(COOKIE_DOMAIN, ".anycook.de");
-    }
-
-    @XmlElement
-    public boolean isDynamoDbDrafts() {
-        return properties.getProperty(DYNAMO_DB_DRAFTS, "OFF").equals("ON");
-    }
-
-    @XmlElement
-    public String getDynamoDbAccessKey() {
-        return properties.getProperty(DYNAMO_DB_ACCESS_KEY, getAwsAccessKey());
-    }
-
-    public String getDynamoDbAccessSecret() {
-        return properties.getProperty(DYNAMO_DB_ACCESS_SECRET, getAwsAccessSecret());
-    }
-
-    @XmlElement
-    public String getFacebookAppId() {
-        return properties.getProperty(FACEBOOK_APP_ID);
-    }
-
-    public String getFacebookAppSecret() {
-        return properties.getProperty(FACEBOOK_APP_SECRET);
     }
 
     @XmlElement
@@ -202,23 +164,9 @@ public class Configuration {
     }
 
     @XmlElement
-    public boolean isImageS3Upload(){
-        String uploadToS3 = properties.getProperty(IMAGE_S3_UPLOAD, "OFF");
-        return uploadToS3.equals("ON");
-    }
-
-    @XmlElement
-    public String getImageS3AccessKey() {
-        return properties.getProperty(IMAGE_S3_ACCESS_KEY, getAwsAccessKey());
-    }
-
-    public String getImageS3AccessSecret() {
-        return properties.getProperty(IMAGE_S3_ACCESS_SECRET, getAwsAccessSecret());
-    }
-
-    @XmlElement
-    public String getImageS3Bucket() {
-        return properties.getProperty(IMAGE_S3_BUCKET, "images.anycook.de");
+    public String getSessionCookieName() {
+        return properties.getProperty(
+                SESSION_COOKIE_NAME, "anycook_session");
     }
 
     @XmlElement

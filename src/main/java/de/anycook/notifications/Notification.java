@@ -29,7 +29,7 @@ import de.anycook.messages.Message;
 import de.anycook.messages.MessageSession;
 import de.anycook.user.User;
 import de.anycook.user.settings.NotificationSettings;
-import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.api.utils.enumerations.NotificationType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

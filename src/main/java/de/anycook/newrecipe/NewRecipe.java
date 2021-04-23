@@ -18,7 +18,12 @@
 
 package de.anycook.newrecipe;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.sql.SQLException;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 import de.anycook.db.drafts.RecipeDraftsStore;
 import de.anycook.db.mysql.DBSaveRecipe;
@@ -28,18 +33,9 @@ import de.anycook.recipe.Recipes;
 import de.anycook.recipe.Time;
 import de.anycook.recipe.ingredient.Ingredient;
 import de.anycook.recipe.step.Step;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
 
 /**
@@ -50,7 +46,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
  */
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class NewRecipe {
 
     private static Logger logger = LogManager.getLogger(NewRecipe.class);

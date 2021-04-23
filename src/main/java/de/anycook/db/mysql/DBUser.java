@@ -19,7 +19,6 @@
 package de.anycook.db.mysql;
 
 import de.anycook.location.Location;
-import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
 
 import java.io.IOException;
@@ -506,15 +505,6 @@ public class DBUser extends DBHandler {
 
         User user = new User(id, name, mail, facebookId, image, level, text,
                 createDate, lastLogin, place, placeLat, placeLng, following, followers, emailCandidate);
-
-        if (image == null && facebookId != 0) {
-            try {
-                image = FacebookHandler.saveImage(facebookId);
-                user.setImage(image);
-            } catch (IOException e) {
-                logger.error("failed to load facebook image", e);
-            }
-        }
 
         return user;
     }

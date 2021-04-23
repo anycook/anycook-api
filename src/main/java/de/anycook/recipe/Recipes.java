@@ -15,8 +15,8 @@ import de.anycook.recipe.ingredient.Ingredients;
 import de.anycook.recipe.step.Steps;
 import de.anycook.recipe.tag.Tag;
 import de.anycook.user.User;
-import de.anycook.utils.enumerations.ImageType;
-import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.api.utils.enumerations.ImageType;
+import de.anycook.api.utils.enumerations.NotificationType;
 
 import org.apache.logging.log4j.LogManager;
 

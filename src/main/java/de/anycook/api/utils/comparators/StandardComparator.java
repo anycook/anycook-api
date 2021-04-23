@@ -16,24 +16,13 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.utils;
+package de.anycook.api.utils.comparators;
 
-import java.util.concurrent.ThreadFactory;
+import java.util.Comparator;
 
-public class DaemonThreadFactory implements ThreadFactory {
-    private static DaemonThreadFactory singleton = null;
-
-    public static DaemonThreadFactory singleton() {
-        if (singleton == null)
-            singleton = new DaemonThreadFactory();
-        return singleton;
-    }
-
+public class StandardComparator<T extends Comparable<T>> implements Comparator<T> {
     @Override
-    public Thread newThread(Runnable r) {
-        Thread thread = new Thread(r);
-        thread.setDaemon(true);
-        return thread;
+    public int compare(T o1, T o2) {
+        return o1.compareTo(o2);
     }
-
 }

@@ -20,7 +20,7 @@ package de.anycook.db.mysql;
 
 import de.anycook.messages.Message;
 import de.anycook.user.User;
-import de.anycook.utils.DateParser;
+import de.anycook.api.utils.DateParser;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;

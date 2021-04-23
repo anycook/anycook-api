@@ -19,23 +19,20 @@
 package de.anycook.session;
 
 
+import java.io.IOException;
+import java.security.Principal;
+import java.sql.SQLException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.SecurityContext;
+
 import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBSaveRecipe;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.news.life.Lifes;
-import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.WebApplicationException;
 
 
 /**
@@ -44,7 +41,7 @@ import javax.ws.rs.WebApplicationException;
  *
  * @author Jan Grassegger
  */
-public class Session {
+public class Session implements SecurityContext {
 
     private static final String adminPwd;
 
@@ -64,36 +61,18 @@ public class Session {
 
     }
 
-    /**
-     * Ueberprueft, ob bereits eine INstanz von Sessionhandler in der Session gespeichert ist, wenn
-     * wird eine neue erzeugt.
-     *
-     * @param session HttpSession des Users
-     * @return instanz von Sessionhandler
-     */
-    static public Session init(HttpSession session) {
-        if (session.getAttribute("shandler") != null) {
-            return (Session) session.getAttribute("shandler");
-        }
-
-        Session shandler = new Session();
-        session.setAttribute("shandler", shandler);
-
-        return shandler;
-    }
-
-    static public Session init(HttpServletRequest request) {
-        Session session = init(request.getSession(true));
-        if (session.login == null) {
-            try {
-                session.loginWithCookies(request.getCookies());
-            } catch (IOException | SQLException e) {
-                LogManager.getLogger(Session.class).error(e, e);
-            }
-        }
-
-        return session;
-    }
+//    static public Session init(HttpServletRequest request) {
+//        Session session = init(request.getSession(true));
+//        if (session.login == null) {
+//            try {
+//                session.loginWithCookies(request.getCookies());
+//            } catch (IOException | SQLException e) {
+//                LogManager.getLogger(Session.class).error(e, e);
+//            }
+//        }
+//
+//        return session;
+//    }
 
     // Login
 
@@ -120,35 +99,23 @@ public class Session {
         return login != null;
     }
 
-    private void loginWithCookies(javax.servlet.http.Cookie[] cookies)
-            throws IOException, SQLException {
-        if (cookies == null) {
-            return;
-        }
-
-        for (javax.servlet.http.Cookie cookie : cookies) {
-            if (cookie.getName().equals("anycook")) {
-                String cookieId = cookie.getValue();
-                try {
-                    login(cookieId);
-                } catch (DBUser.CookieNotFoundException | DBUser.UserNotFoundException e) {
-                    logger.warn(e, e);
-                }
-            }
-
-            String fbCookieKey = "fbsr_" + FacebookHandler.APP_ID;
-            if (cookie.getName().equals(fbCookieKey)) {
-                String cookieValue = cookie.getValue();
-                FacebookHandler.FacebookRequest request = FacebookHandler.decode(cookieValue);
-                Long uid = Long.parseLong(request.user_id);
-                try {
-                    facebookLogin(uid);
-                } catch (User.LoginException | DBUser.UserNotFoundException e) {
-                    logger.warn(e, e);
-                }
-            }
-        }
-    }
+//    private void loginWithCookies(javax.servlet.http.Cookie[] cookies)
+//            throws IOException, SQLException {
+//        if (cookies == null) {
+//            return;
+//        }
+//
+//        for (javax.servlet.http.Cookie cookie : cookies) {
+//            if (cookie.getName().equals("anycook")) {
+//                String cookieId = cookie.getValue();
+//                try {
+//                    login(cookieId);
+//                } catch (DBUser.CookieNotFoundException | DBUser.UserNotFoundException e) {
+//                    logger.warn(e, e);
+//                }
+//            }
+//        }
+//    }
 
     /**
      * loggt einen user ein, wenn pwd und mail korrekt
@@ -174,17 +141,6 @@ public class Session {
             throws SQLException, IOException, DBUser.UserNotFoundException,
                    DBUser.CookieNotFoundException {
         login = User.login(cookieId);
-    }
-
-    public void facebookLogin(String signedRequest)
-            throws IOException, User.LoginException, SQLException, DBUser.UserNotFoundException {
-        FacebookHandler.FacebookRequest request = FacebookHandler.decode(signedRequest);
-        facebookLogin(Long.parseLong(request.user_id));
-    }
-
-    private void facebookLogin(Long uid)
-            throws SQLException, IOException, User.LoginException, DBUser.UserNotFoundException {
-        login = User.facebookLogin(uid);
     }
 
     public String makePermanentCookieId(int userid) throws SQLException {
@@ -251,6 +207,33 @@ public class Session {
         dbuser.deleteCookieId(id);
         dbuser.close();
         logger.info("deleted persistent cookieid: " + id);
+    }
+
+    @Override
+    public Principal getUserPrincipal() {
+        return login;
+    }
+
+    @Override
+    public boolean isUserInRole(String role) {
+        if (login == null) {
+            return false;
+        }
+
+        if ("admin".equals(role)) {
+            return login.isAdmin();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getAuthenticationScheme() {
+        return null;
     }
 
     public static class UserAuth {

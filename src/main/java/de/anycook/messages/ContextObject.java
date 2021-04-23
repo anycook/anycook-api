@@ -18,7 +18,7 @@
 
 package de.anycook.messages;
 
-import javax.servlet.AsyncContext;
+import org.glassfish.jersey.server.AsyncContext;
 
 public class ContextObject {
     public final AsyncContext context;

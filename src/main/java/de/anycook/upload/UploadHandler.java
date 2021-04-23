@@ -18,19 +18,6 @@
 
 package de.anycook.upload;
 
-import com.google.common.base.Preconditions;
-
-import de.anycook.conf.Configuration;
-import de.anycook.upload.imagesaver.AmazonS3ImageSaver;
-import de.anycook.upload.imagesaver.ImageSaver;
-import de.anycook.upload.imagesaver.LocalImageSaver;
-
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -39,8 +26,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
-
 import javax.imageio.ImageIO;
+
+import com.google.common.base.Preconditions;
+import de.anycook.upload.imagesaver.ImageSaver;
+import de.anycook.upload.imagesaver.LocalImageSaver;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -76,9 +71,7 @@ public abstract class UploadHandler {
         this.bigWidth = bigWidth;
         this.bigHeight = bigHeight;
 
-        this.imageSaver =
-                Configuration.getInstance().isImageS3Upload() ? new AmazonS3ImageSaver(imagePath) :
-                new LocalImageSaver(imagePath);
+        this.imageSaver = new LocalImageSaver(imagePath);
     }
 
     /**

@@ -21,16 +21,14 @@ package de.anycook.api;
 import de.anycook.api.util.MediaType;
 import de.anycook.api.views.PrivateView;
 import de.anycook.api.views.PublicView;
-import de.anycook.conf.Configuration;
 import de.anycook.db.mysql.DBUser;
 import de.anycook.discussion.Discussion;
 import de.anycook.recipe.Recipe;
 import de.anycook.recipe.Recipes;
 import de.anycook.recommendation.Recommendation;
 import de.anycook.session.Session;
-import de.anycook.social.facebook.FacebookHandler;
 import de.anycook.user.User;
-import de.anycook.utils.enumerations.ImageType;
+import de.anycook.api.utils.enumerations.ImageType;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -283,56 +281,5 @@ public class UserApi {
             logger.warn(e, e);
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-    }
-
-    @POST
-    @Path("facebook")
-    @Produces(MediaType.TEXT_HTML)
-    public Response registerFacebookUser(@FormParam("signed_request") String requestString) {
-        if (requestString == null) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
-        FacebookHandler.FacebookRequest request;
-
-        try {
-            request = FacebookHandler.decode(requestString);
-        } catch (IOException e) {
-            logger.error(e, e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-
-        String mail = request.registration.get("email");
-        String name = request.registration.get("name");
-
-        String responseText;
-
-        try {
-            if (User.checkMail(mail) || User.checkUsername(name)) {
-                logger.info("user already exists");
-                responseText = "exists";
-            } else {
-                if (User.newFacebookUser(mail, name, Long.parseLong(request.user_id))) {
-                    responseText = "success";
-                } else {
-                    responseText = "error";
-                    logger.info("error creating new fb user");
-                }
-
-            }
-        } catch (SQLException e) {
-            logger.error(e, e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        }
-
-        String uri =
-                String.format("http://%s/#fbregistration?response=%s",
-                              Configuration.getInstance().getRedirectDomain(),
-                              responseText);
-
-        String content =
-                "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n<HTML>"
-                + "<HEAD><META HTTP-EQUIV=\"REFRESH\" content=\"0; url="
-                + uri + "\"></HEAD>\n<BODY></BODY></HTML>";
-        return Response.ok(content).build();
     }
 }

@@ -18,22 +18,9 @@
 
 package de.anycook.api;
 
-import de.anycook.api.util.MediaType;
-import de.anycook.api.views.PrivateView;
-import de.anycook.db.mysql.DBUser;
-import de.anycook.session.LoginAttempt;
-import de.anycook.session.Session;
-import de.anycook.sitemap.SiteMapGenerator;
-import de.anycook.user.User;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -49,6 +36,17 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+
+import de.anycook.api.util.MediaType;
+import de.anycook.api.views.PrivateView;
+import de.anycook.db.mysql.DBUser;
+import de.anycook.session.LoginAttempt;
+import de.anycook.session.Session;
+import de.anycook.sitemap.SiteMapGenerator;
+import de.anycook.user.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.glassfish.grizzly.http.server.Request;
 
 
 @Path("session")
@@ -82,10 +80,12 @@ public class SessionApi {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(@Context HttpServletRequest request,
+    public Response login(@Context Request request,
                           Session.UserAuth auth) {
 
         LoginAttempt loginAttempt = null;
+
+        request.getSession()
 
         try {
             int userId = User.getUserId(auth.username);
@@ -125,22 +125,6 @@ public class SessionApi {
                     logger.error(e, e);
                 }
             }
-        }
-    }
-
-    @POST
-    @Path("facebook")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public void facebookLogin(String signedRequest) {
-        try {
-            session.facebookLogin(signedRequest);
-        } catch (IOException | SQLException e) {
-            logger.error(e, e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-        } catch (User.LoginException | DBUser.UserNotFoundException e) {
-            logger.warn(e, e);
-            throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
     }
 
@@ -212,12 +196,12 @@ public class SessionApi {
         }
     }
 
-    @GET
-    @Path("id")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String getSessionId(@Context HttpServletRequest request) {
-        return request.getSession(true).getId();
-    }
+//    @GET
+//    @Path("id")
+//    @Produces(MediaType.TEXT_PLAIN)
+//    public String getSessionId(@Context SecurityContext request) {
+//        return request.getSession(true).getId();
+//    }
 
     public static class PasswordReset {
 

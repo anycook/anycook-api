@@ -18,7 +18,6 @@
 
 package de.anycook.search;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.anycook.recipe.Time;
 
 import java.util.Set;
@@ -26,7 +25,6 @@ import java.util.Set;
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class Query {
     private Set<String> tags;
     private Set<String> ingredients;

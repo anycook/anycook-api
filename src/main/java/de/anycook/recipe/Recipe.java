@@ -18,6 +18,11 @@
 
 package de.anycook.recipe;
 
+import java.sql.SQLException;
+import java.util.Date;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import de.anycook.api.views.PublicView;
 import de.anycook.api.views.TasteNumView;
 import de.anycook.db.mysql.DBGetRecipe;
@@ -26,16 +31,6 @@ import de.anycook.drafts.RecipeDraft;
 import de.anycook.image.Image;
 import de.anycook.image.RecipeImage;
 import de.anycook.user.User;
-
-import org.apache.logging.log4j.LogManager;
-
-import java.sql.SQLException;
-import java.util.Date;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 
 /**
@@ -158,14 +153,10 @@ public class Recipe implements Comparable<Recipe> {
 
     @XmlElement
     @TasteNumView
-    public int getTasteNum() {
+    public int getTasteNum() throws SQLException {
         try (DBGetRecipe dbGetRecipe = new DBGetRecipe()) {
             return dbGetRecipe.getTasteNum(name);
-        } catch (SQLException e) {
-            LogManager.getLogger(getClass()).error(e, e);
-            throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
         }
-
     }
 
     public int getId() {

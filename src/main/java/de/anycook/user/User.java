@@ -29,9 +29,8 @@ import de.anycook.location.Location;
 import de.anycook.news.life.Lifes;
 import de.anycook.notifications.Notification;
 import de.anycook.sitemap.SiteMapGenerator;
-import de.anycook.social.facebook.FacebookHandler;
-import de.anycook.utils.enumerations.ImageType;
-import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.api.utils.enumerations.ImageType;
+import de.anycook.api.utils.enumerations.NotificationType;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.math3.random.RandomDataGenerator;
@@ -39,6 +38,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
@@ -53,7 +53,7 @@ import java.util.regex.Pattern;
  *
  * @author Jan Grassegger
  */
-public class User implements Comparable<User> {
+public class User implements Comparable<User>, Principal {
 
     private static final Logger logger;
     private static final String adminMail;
@@ -130,22 +130,6 @@ public class User implements Comparable<User> {
         }
     }
 
-    public static User facebookLogin(Long uid)
-            throws SQLException, IOException, DBUser.UserNotFoundException,
-                   LoginException {
-        try (DBUser dbuser = new DBUser()) {
-            int userId = dbuser.facebookLogin(uid);
-            if (userId != -1) {
-                dbuser.setLastLogin(userId);
-                logger.info(userId + " logged in via Facebook");
-                return User.init(userId);
-            }
-
-            logger.info("Login for " + uid + " failed");
-            throw new LoginException(uid);
-        }
-    }
-
 	/*public boolean newUser(String mail, String username, String pwd){
         try {
 
@@ -200,21 +184,6 @@ public class User implements Comparable<User> {
                 return true;
             }
             logger.warn("failed to create user. Username:" + username + " Mail: " + mail);
-            return false;
-        }
-    }
-
-    public static boolean newFacebookUser(String mail, String name, long facebook_id)
-            throws SQLException {
-        try (DBUser dbuser = new DBUser()) {
-            Integer newUserId = dbuser.newFacebookUser(mail, name, facebook_id);
-            if (newUserId != null) {
-                activateByUserId(newUserId);
-                logger.info("user created. Username:" + name + " Mail: " + mail);
-                return true;
-            }
-
-            logger.warn("failed to create user. Username:" + name + " Mail: " + mail);
             return false;
         }
     }
@@ -607,16 +576,6 @@ public class User implements Comparable<User> {
     public String getUserImage(ImageType type)
             throws SQLException, IOException, DBUser.UserNotFoundException {
         return getUserImage(id, type);
-    }
-
-    //@JsonIgnore
-    public String getFaceBookAccessToken() throws IOException {
-        return facebookID == 0 ? null : FacebookHandler.getUsersOAuthToken(facebookID);
-    }
-
-    //@JsonIgnore
-    public String getFacebookPermissions() throws IOException {
-        return FacebookHandler.getPermissions(getFaceBookAccessToken(), facebookID);
     }
 
     //@JsonView(Views.PrivateUserView.class)

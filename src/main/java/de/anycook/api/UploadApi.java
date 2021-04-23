@@ -43,10 +43,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 
 
 @Path("upload")
@@ -62,14 +65,14 @@ public class UploadApi {
     @POST
     @Path("image/{type}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public Response uploadRecipeImage(@Context HttpServletRequest request,
+    public Response uploadRecipeImage(@Context ContainerRequestContext requestContext,
                                       @Context HttpHeaders hh,
                                       @FormDataParam("file") InputStream uploadedInputStream,
                                       @FormDataParam("file") FormDataContentDisposition fileDetail,
                                       @PathParam("type") String type) {
 
         UploadHandler upload;
-        Session session = Session.init(request.getSession());
+        Session session = Session.init(requestContext);
 
         switch (type) {
             case "recipe":

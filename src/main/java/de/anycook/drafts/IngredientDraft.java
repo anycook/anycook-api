@@ -1,12 +1,10 @@
 package de.anycook.drafts;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 import de.anycook.recipe.ingredient.Ingredient;
 
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
-@DynamoDBDocument
 public class IngredientDraft {
     public String name;
     public String amount;

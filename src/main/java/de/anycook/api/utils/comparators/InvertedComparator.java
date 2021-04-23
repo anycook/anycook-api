@@ -16,7 +16,7 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.utils.comparators;
+package de.anycook.api.utils.comparators;
 
 import java.util.Comparator;
 

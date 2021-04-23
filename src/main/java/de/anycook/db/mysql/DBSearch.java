@@ -21,7 +21,7 @@ package de.anycook.db.mysql;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import de.anycook.recipe.Time;
-import de.anycook.utils.comparators.InvertedComparator;
+import de.anycook.api.utils.comparators.InvertedComparator;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;

@@ -23,8 +23,8 @@ import com.google.common.collect.TreeMultimap;
 import de.anycook.db.mysql.DBRecipe;
 import de.anycook.db.mysql.DBRecommend;
 import de.anycook.recipe.Recipe;
-import de.anycook.utils.comparators.InvertedComparator;
-import de.anycook.utils.comparators.StandardComparator;
+import de.anycook.api.utils.comparators.InvertedComparator;
+import de.anycook.api.utils.comparators.StandardComparator;
 
 import java.sql.SQLException;
 import java.util.*;

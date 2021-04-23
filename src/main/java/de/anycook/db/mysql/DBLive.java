@@ -24,7 +24,7 @@ import de.anycook.news.life.Life;
 import de.anycook.news.life.Lifes;
 import de.anycook.recipe.Recipe;
 import de.anycook.user.User;
-import de.anycook.utils.DateParser;
+import de.anycook.api.utils.DateParser;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

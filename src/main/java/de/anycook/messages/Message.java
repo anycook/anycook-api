@@ -20,7 +20,7 @@ package de.anycook.messages;
 
 import de.anycook.db.mysql.DBMessage;
 import de.anycook.user.User;
-import de.anycook.utils.enumerations.NotificationType;
+import de.anycook.api.utils.enumerations.NotificationType;
 
 import java.sql.SQLException;
 import java.util.Date;

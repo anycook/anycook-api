@@ -16,7 +16,7 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.utils.enumerations;
+package de.anycook.api.utils.enumerations;
 
 public enum NotificationType {
     RECIPE_ACTIVATION,

@@ -16,8 +16,24 @@
  * along with this program. If not, see [http://www.gnu.org/licenses/].
  */
 
-package de.anycook.utils.enumerations;
+package de.anycook.api.utils;
 
-public enum ImageType {
-    SMALL, LARGE, ORIGINAL;
+import java.util.concurrent.ThreadFactory;
+
+public class DaemonThreadFactory implements ThreadFactory {
+    private static DaemonThreadFactory singleton = null;
+
+    public static DaemonThreadFactory singleton() {
+        if (singleton == null)
+            singleton = new DaemonThreadFactory();
+        return singleton;
+    }
+
+    @Override
+    public Thread newThread(Runnable r) {
+        Thread thread = new Thread(r);
+        thread.setDaemon(true);
+        return thread;
+    }
+
 }

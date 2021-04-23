@@ -1,16 +1,13 @@
 package de.anycook.drafts;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
+import java.util.List;
 
 import de.anycook.recipe.ingredient.Ingredients;
 import de.anycook.recipe.step.Step;
 
-import java.util.List;
-
 /**
  * @author Jan Graßegger<jan@anycook.de>
  */
-@DynamoDBDocument
 public class StepDraft implements Comparable<StepDraft>{
     private Integer id;
     private String text;
